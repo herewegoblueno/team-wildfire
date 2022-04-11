@@ -1,9 +1,6 @@
-# -------------------------------------------------
-# Project created by QtCreator 2010-08-22T14:12:19
-# -------------------------------------------------
 QT += opengl xml \
     widgets
-TARGET = beagle
+TARGET = wildfire
 TEMPLATE = app
 
 QMAKE_CXXFLAGS += -std=c++14
@@ -15,7 +12,6 @@ unix:!macx {
 macx {
     QMAKE_CFLAGS_X86_64 += -mmacosx-version-min=10.7
     QMAKE_CXXFLAGS_X86_64 = $$QMAKE_CFLAGS_X86_64
-    ICON = beagle_icon.icns
     CONFIG += c++11
 }
 win32 {
@@ -24,16 +20,8 @@ win32 {
 }
 
 SOURCES += ui/mainwindow.cpp \
-    lsystems/LSystem.cpp \
-    lsystems/LSystemVisualizer.cpp \
-    lsystems/Turtle.cpp \
     main.cpp \
     glew-1.10.0/src/glew.c \
-    shaderevolution/AstNodes.cpp \
-    shaderevolution/MutationFactory.cpp \
-    shaderevolution/NodeDispenser.cpp \
-    shaderevolution/ShaderConstructor.cpp \
-    shaderevolution/ShaderEvolutionManager.cpp \
     support/Settings.cpp \
     support/camera/CamtransCamera.cpp \
     support/camera/OrbitingCamera.cpp \
@@ -58,11 +46,9 @@ SOURCES += ui/mainwindow.cpp \
     support/lib/CS123XmlSceneParser.cpp \
     support/lib/RGBA.cpp \
     support/lib/ResourceLoader.cpp \
-    support/scenegraph/LSystemTreeScene.cpp \
+    support/scenegraph/BasicForestScene.cpp \
     support/scenegraph/OpenGLScene.cpp \
     support/scenegraph/Scene.cpp \
-    support/scenegraph/ShaderEvolutionTestingScene.cpp \
-    support/scenegraph/ShaderImportScene.cpp \
     support/scenegraph/SupportCanvas3D.cpp \
     support/shapes/CircularPlane.cpp \
     support/shapes/Cone.cpp \
@@ -74,21 +60,10 @@ SOURCES += ui/mainwindow.cpp \
     support/shapes/Shape.cpp \
     support/shapes/Sphere.cpp \
     support/shapes/Surface.cpp \
-    support/shapes/Torus.cpp \
-    ui/shadercodedisplayer.cpp \
-    lsystems/LSystemUtils.cpp \
-    support/scenegraph/GalleryScene.cpp
+    support/shapes/Torus.cpp
 
 
 HEADERS += ui/mainwindow.h \
-    lsystems/LSystem.h \
-    lsystems/LSystemVisualizer.h \
-    lsystems/Turtle.h \
-    shaderevolution/AstNodes.h \
-    shaderevolution/MutationFactory.h \
-    shaderevolution/NodeDispenser.h \
-    shaderevolution/ShaderConstructor.h \
-    shaderevolution/ShaderEvolutionManager.h \
     support/Settings.h \
     support/camera/Camera.h \
     support/camera/CamtransCamera.h \
@@ -363,11 +338,9 @@ HEADERS += ui/mainwindow.h \
     support/lib/CS123XmlSceneParser.h \
     support/lib/RGBA.h \
     support/lib/ResourceLoader.h \
-    support/scenegraph/LSystemTreeScene.h \
+    support/scenegraph/BasicForestScene.h \
     support/scenegraph/OpenGLScene.h \
     support/scenegraph/Scene.h \
-    support/scenegraph/ShaderEvolutionTestingScene.h \
-    support/scenegraph/ShaderImportScene.h \
     support/scenegraph/SupportCanvas3D.h \
     support/shapes/CircularPlane.h \
     support/shapes/Cone.h \
@@ -380,14 +353,10 @@ HEADERS += ui/mainwindow.h \
     support/shapes/Sphere.h \
     support/shapes/Surface.h \
     support/shapes/Torus.h \
-    ui/shadercodedisplayer.h \
     ui_mainwindow.h \
-    glew-1.10.0/include/GL/glew.h \
-    lsystems/LSystemUtils.h \
-    support/scenegraph/GalleryScene.h
+    glew-1.10.0/include/GL/glew.h
 
-FORMS += ui/mainwindow.ui \
-    ui/shadercodedisplayer.ui
+FORMS += ui/mainwindow.ui
 INCLUDEPATH += glm ui glew-1.10.0/include
 DEPENDPATH += glm ui glew-1.10.0/include
 
@@ -425,7 +394,5 @@ DISTFILES += \
     shaders/normals/normalsArrow.gsh \
     shaders/normals/normalsArrow.frag \
     shaders/normals/normalsArrow.vert \
-    shaders/shaderevolutionshader.frag \
-    shaders/shaderevolutionshader.vert \
     support/glm/CMakeLists.txt \
-    xmlScenes/shaderTestingScene.xml
+    xmlScenes/basicScene.xml

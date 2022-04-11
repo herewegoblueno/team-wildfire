@@ -11,32 +11,14 @@
 #include <QObject>
 #include "support/lib/RGBA.h"
 
-
-// Enumeration values for the Shapes that the user can select in the GUI.
-enum ShapeType {
-    SHAPE_CUBE,
-    SHAPE_CONE,
-    SHAPE_SPHERE,
-    SHAPE_CYLINDER,
-    SHAPE_TORUS,
-    SHAPE_SPECIAL_1,
-    SHAPE_SPECIAL_2,
-    NUM_SHAPE_TYPES
-};
-
+// Enumeration values for the currently selected UI tab
 enum UITab {
-    SHADER_TESTING_TAB,
-    SHADER_IMPORT_TAB,
-    TREE_TESTING_TAB,
-    GALLERY_TAB
+    FOREST_TAB
 };
 
 // Enumeration values for the currently selected scene type
 enum SceneMode {
-    SCENEMODE_TREE_TESTING,
-    SCENEMODE_SHADER_TESTING,
-    SCENEMODE_SHADER_IMPORT,
-    SCENEMODE_COMBINED_SCENE
+    FOREST_SCENE_MODE,
 };
 
 // Enumeration values for the currently selected camera type
@@ -76,19 +58,9 @@ struct Settings
     float cameraNear;           // The distance from the camera to the near clipping plane.
     float cameraFar;            // The distance from the camera to the far clipping plane.
 
-    // Modeler
-    int objTool;                // The currently selected modeler tool.
-
     bool usePointLights;        // Enable or disable point lighting.
     bool useDirectionalLights;  // Enable or disable directional lighting (extra credit).
     bool useSpotLights;         // Enable or disable spot lights (extra credit).
-
-    bool lengthStochasticity;
-    bool angleStochasticity;
-    bool hasLeaves;
-
-    int numRecursions;
-    int lSystemType;
 
     int getSceneMode();
     int getCameraMode();

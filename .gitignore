@@ -1,6 +1,4 @@
 .DS_Store
-final.pro.user
-
 
 qrc_resources.cpp
 .qmake.stash
@@ -18,7 +16,4 @@ moc_*
 Makefile*
 ui_*
 *.user
-
-beagle.app
-beagle
 

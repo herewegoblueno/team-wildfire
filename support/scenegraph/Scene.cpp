@@ -35,7 +35,7 @@ void Scene::parse(Scene *sceneToFill, CS123ISceneParser *parser) {
    }
 
    traverseSceneGraph(sceneToFill, glm::mat4(1.f), parser->getRootNode());
-    sceneToFill->primitiveCount = sceneToFill->primitives.size();
+   sceneToFill->primitiveCount = sceneToFill->primitives.size();
 }
 
 void Scene::addPrimitive(const CS123ScenePrimitive &scenePrimitive, const glm::mat4x4 &matrix) {

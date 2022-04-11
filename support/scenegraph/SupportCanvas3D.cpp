@@ -10,29 +10,24 @@
 #include "support/camera/CamtransCamera.h"
 #include "support/camera/OrbitingCamera.h"
 
-#include "LSystemTreeScene.h"
-#include "ShaderImportScene.h"
-#include "ShaderEvolutionTestingScene.h"
-#include "GalleryScene.h"
+#include "BasicForestScene.h"
 
 #include <iostream>
 #include "support/gl/GLDebug.h"
 #include "support/lib/CS123XmlSceneParser.h"
 
-SupportCanvas3D::SupportCanvas3D(QGLFormat format, QWidget *parent) : QGLWidget(format, parent),
+//This has been designed so that this one canvas can render differnet things and use differnt camera settings based on what the
+//current "scene" is
+SupportCanvas3D::SupportCanvas3D(QGLFormat format, MainWindow *parent) : QGLWidget(format, parent),
     m_isDragging(false),
     m_settingsDirty(true),
     m_defaultPerspectiveCamera(new CamtransCamera()),
     m_defaultOrbitingCamera(new OrbitingCamera()),
-    m_currentScene(nullptr)
-{
-    //The CameraConfig for the Shader Testing scene is set up in
-    //MainWindow::fileOpen when the initialize button is called
-    //But for the other 3 scenes they have to be manually set
-    m_LSystemSceneCameraConfig = {glm::vec4(-7,1,0,1), glm::vec4(7,0,0,0), glm::vec4(0,1,0,0), 45};
-    m_GallerySceneCameraConfig = {glm::vec4(0,0,9.5,1), glm::vec4(0,0,-7,0), glm::vec4(0,1,0,0), 45};
-    m_shaderImportSceneCameraConfig = {glm::vec4(0,0,9.5,1), glm::vec4(0,0,-7,0), glm::vec4(0,1,0,0), 45};
+    m_currentScene(nullptr),
+    m_mainWindowParent(parent)
 
+{
+    //The CameraConfig for the FOREST_SCENE_MODE is set up in MainWindow::fileOpen
 }
 
 SupportCanvas3D::~SupportCanvas3D()
@@ -59,14 +54,8 @@ OrbitingCamera *SupportCanvas3D::getOrbitingCamera() {
 
 CameraConfig *SupportCanvas3D::getCurrentSceneCamtasConfig() {
     switch(settings.getSceneMode()) {
-        case SCENEMODE_SHADER_TESTING:
-           return &m_shaderTestingSceneCameraConfig;
-        case SCENEMODE_TREE_TESTING:
-            return &m_LSystemSceneCameraConfig;
-        case SCENEMODE_COMBINED_SCENE:
-            return &m_GallerySceneCameraConfig;
-        case SCENEMODE_SHADER_IMPORT:
-            return &m_shaderImportSceneCameraConfig;
+        case FOREST_SCENE_MODE:
+           return &m_basicForestSceneCameraConfig;
     }
     return nullptr;
 }
@@ -88,6 +77,7 @@ void SupportCanvas3D::initializeGL() {
 
     settingsChanged();
 
+    m_mainWindowParent->onSupportCanvasInitialized();
 }
 
 void SupportCanvas3D::initializeGlew() {
@@ -122,10 +112,7 @@ void SupportCanvas3D::initializeOpenGLSettings() {
 }
 
 void SupportCanvas3D::initializeScenes() {
-    m_LSystemScene = std::make_unique<LSystemTreeScene>();
-    m_shaderTestingScene = std::make_unique<ShaderEvolutionTestingScene>();
-    m_galleryScene = std::make_unique<GalleryScene>();
-    m_shaderImportScene = std::make_unique<ShaderImportScene>();
+    m_basicForestScene = std::make_unique<BasicForestScene>();
 }
 
 void SupportCanvas3D::paintGL() {
@@ -151,31 +138,20 @@ void SupportCanvas3D::settingsChanged() {
 
 void SupportCanvas3D::setSceneFromSettings() {
     switch(settings.getSceneMode()) {
-        case SCENEMODE_SHADER_TESTING:
-            setSceneToShaderTesting();
-            break;
-        case SCENEMODE_SHADER_IMPORT:
-            setSceneToShaderImport();
-            m_shaderImportScene->render(this);
-            break;
-        case SCENEMODE_TREE_TESTING:
-            setSceneToLSystemSceneview();
-            m_LSystemScene->render(this);
-            break;
-        case SCENEMODE_COMBINED_SCENE:
-            setSceneToGallery();
-            m_galleryScene->render(this);
+        case FOREST_SCENE_MODE:
+            setSceneToForestScene();
             break;
     }
     m_settingsDirty = false;
 }
 
-void SupportCanvas3D::loadSceneFromParser(CS123XmlSceneParser &parser) {
-    assert(settings.getSceneMode() == SCENEMODE_SHADER_TESTING);
-    //The shader testing scene is the only scene who is build from an xml scene
-    m_shaderTestingScene = std::make_unique<ShaderEvolutionTestingScene>();
-    Scene::parse(m_shaderTestingScene.get(), &parser);
-    applyCameraConfig(m_shaderTestingSceneCameraConfig);
+void SupportCanvas3D::loadSceneFromParserForForestScene(CS123XmlSceneParser &parser) {
+    assert(settings.getSceneMode() == FOREST_SCENE_MODE);
+    //The basic forest scene is currently the only scene who is designed to load from an xml file
+    m_basicForestScene = std::make_unique<BasicForestScene>();
+    Scene::parse(m_basicForestScene.get(), &parser);
+    m_basicForestScene.get()->onNewSceneLoaded();
+    applyCameraConfig(m_basicForestSceneCameraConfig);
     m_settingsDirty = true;
 }
 
@@ -185,28 +161,11 @@ void SupportCanvas3D::applyCameraConfig(CameraConfig c){
 }
 
 
-void SupportCanvas3D::setSceneToLSystemSceneview() {
-    assert(m_LSystemScene.get());
-    m_currentScene = m_LSystemScene.get();
-    applyCameraConfig(m_LSystemSceneCameraConfig);
-}
 
-void SupportCanvas3D::setSceneToShaderTesting(){
-    assert(m_shaderTestingScene.get());
-    m_currentScene = m_shaderTestingScene.get();
-    applyCameraConfig(m_shaderTestingSceneCameraConfig);
-}
-
-void SupportCanvas3D::setSceneToShaderImport(){
-    assert(m_shaderImportScene.get());
-    m_currentScene = m_shaderImportScene.get();
-    applyCameraConfig(m_shaderImportSceneCameraConfig);
-}
-
-void::SupportCanvas3D::setSceneToGallery() {
-    assert(m_galleryScene.get());
-    m_currentScene = m_galleryScene.get();
-    applyCameraConfig(m_GallerySceneCameraConfig);
+void SupportCanvas3D::setSceneToForestScene(){
+    assert(m_basicForestScene.get());
+    m_currentScene = m_basicForestScene.get();
+    applyCameraConfig(m_basicForestSceneCameraConfig);
 }
 
 

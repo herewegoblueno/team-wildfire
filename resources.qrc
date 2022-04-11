@@ -2,10 +2,8 @@
     <qresource prefix="/shaders">
         <file alias="default.frag">shaders/shader.frag</file>
         <file alias="default.vert">shaders/shader.vert</file>
-        <file>shaders/shaderevolutionshader.frag</file>
-        <file>shaders/shaderevolutionshader.vert</file>
     </qresource>
     <qresource prefix="/xmlScenes">
-        <file>xmlScenes/shaderTestingScene.xml</file>
+        <file>xmlScenes/basicScene.xml</file>
     </qresource>
 </RCC>

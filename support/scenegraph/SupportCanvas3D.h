@@ -6,6 +6,8 @@
 #include "GL/glew.h"
 #include <QGLWidget>
 
+#include "mainwindow.h"
+
 #include "glm/glm.hpp"
 
 class RGBA;
@@ -14,7 +16,7 @@ class OpenGLScene;
 class OrbitingCamera;
 class CamtransCamera;
 class CS123XmlSceneParser;
-class ShaderEvolutionTestingScene;
+class BasicForestScene;
 class ShaderImportScene;
 class LSystemTreeScene;
 class GalleryScene;
@@ -42,7 +44,7 @@ struct CameraConfig {
 class SupportCanvas3D : public QGLWidget {
     Q_OBJECT
 public:
-    SupportCanvas3D(QGLFormat format, QWidget *parent);
+    SupportCanvas3D(QGLFormat format, MainWindow *parent);
 
     virtual ~SupportCanvas3D();
 
@@ -52,11 +54,11 @@ public:
 
     // Returns a pointer to the current scene. If no scene is loaded, this function returns nullptr.
     OpenGLScene *getScene() { return m_currentScene; }
-    ShaderEvolutionTestingScene *getShaderScene() { return m_shaderTestingScene.get(); }
-    ShaderImportScene *getImportScene() { return m_shaderImportScene.get(); }
+
+    BasicForestScene *getForestScene() { return m_basicForestScene.get(); }
 
 
-    void loadSceneFromParser(CS123XmlSceneParser &parser);
+    void loadSceneFromParserForForestScene(CS123XmlSceneParser &parser);
     void switchToSceneviewScene();
     void switchToShapesScene();
 
@@ -110,7 +112,7 @@ private:
     void initializeScenes();
     void setSceneFromSettings();
     void setSceneToLSystemSceneview();
-    void setSceneToShaderTesting();
+    void setSceneToForestScene();
     void setSceneToShaderImport();
     void setSceneToGallery();
 
@@ -126,17 +128,10 @@ private:
     std::unique_ptr<OrbitingCamera> m_defaultOrbitingCamera;
     OpenGLScene *m_currentScene;
 
-    std::unique_ptr<ShaderEvolutionTestingScene> m_shaderTestingScene;
-    CameraConfig m_shaderTestingSceneCameraConfig;
+    std::unique_ptr<BasicForestScene> m_basicForestScene;
+    CameraConfig m_basicForestSceneCameraConfig;
 
-    std::unique_ptr<ShaderImportScene> m_shaderImportScene;
-    CameraConfig m_shaderImportSceneCameraConfig;
-
-    std::unique_ptr<LSystemTreeScene> m_LSystemScene;
-    CameraConfig m_LSystemSceneCameraConfig;
-
-    std::unique_ptr<GalleryScene> m_galleryScene;
-    CameraConfig m_GallerySceneCameraConfig;
+    MainWindow *m_mainWindowParent;
 
 };
 

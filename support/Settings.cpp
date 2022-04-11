@@ -17,6 +17,9 @@
 #include <QSettings>
 
 Settings settings;
+std::string SETTINGS_ORGO = "TeamWildfire";
+std::string SETTINGS_NAME = "WildfireSim";
+
 
 
 /**
@@ -25,33 +28,29 @@ Settings settings;
  */
 void Settings::loadSettingsOrDefaults() {
     // Set the default values below
-    QSettings s("Beagle", "beagle");
+    QSettings s(SETTINGS_ORGO.c_str(), SETTINGS_NAME.c_str());
 
-    // Shapes
+    // Shape Tesselation Settings
     //shapeType = s.value("shapeType", SHAPE_SPHERE).toInt();
     shapeParameter1 = s.value("shapeParameter1", 15).toInt();
     shapeParameter2 = s.value("shapeParameter2", 15).toInt();
     shapeParameter3 = s.value("shapeParameter3", 15).toDouble();
+
+
+    //Rendering Settings
+    drawWireframe = s.value("drawWireframe", false).toBool();
+    drawNormals = s.value("drawNormals", false).toBool();
     useLighting = s.value("useLighting", true).toBool();
     usePointLights = s.value("usePointLights", true).toBool();
 
-    drawWireframe = s.value("drawWireframe", false).toBool();
-    drawNormals = s.value("drawNormals", false).toBool();
-
-    // Camtrans
+    // Camera Settings
     useOrbitCamera = s.value("useOrbitCamera", true).toBool();
     cameraFov = s.value("cameraFov", 55).toDouble();
     cameraNear = s.value("cameraNear", 0.1).toDouble();
     cameraFar = s.value("cameraFar", 50).toDouble();
 
-    currentTab = s.value("currentTab", SHADER_TESTING_TAB).toInt();
-
-    // l system trees
-    lengthStochasticity = s.value("lengthStochasticity").toBool();
-    angleStochasticity = s.value("angleStochasticity").toBool();
-    numRecursions = s.value("recursiveDepth").toInt();
-    lSystemType = s.value("lSystemType").toInt();
-    hasLeaves = s.value("leaves").toBool();
+    //UI serrings
+    currentTab = s.value("currentTab", FOREST_TAB).toInt();
 
     // These are for computing deltas and the values don't matter, so start all dials in the up
     // position
@@ -64,10 +63,9 @@ void Settings::loadSettingsOrDefaults() {
 }
 
 void Settings::saveSettings() {
-    QSettings s("Beagle", "beagle");
+    QSettings s(SETTINGS_ORGO.c_str(), SETTINGS_NAME.c_str());
 
     // Shapes
-    //s.setValue("shapeType", shapeType);
     s.setValue("shapeParameter1", shapeParameter1);
     s.setValue("shapeParameter2", shapeParameter2);
     s.setValue("shapeParameter3", shapeParameter3);
@@ -85,26 +83,14 @@ void Settings::saveSettings() {
     s.setValue("useDirectionalLights", useDirectionalLights);
     s.setValue("useSpotLights", useSpotLights);
 
-    s.setValue("lengthStochasticity", lengthStochasticity);
-    s.setValue("angleStochasticity", angleStochasticity);
-    s.setValue("recursiveDepth", numRecursions);
-    s.setValue("lSystemType", lSystemType);
-    s.setValue("leaves", hasLeaves);
-
-
     s.setValue("currentTab", currentTab);
 }
 
 int Settings::getSceneMode() {
-    if (this->currentTab == SHADER_TESTING_TAB) {
-        return SCENEMODE_SHADER_TESTING;
-    } else if(this->currentTab == TREE_TESTING_TAB) {
-        return SCENEMODE_TREE_TESTING;      
-    } else if(this->currentTab == SHADER_IMPORT_TAB) {
-        return SCENEMODE_SHADER_IMPORT;
-    } else {
-        return SCENEMODE_COMBINED_SCENE;
+    if (this->currentTab == FOREST_TAB) {
+        return FOREST_SCENE_MODE;
     }
+    return -1; //Should never happen
 }
 
 int Settings::getCameraMode() {
