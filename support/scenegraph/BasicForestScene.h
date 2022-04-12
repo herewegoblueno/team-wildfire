@@ -7,6 +7,8 @@
 #include <memory>
 #include <vector>
 #include "support/shapes/Shape.h"
+#include "voxels/voxelgridline.h"
+
 
 namespace CS123 { namespace GL {
 
@@ -38,6 +40,7 @@ private:
     std::vector<std::unique_ptr<Shape>> shapeOptions;
     std::vector<std::unique_ptr<CS123::GL::CS123Shader>> shader_bank;
     CS123::GL::CS123Shader *current_shader;
+    VoxelGridLine gridline;
 
 };
 

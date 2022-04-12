@@ -46,7 +46,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     QMainWindow::closeEvent(event);
 }
 
-//m_canvas3D doesn't call initializeGL, but we need to wait before it does
+//m_canvas3D doesn't call initializeGL immediately, but we need to wait before it does
 //for us to start rendering anything
 void MainWindow::onSupportCanvasInitialized(){
     openXmlFileForForestScene(":/xmlScenes/xmlScenes/basicScene.xml");

@@ -60,7 +60,8 @@ SOURCES += ui/mainwindow.cpp \
     support/shapes/Shape.cpp \
     support/shapes/Sphere.cpp \
     support/shapes/Surface.cpp \
-    support/shapes/Torus.cpp
+    support/shapes/Torus.cpp \
+    voxels/voxelgridline.cpp
 
 
 HEADERS += ui/mainwindow.h \
@@ -354,7 +355,8 @@ HEADERS += ui/mainwindow.h \
     support/shapes/Surface.h \
     support/shapes/Torus.h \
     ui_mainwindow.h \
-    glew-1.10.0/include/GL/glew.h
+    glew-1.10.0/include/GL/glew.h \
+    voxels/voxelgridline.h
 
 FORMS += ui/mainwindow.ui
 INCLUDEPATH += glm ui glew-1.10.0/include
@@ -364,7 +366,9 @@ DEFINES += _USE_MATH_DEFINES
 DEFINES += TIXML_USE_STL
 DEFINES += GLM_SWIZZLE GLM_FORCE_RADIANS
 OTHER_FILES += shaders/shader.frag \
-    shaders/shader.vert
+    shaders/shader.vert \
+    shaders/gridline.vert \
+    shaders/gridline.frag
 
 # Don't add the -pg flag unless you know what you are doing. It makes QThreadPool freeze on Mac OS X
 QMAKE_CXXFLAGS_RELEASE -= -O2

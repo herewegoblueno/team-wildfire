@@ -20,7 +20,8 @@ using namespace CS123::GL;
 
 #include <iostream>
 
-BasicForestScene::BasicForestScene()
+BasicForestScene::BasicForestScene():
+     gridline(10, vec3(0,0,0), 30)
 {
     defineShapeOptions();
 }
@@ -66,6 +67,10 @@ void BasicForestScene::render(SupportCanvas3D *context) {
         drawPrimitiveWithShader(i, bundle.model, mat, (shapeOptions[(int) bundle.primitive.type]).get(), context);
     }
 
+    Camera *camera = context->getCamera();
+    gridline.setMVP(camera->getProjectionMatrix() * camera->getViewMatrix());
+    gridline.draw(context);
+
     //Trigger another render
     context->update();
 }
@@ -73,6 +78,8 @@ void BasicForestScene::render(SupportCanvas3D *context) {
 void BasicForestScene::drawPrimitiveWithShader (int shapeIndex, glm::mat4x4 modelMat, CS123SceneMaterial mat, Shape *shape, SupportCanvas3D *c){
     current_shader = shader_bank[shapeIndex].get();
 
+    //TODO: will have to minimize bindings and unbindings to optimize
+    //WW'd want to draw all the thigns that use any given shader all at once
     current_shader->bind();
     setShaderSceneUniforms(c);
     setLights();

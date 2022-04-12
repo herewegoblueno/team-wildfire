@@ -38,7 +38,6 @@ struct Settings
     void saveSettings();
 
     // Shapes
-    //int shapeType;              // Selected shape type
     int shapeParameter1;
     int shapeParameter2;
     float shapeParameter3;
