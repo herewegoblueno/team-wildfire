@@ -49,9 +49,9 @@ Voxel *VoxelGrid::getVoxel(int xIndex, int yIndex, int zIndex){
 
 Voxel *VoxelGrid::getVoxelClosestToPoint(vec3 point){
     vec3 distancesToPoint = point - minXYZ;
-    int xIndex = static_cast<int>(clamp(round(distancesToPoint.x / resolution), 0.f, float(resolution - 1)));
-    int yIndex = static_cast<int>(clamp(round(distancesToPoint.y / resolution), 0.f, float(resolution - 1)));
-    int zIndex = static_cast<int>(clamp(round(distancesToPoint.z / resolution), 0.f, float(resolution - 1)));
+    int xIndex = static_cast<int>(clamp(floor(distancesToPoint.x / resolution), 0.f, float(resolution - 1)));
+    int yIndex = static_cast<int>(clamp(floor(distancesToPoint.y / resolution), 0.f, float(resolution - 1)));
+    int zIndex = static_cast<int>(clamp(floor(distancesToPoint.z / resolution), 0.f, float(resolution - 1)));
     return getVoxel(xIndex, yIndex, zIndex);
 }
 
