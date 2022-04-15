@@ -21,6 +21,7 @@ public:
     void setColor(vec4 color);
     void setMVP(mat4 mvp);
     void draw(SupportCanvas3D *context);
+    void toggle();
 
 private:
     void generateGridVertices(int axisSize, vec3 offset, int resolution);
@@ -29,6 +30,8 @@ private:
     vector<float> vertices;
     mat4 MVP;
     vec4 lineColor;
+
+    bool isEnabled = false;
 };
 
 #endif // VOXELGRIDLINE_H

@@ -18,7 +18,7 @@ using namespace CS123::GL;
 #include <iostream>
 
 BasicForestScene::BasicForestScene():
-     gridline(10, vec3(0,0,0), 30)
+     voxelGrids(10, vec3(0,0,0), 30)
 {
     defineShapeOptions();
 }
@@ -65,8 +65,8 @@ void BasicForestScene::render(SupportCanvas3D *context) {
     }
 
     Camera *camera = context->getCamera();
-    gridline.setMVP(camera->getProjectionMatrix() * camera->getViewMatrix());
-    gridline.draw(context);
+    voxelGrids.getVisualization()->setMVP(camera->getProjectionMatrix() * camera->getViewMatrix());
+    voxelGrids.getVisualization()->draw(context);
 
     //Trigger another render
     context->update();

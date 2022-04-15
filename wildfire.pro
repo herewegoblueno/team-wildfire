@@ -62,6 +62,8 @@ SOURCES += ui/mainwindow.cpp \
     trees/LSystem.cpp \
     trees/MeshGenerator.cpp \
     trees/terrain.cpp \
+    voxels/voxel.cpp \
+    voxels/voxelgrid.cpp \
     voxels/voxelgridline.cpp
 
 
@@ -115,6 +117,8 @@ HEADERS += ui/mainwindow.h \
     trees/terrain.h \
     ui_mainwindow.h \
     glew-1.10.0/include/GL/glew.h \
+    voxels/voxel.h \
+    voxels/voxelgrid.h \
     voxels/voxelgridline.h
 
 FORMS += ui/mainwindow.ui
