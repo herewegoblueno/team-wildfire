@@ -41,6 +41,8 @@ void VoxelGridLine::setColor(vec4 c){
 }
 
 void VoxelGridLine::draw(SupportCanvas3D *) {
+    if (!isEnabled) return;
+
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -87,4 +89,8 @@ void VoxelGridLine::generateGridVertices(int axisSize, vec3 offset, int resoluti
                             });
         }
      }
+}
+
+void VoxelGridLine::toggle(){
+    isEnabled = !isEnabled;
 }
