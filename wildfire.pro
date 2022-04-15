@@ -50,17 +50,21 @@ SOURCES += ui/mainwindow.cpp \
     support/scenegraph/OpenGLScene.cpp \
     support/scenegraph/Scene.cpp \
     support/scenegraph/SupportCanvas3D.cpp \
-    support/shapes/CircularPlane.cpp \
+    support/shapes/CircleBase.cpp \
     support/shapes/Cone.cpp \
     support/shapes/Cube.cpp \
     support/shapes/Cylinder.cpp \
-    support/shapes/HemispherePlane.cpp \
-    support/shapes/Loop.cpp \
-    support/shapes/Rectplane.cpp \
+    support/shapes/ExampleShape.cpp \
+    support/shapes/Fruit.cpp \
+    support/shapes/Leaf.cpp \
+    support/shapes/OpenGLShape.cpp \
     support/shapes/Shape.cpp \
     support/shapes/Sphere.cpp \
-    support/shapes/Surface.cpp \
-    support/shapes/Torus.cpp \
+    support/shapes/Tessellator.cpp \
+    support/shapes/Trunk.cpp \
+    trees/LSystem.cpp \
+    trees/MeshGenerator.cpp \
+    trees/terrain.cpp \
     voxels/voxelgridline.cpp
 
 
@@ -343,17 +347,23 @@ HEADERS += ui/mainwindow.h \
     support/scenegraph/OpenGLScene.h \
     support/scenegraph/Scene.h \
     support/scenegraph/SupportCanvas3D.h \
-    support/shapes/CircularPlane.h \
+    support/shapes/CircleBase.h \
     support/shapes/Cone.h \
     support/shapes/Cube.h \
     support/shapes/Cylinder.h \
-    support/shapes/HemispherePlane.h \
-    support/shapes/Loop.h \
-    support/shapes/Rectplane.h \
+    support/shapes/ExampleShape.h \
+    support/shapes/Fruit.h \
+    support/shapes/Leaf.h \
+    support/shapes/OpenGLShape.h \
     support/shapes/Shape.h \
     support/shapes/Sphere.h \
-    support/shapes/Surface.h \
-    support/shapes/Torus.h \
+    support/shapes/Tessellator.h \
+    support/shapes/TriMesh.h \
+    support/shapes/Trunk.h \
+    trees/LSystem.h \
+    trees/MeshGenerator.h \
+    trees/Random.h \
+    trees/terrain.h \
     ui_mainwindow.h \
     glew-1.10.0/include/GL/glew.h \
     voxels/voxelgridline.h

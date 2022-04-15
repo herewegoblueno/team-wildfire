@@ -21,7 +21,7 @@ public:
     virtual ~Scene();
 
     std::vector<CS123SceneLightData> lightingInformation;
-    std::vector<CS123ScenePrimitiveBundle> primitives;
+    std::vector<PrimitiveBundle> primitives;
     CS123SceneGlobalData globalData;
 
     virtual void settingsChanged() {}

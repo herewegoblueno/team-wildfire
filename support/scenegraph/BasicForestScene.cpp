@@ -8,11 +8,8 @@
 #include "support/lib/ResourceLoader.h"
 #include "support/gl/shaders/CS123Shader.h"
 
-#include "support/shapes/Cube.h"
-#include "support/shapes/Cone.h"
-#include "support/shapes/Sphere.h"
-#include "support/shapes/Cylinder.h"
-#include "support/shapes/Torus.h"
+#include "support/shapes/Trunk.h"
+#include "support/shapes/Leaf.h"
 
 #include <chrono>
 using namespace std::chrono;
@@ -38,7 +35,7 @@ void BasicForestScene::constructShaders() {
     shader_bank.clear();
     std::string vertexSource = ResourceLoader::loadResourceFileToString(":/shaders/default.vert");
 
-    //THis is here so that with a little bit of modification, you could have different shaders for each primitive
+    //This is here so that with a little bit of modification, you could have different shaders for each primitive
     //TODO: this might need to be improved since if we have a lot of primitives, we'll have a shader for each one of them
     for (int i = 0; i < (int)primitives.size(); i ++){
         std::string fragmentSource = ResourceLoader::loadResourceFileToString(":/shaders/default.frag");
@@ -57,7 +54,7 @@ void BasicForestScene::render(SupportCanvas3D *context) {
 
     int size = primitives.size();
     for (int i = 0; i < size; i++){
-        CS123ScenePrimitiveBundle bundle = primitives[i];
+        PrimitiveBundle bundle = primitives[i];
         CS123SceneMaterial mat = bundle.primitive.material;
         mat.cDiffuse *= globalData.kd;
         mat.cAmbient *= globalData.ka;
@@ -79,7 +76,7 @@ void BasicForestScene::drawPrimitiveWithShader (int shapeIndex, glm::mat4x4 mode
     current_shader = shader_bank[shapeIndex].get();
 
     //TODO: will have to minimize bindings and unbindings to optimize
-    //WW'd want to draw all the thigns that use any given shader all at once
+    //We'd want to draw all the things that use any given shader all at once
     current_shader->bind();
     setShaderSceneUniforms(c);
     setLights();
@@ -115,15 +112,8 @@ void BasicForestScene::defineShapeOptions(){
     //Can be linked to settings.parameter1-3, but since
     //we know the scenes that are being made we'll but hardcode it
     //Helpful for perfomance reasons too (prevents excessive tessellation)
-    int p1 = std::floor(2);
-    int p2 = std::floor(2);
-    int p3 = std::floor(2);
 
-    shapeOptions.resize(6);
-    shapeOptions[0] = std::make_unique<Cube>(p1);
-    shapeOptions[1] = std::make_unique<Cone>(p1, p2);
-    shapeOptions[2] = std::make_unique<Cylinder>(p1, p2);
-    shapeOptions[3] = std::make_unique<Torus>(p1, p2, p3);
-    shapeOptions[4] = std::make_unique<Sphere>(p1, p2);
-    shapeOptions[5] = std::make_unique<Sphere>(p1, p2); //Spheres will substitite for meshes
+    shapeOptions.resize(2);
+    shapeOptions[0] = std::make_unique<Trunk>(1, 1);
+    shapeOptions[1] = std::make_unique<Leaf>();
 }

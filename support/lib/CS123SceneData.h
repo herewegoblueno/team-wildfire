@@ -20,9 +20,10 @@ enum class PrimitiveType {
     PRIMITIVE_CUBE,
     PRIMITIVE_CONE,
     PRIMITIVE_CYLINDER,
-    PRIMITIVE_TORUS,
     PRIMITIVE_SPHERE,
-    PRIMITIVE_MESH
+    PRIMITIVE_MESH,
+    PRIMITIVE_TRUNK,
+    PRIMITIVE_LEAF
 };
 
 // Enumeration for types of transformations that can be applied to objects, lights, and cameras.
@@ -137,9 +138,16 @@ struct CS123ScenePrimitive {
    PrimitiveType type;
    std::string meshfile;     // Only applicable to meshes
    CS123SceneMaterial material;
+   CS123ScenePrimitive() {
+   }
+   CS123ScenePrimitive(PrimitiveType type, CS123SceneMaterial material) :
+       type(type),
+       material(material)
+   {
+   }
 };
 
-struct CS123ScenePrimitiveBundle {
+struct PrimitiveBundle {
    CS123ScenePrimitive primitive;
    glm::mat4 model;
 };

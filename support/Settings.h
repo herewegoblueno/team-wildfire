@@ -37,6 +37,11 @@ struct Settings
     // Saves the current settings to disk.
     void saveSettings();
 
+    // Forest
+    int recursionDepth;
+    float leafDensity;
+    float branchStochasticity;
+
     // Shapes
     int shapeParameter1;
     int shapeParameter2;
