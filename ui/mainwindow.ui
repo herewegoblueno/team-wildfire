@@ -69,11 +69,18 @@
          <property name="currentIndex">
           <number>0</number>
          </property>
-         <widget class="QWidget" name="shaderTab">
+         <widget class="QWidget" name="forestTab">
           <attribute name="title">
-           <string>Shaders</string>
+           <string>Forest</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item>
+            <widget class="QCheckBox" name="vizualizeForestVoxelGrid">
+             <property name="text">
+              <string>Visualize Voxel Grid</string>
+             </property>
+            </widget>
+           </item>
            <item>
             <widget class="QCheckBox" name="useLightingForShaders">
              <property name="text">
@@ -86,11 +93,6 @@
              <property name="text">
               <string>Use Orbiting Camera</string>
              </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QWidget" name="InitializeAndSrc" native="true">
-             <layout class="QHBoxLayout" name="horizontalLayout_3"/>
             </widget>
            </item>
           </layout>

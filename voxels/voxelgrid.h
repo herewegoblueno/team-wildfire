@@ -15,7 +15,7 @@ class VoxelGrid
 {
 public:
     VoxelGrid(int axisSize, vec3 offset, int resolution);
-    void toggleVisualization();
+    void toggleVisualization(bool enabled);
     int getResolution();
     Voxel *getVoxel(int xIndex, int yIndex, int zIndex);
     Voxel *getVoxelClosestToPoint(vec3 point);

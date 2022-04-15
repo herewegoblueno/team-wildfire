@@ -18,9 +18,10 @@ using namespace CS123::GL;
 #include <iostream>
 
 BasicForestScene::BasicForestScene():
-     voxelGrids(10, vec3(0,0,0), 30)
+     voxelGrids(3, vec3(0,0,0), 30)
 {
     defineShapeOptions();
+    voxelGrids.getVisualization()->toggle(settings.visualizeForestVoxelGrid);
 }
 
 BasicForestScene::~BasicForestScene()
@@ -104,7 +105,7 @@ void BasicForestScene::setLights()
 }
 
 void BasicForestScene::settingsChanged() {
-
+     voxelGrids.getVisualization()->toggle(settings.visualizeForestVoxelGrid);
 }
 
 

@@ -21,7 +21,7 @@ public:
     void setColor(vec4 color);
     void setMVP(mat4 mvp);
     void draw(SupportCanvas3D *context);
-    void toggle();
+    void toggle(bool enabled);
 
 private:
     void generateGridVertices(int axisSize, vec3 offset, int resolution);

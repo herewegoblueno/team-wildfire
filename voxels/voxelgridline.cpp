@@ -91,6 +91,6 @@ void VoxelGridLine::generateGridVertices(int axisSize, vec3 offset, int resoluti
      }
 }
 
-void VoxelGridLine::toggle(){
-    isEnabled = !isEnabled;
+void VoxelGridLine::toggle(bool enabled){
+    isEnabled = enabled;
 }

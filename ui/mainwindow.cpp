@@ -33,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->useLightingForShaders->setCheckState((settings.useLighting && settings.usePointLights) ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
     ui->mainTabWidget->setCurrentIndex(settings.currentTab);
     ui->useOrbitingCamera->setCheckState(settings.useOrbitCamera ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+    ui->vizualizeForestVoxelGrid->setCheckState(settings.visualizeForestVoxelGrid ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 }
 
 MainWindow::~MainWindow()
@@ -111,3 +112,10 @@ void MainWindow::changeCameraSettings(bool useOrbiting){
     ui->useOrbitingCamera->setCheckState(state);
     signalSettingsChanged();
 }
+
+void MainWindow::on_vizualizeForestVoxelGrid_stateChanged(int state)
+{
+    settings.visualizeForestVoxelGrid = state == Qt::CheckState::Checked;
+    signalSettingsChanged();
+}
+

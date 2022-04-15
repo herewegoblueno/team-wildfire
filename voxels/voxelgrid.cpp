@@ -28,8 +28,8 @@ VoxelGrid::VoxelGrid(int axisSize, vec3 offset, int resolution) :
     }
 }
 
-void VoxelGrid::toggleVisualization(){
-    gridlines.toggle();
+void VoxelGrid::toggleVisualization(bool enabled){
+    gridlines.toggle(enabled);
 }
 
 VoxelGridLine *VoxelGrid::getVisualization(){

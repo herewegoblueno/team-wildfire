@@ -34,9 +34,10 @@ void Settings::loadSettingsOrDefaults() {
     recursionDepth = s.value("recursionDepth", 8).toInt();
     leafDensity = s.value("leafDensity", 1.0).toDouble();
     branchStochasticity = s.value("branchStochasticity", 0.5).toDouble();
+    visualizeForestVoxelGrid = s.value("visualizeForestVoxelGrid", false).toBool();
+
 
     // Shape Tesselation Settings
-    //shapeType = s.value("shapeType", SHAPE_SPHERE).toInt();
     shapeParameter1 = s.value("shapeParameter1", 15).toInt();
     shapeParameter2 = s.value("shapeParameter2", 15).toInt();
     shapeParameter3 = s.value("shapeParameter3", 15).toDouble();
@@ -71,6 +72,8 @@ void Settings::saveSettings() {
 
     // Forest
     s.setValue("recursionDepth", recursionDepth);
+    s.setValue("visualizeForestVoxelGrid", visualizeForestVoxelGrid);
+
 
     // Shapes
     s.setValue("shapeParameter1", shapeParameter1);
