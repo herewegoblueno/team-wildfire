@@ -48,6 +48,8 @@ struct Settings
     float visualizeForestVoxelGridEyeY;
     float visualizeForestVoxelGridEyeZ;
     float visualizeForestVoxelGridEyeRadius;
+    float visualizeForestVoxelGridMinTemp;
+    float visualizeForestVoxelGridMaxTemp;
 
     // Shapes
     int shapeParameter1;

@@ -41,6 +41,8 @@ void Settings::loadSettingsOrDefaults() {
     visualizeForestVoxelGridEyeY =  s.value("visualizeForestVoxelGridEyeY", 0).toDouble();
     visualizeForestVoxelGridEyeZ =  s.value("visualizeForestVoxelGridEyeZ", 0).toDouble();
     visualizeForestVoxelGridEyeRadius =  s.value("visualizeForestVoxelGridEyeRadius", 0.5).toDouble();
+    visualizeForestVoxelGridMinTemp = s.value("visualizeForestVoxelGridMinTemp", 0).toDouble();
+    visualizeForestVoxelGridMaxTemp = s.value("visualizeForestVoxelGridMaxTemp", 3).toDouble();
 
     // Shape Tesselation Settings
     shapeParameter1 = s.value("shapeParameter1", 15).toInt();

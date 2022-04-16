@@ -43,6 +43,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->forestVisualizationEyeZSlider->setValue(settings.visualizeForestVoxelGridEyeZ * 10);
     ui->forestVisualizationEyeRSlider->setRange(0, 10);
     ui->forestVisualizationEyeRSlider->setValue(settings.visualizeForestVoxelGridEyeRadius * 10);
+    ui->visualizationTemperatureRangeSlider->setRange(0, 50);
+    ui->visualizationTemperatureRangeSlider->setValues(settings.visualizeForestVoxelGridMinTemp * 10, settings.visualizeForestVoxelGridMaxTemp * 10);
 
 }
 
@@ -158,6 +160,16 @@ void MainWindow::on_forestVisualizationEyeRSlider_valueChanged(int value)
 {
     ui->forestVisualizationEyeRValue->setText(QString::number(value / 10.0));
     settings.visualizeForestVoxelGridEyeRadius = value / 10.0;
+    signalSettingsChanged();
+}
+
+
+void MainWindow::on_visualizationTemperatureRangeSlider_valuesChanged(int min, int max)
+{
+    settings.visualizeForestVoxelGridMinTemp = min / 10.0;
+    settings.visualizeForestVoxelGridMaxTemp = max / 10.0;
+    ui->forestVisualizationTemperatureMinValue->setText(QString::number(min / 10.0));
+    ui->forestVisualizationTemperatureMaxValue->setText(QString::number(max / 10.0));
     signalSettingsChanged();
 }
 
