@@ -34,6 +34,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainTabWidget->setCurrentIndex(settings.currentTab);
     ui->useOrbitingCamera->setCheckState(settings.useOrbitCamera ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
     ui->vizualizeForestVoxelGrid->setCheckState(settings.visualizeForestVoxelGrid ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+
+    ui->forestVisualizationEyeXSlider->setRange(-50, 50);
+    ui->forestVisualizationEyeXSlider->setValue(settings.visualizeForestVoxelGridEyeX * 10);
+    ui->forestVisualizationEyeYSlider->setRange(-50, 50);
+    ui->forestVisualizationEyeYSlider->setValue(settings.visualizeForestVoxelGridEyeY * 10);
+    ui->forestVisualizationEyeZSlider->setRange(-50, 50);
+    ui->forestVisualizationEyeZSlider->setValue(settings.visualizeForestVoxelGridEyeZ * 10);
+    ui->forestVisualizationEyeRSlider->setRange(0, 10);
+    ui->forestVisualizationEyeRSlider->setValue(settings.visualizeForestVoxelGridEyeRadius * 10);
+
 }
 
 MainWindow::~MainWindow()
@@ -116,6 +126,38 @@ void MainWindow::changeCameraSettings(bool useOrbiting){
 void MainWindow::on_vizualizeForestVoxelGrid_stateChanged(int state)
 {
     settings.visualizeForestVoxelGrid = state == Qt::CheckState::Checked;
+    signalSettingsChanged();
+}
+
+
+void MainWindow::on_forestVisualizationEyeXSlider_valueChanged(int value)
+{
+    ui->forestVisualizationEyeXValue->setText(QString::number(value / 10.0));
+    settings.visualizeForestVoxelGridEyeX = value / 10.0;
+    signalSettingsChanged();
+}
+
+
+void MainWindow::on_forestVisualizationEyeYSlider_valueChanged(int value)
+{
+    ui->forestVisualizationEyeYValue->setText(QString::number(value / 10.0));
+    settings.visualizeForestVoxelGridEyeY = value / 10.0;
+    signalSettingsChanged();
+}
+
+
+void MainWindow::on_forestVisualizationEyeZSlider_valueChanged(int value)
+{
+    ui->forestVisualizationEyeZValue->setText(QString::number(value / 10.0));
+    settings.visualizeForestVoxelGridEyeZ = value / 10.0;
+    signalSettingsChanged();
+}
+
+
+void MainWindow::on_forestVisualizationEyeRSlider_valueChanged(int value)
+{
+    ui->forestVisualizationEyeRValue->setText(QString::number(value / 10.0));
+    settings.visualizeForestVoxelGridEyeRadius = value / 10.0;
     signalSettingsChanged();
 }
 

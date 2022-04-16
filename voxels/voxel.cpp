@@ -7,7 +7,8 @@ Voxel::Voxel(VoxelGrid *grid, int XIndex, int YIndex, int ZIndex, vec3 center) :
     ZIndex(ZIndex),
     centerInWorldSpace(center)
 {
-
+    //Just for testing...
+    temperature =  (arc4random_uniform(3));
 }
 
 

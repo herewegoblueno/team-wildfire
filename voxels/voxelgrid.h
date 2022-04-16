@@ -21,6 +21,7 @@ public:
     Voxel *getVoxelClosestToPoint(vec3 point);
     VoxelGridLine *getVisualization();
     float getVolumePerCell();
+    float cellSideLength();
 
 private:
     VoxelGridLine gridlines;

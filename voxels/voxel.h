@@ -2,8 +2,11 @@
 #define VOXEL_H
 
 #include "voxelgrid.h"
+#include <glm.hpp>
 
 class VoxelGrid;
+
+using namespace glm;
 
 struct Voxel {
     Voxel(VoxelGrid *grid, int XIndex, int YIndex, int ZIndex, vec3 center);

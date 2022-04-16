@@ -4,14 +4,20 @@
 #include "support/gl/GLDebug.h"
 #include "support/lib/ResourceLoader.h"
 #include "support/camera/Camera.h"
+#include "voxelgrid.h"
+#include "support/Settings.h"
 
 
 //Modified from https://stackoverflow.com/questions/14486291/how-to-draw-line-in-opengl
-VoxelGridLine::VoxelGridLine(int axisSize, vec3 offset, int resolution)
+void VoxelGridLine::init(VoxelGrid *grid)
 {
-    lineColor = vec4(1,1,1,1);
-    MVP = mat4(1.0f);
-    generateGridVertices(axisSize, offset, resolution);
+    this->grid = grid;
+    pv = mat4(1.0f);
+    updateValuesFromSettings();
+    temperatureThreshold = 0.3;
+    temperatureMax = 4;
+
+    generateGridVertices(grid);
 
     std::string fragmentShaderSource = ResourceLoader::loadResourceFileToString(":/shaders/gridline.frag");
     std::string vertexShaderSource = ResourceLoader::loadResourceFileToString(":/shaders/gridline.vert");
@@ -32,12 +38,8 @@ VoxelGridLine::VoxelGridLine(int axisSize, vec3 offset, int resolution)
     glBindVertexArray(0);
 }
 
-void VoxelGridLine::setMVP(mat4 mvp) {
-    MVP = mvp;
-}
-
-void VoxelGridLine::setColor(vec4 c){
-    lineColor = c;
+void VoxelGridLine::setPV(mat4 pv) {
+    this->pv = pv;
 }
 
 void VoxelGridLine::draw(SupportCanvas3D *) {
@@ -46,15 +48,32 @@ void VoxelGridLine::draw(SupportCanvas3D *) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    vec4 homogeneousCamPos = inverse(MVP) * vec4(0,0,-1,0);
-    vec3 worldCameraPos = (homogeneousCamPos / homogeneousCamPos.w).xyz();
+
     shader.get()->bind();
-    shader->setUniform("MVP", MVP);
-    shader->setUniform("color", lineColor);
-    shader->setUniform("camPos", worldCameraPos);
+    shader->setUniform("PV", pv);
+    shader->setUniform("tempMin", temperatureThreshold);
+    shader->setUniform("tempMax", temperatureMax);
+
+    int resolution = grid->getResolution();
 
     glBindVertexArray(VAO);
-    glDrawArrays(GL_LINES, 0, vertices.size() / 3);
+    for (int x = 0; x < resolution; x++){
+        for (int y = 0; y < resolution; y++){
+            for (int z = 0; z < resolution; z++){
+                float temperature = grid->getVoxel(x, y, z)->temperature;
+                vec3 pos = grid->getVoxel(x, y, z)->centerInWorldSpace;
+
+                //We'd love to do this in the shader, but its better to do this here for performance
+                if (temperature < temperatureThreshold) continue;
+                if (glm::length(vec3(pos - eyeCenter)) > eyeRadius) continue;
+
+                shader->setUniform("m", grid->getVoxel(x, y, z)->centerInWorldSpace);
+                shader->setUniform("temp", temperature);
+                glDrawArrays(GL_LINES, 0, vertices.size() / 3);
+            }
+        }
+    }
+
 
     glDisable(GL_BLEND);
 }
@@ -64,33 +83,69 @@ VoxelGridLine::~VoxelGridLine() {
     glDeleteBuffers(1, &VBO);
 }
 
-void VoxelGridLine::generateGridVertices(int axisSize, vec3 offset, int resolution){
-    vec3 minXYZ = offset - vec3(axisSize, axisSize, axisSize) / 2.f;
-    vec3 maxXYZ = offset + vec3(axisSize, axisSize, axisSize) / 2.f;
-    float iterOffset = axisSize * (1.f / resolution);
-    for (int iteration = 0; iteration < resolution; iteration++){
-        for (int subiteration = 0; subiteration < resolution; subiteration++){
-            //Plane of lines going up and down (Y) plane extends along Z axis, stepts forward along X with every new iteration
-            vertices.insert(vertices.end(), {
-                                minXYZ.x + iterOffset * iteration, minXYZ.y, minXYZ.z + iterOffset * subiteration,
-                                minXYZ.x + iterOffset * iteration, maxXYZ.y, minXYZ.z + iterOffset * subiteration
-                            });
+void VoxelGridLine::updateValuesFromSettings(){
+    eyeCenter = vec3(
+                settings.visualizeForestVoxelGridEyeX,
+                settings.visualizeForestVoxelGridEyeY,
+                settings.visualizeForestVoxelGridEyeZ);
+    eyeRadius = settings.visualizeForestVoxelGridEyeRadius;
+}
 
-            //Plane of lines going back and foward (Z), plane extends along X axis, stepts forward along Y with every new iteration
-            vertices.insert(vertices.end(), {
-                                minXYZ.x + iterOffset * subiteration, minXYZ.y + iterOffset * iteration, minXYZ.z,
-                                minXYZ.x + iterOffset * subiteration, minXYZ.y + iterOffset * iteration, maxXYZ.z
-                            });
+void VoxelGridLine::generateGridVertices(VoxelGrid *grid){
 
-            //Plane of lines going back and foward (X), plane extends along Y axis, stepts forward along Z with every new iteration
-            vertices.insert(vertices.end(), {
-                                minXYZ.x, minXYZ.y + iterOffset * subiteration, minXYZ.z + iterOffset * iteration,
-                                maxXYZ.x, minXYZ.y + iterOffset * subiteration, minXYZ.z + iterOffset * iteration
-                            });
-        }
-     }
+    float halfCellLength = (grid->cellSideLength() / 2.0) * 0.8;
+    vec3 offsets [] = {
+        vec3(-halfCellLength, -halfCellLength, -halfCellLength), //(0, 0, 0) 0
+        vec3(halfCellLength, -halfCellLength, -halfCellLength), //(1, 0, 0) 1
+        vec3(halfCellLength, halfCellLength, -halfCellLength), //(1, 1, 0) 2
+        vec3(-halfCellLength, halfCellLength, -halfCellLength), //(0, 1, 0) 3
+        vec3(-halfCellLength, -halfCellLength, halfCellLength), //(0, 0, 1) 4
+        vec3(halfCellLength, -halfCellLength, halfCellLength), //(1, 0, 1) 5
+        vec3(halfCellLength, halfCellLength, halfCellLength), //(1, 1, 1) 6
+        vec3(-halfCellLength, halfCellLength, halfCellLength) //(0, 1, 1) 7
+    };
+
+    vec2 lines [] = {
+        vec2(4, 7),
+        vec2(6, 7),
+        vec2(6, 5),
+        vec2(6, 5),
+        vec2(4, 0),
+        vec2(5, 1),
+        vec2(6, 2),
+        vec2(7, 3),
+        vec2(0, 1),
+        vec2(1, 2),
+        vec2(2, 3),
+        vec2(3, 0),
+    };
+
+
+    for (int line = 0; line < 12; line++){
+        vertices.insert(vertices.end(), {
+                            offsets[(int)lines[line].x].x, offsets[(int)lines[line].x].y, offsets[(int)lines[line].x].z,
+                            offsets[(int)lines[line].y].x, offsets[(int)lines[line].y].y, offsets[(int)lines[line].y].z,
+                        });
+
+    }
 }
 
 void VoxelGridLine::toggle(bool enabled){
     isEnabled = enabled;
+}
+
+vec3 VoxelGridLine::getEyeCenter(){
+    return eyeCenter;
+}
+
+void VoxelGridLine::setEyeCenter(vec3 v){
+    eyeCenter = v;
+}
+
+float VoxelGridLine::getEyeRadius(){
+    return eyeRadius;
+}
+
+void VoxelGridLine::setEyeRadius(float r){
+    eyeRadius = r;
 }
