@@ -13,12 +13,14 @@
 
 // Enumeration values for the currently selected UI tab
 enum UITab {
-    FOREST_TAB
+    FOREST_TAB,
+    FIRE_TAB
 };
 
 // Enumeration values for the currently selected scene type
 enum SceneMode {
     FOREST_SCENE_MODE,
+    FIRE_SCENE_MODE,
 };
 
 // Enumeration values for the currently selected camera type

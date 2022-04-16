@@ -32,6 +32,9 @@ public:
     virtual ~OpenGLShape();
     void draw();
 
+    void setVertexData();
+    void buildVAO();
+
     /**
      * initializes the relavant openGL properties for the shape
      * don't worry about what exactly this function is doing, you'll learn more about that later in the course!

@@ -4,15 +4,15 @@
 #include "support/lib/CS123SceneData.h"
 #include "LSystem.h"
 
-const float pi = 3.14159265359;
+const float m_pi = 3.14159265359;
 
 // Min/max branching levels for adding leaves
 const int minLeafRecursiveDepth = 2;
 const int maxLeafRecursiveDepth = 9;
 // Base amount of y-axis rotation for '+' symbol
-const float thetaPlus = 0.5 * pi;
+const float thetaPlus = 0.5 * m_pi;
 // Base amount of y-axis rotation for '-' symbol
-const float thetaMinus = 0.3 * pi;
+const float thetaMinus = 0.3 * m_pi;
 // Base amount of x-axis rotation
 const float baseXRotation = 0.3;
 // Amount to scale x, z size of each successive iteration

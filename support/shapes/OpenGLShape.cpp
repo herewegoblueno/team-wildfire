@@ -32,6 +32,18 @@ void OpenGLShape::draw() {
     }
 }
 
+void OpenGLShape::setVertexData()
+{
+
+}
+
+
+void OpenGLShape::buildVAO()
+{
+
+}
+
+
 void OpenGLShape::initializeOpenGLShapeProperties() {
     const int numFloatsPerVertex = 6;
     const int numVertices = m_vertexData.size() / numFloatsPerVertex;

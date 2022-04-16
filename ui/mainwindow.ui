@@ -66,6 +66,9 @@
        </property>
        <item>
         <widget class="QTabWidget" name="mainTabWidget">
+         <property name="locale">
+          <locale language="English" country="UnitedStates"/>
+         </property>
          <property name="currentIndex">
           <number>0</number>
          </property>
@@ -96,6 +99,48 @@
             </widget>
            </item>
           </layout>
+         </widget>
+         <widget class="QWidget" name="fireTab">
+          <attribute name="title">
+           <string>fire</string>
+          </attribute>
+          <widget class="QCheckBox" name="useSmoke">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>10</y>
+             <width>265</width>
+             <height>21</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Use smoke</string>
+           </property>
+          </widget>
+          <widget class="QCheckBox" name="useOrbitingCameraFire">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>40</y>
+             <width>265</width>
+             <height>21</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Use Orbiting Camera</string>
+           </property>
+          </widget>
+          <widget class="QWidget" name="InitializeAndSrc_2" native="true">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>60</y>
+             <width>265</width>
+             <height>469</height>
+            </rect>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_4"/>
+          </widget>
          </widget>
         </widget>
        </item>

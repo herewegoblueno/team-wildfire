@@ -157,12 +157,12 @@ void MeshGenerator::initializeLeafPrimitive() {
 
 /** Return y-axis rotation angle for '+' symbol */
 float MeshGenerator::getYRotateAnglePlus() {
-    return thetaPlus + randomFloat() * pi * settings.branchStochasticity;
+    return thetaPlus + randomFloat() * m_pi * settings.branchStochasticity;
 }
 
 /** Return y-axis rotation angle for '-' symbol */
 float MeshGenerator::getYRotateAngleMinus() {
-    return thetaMinus + randomFloat() * pi * settings.branchStochasticity;
+    return thetaMinus + randomFloat() * m_pi * settings.branchStochasticity;
 }
 
 /** Return random angle for x-axis rotation */

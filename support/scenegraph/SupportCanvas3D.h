@@ -17,6 +17,7 @@ class OrbitingCamera;
 class CamtransCamera;
 class CS123XmlSceneParser;
 class BasicForestScene;
+class BasicFireScene;
 class ShaderImportScene;
 class LSystemTreeScene;
 class GalleryScene;
@@ -113,6 +114,7 @@ private:
     void setSceneFromSettings();
     void setSceneToLSystemSceneview();
     void setSceneToForestScene();
+    void setSceneToFireScene();
     void setSceneToShaderImport();
     void setSceneToGallery();
 
@@ -129,7 +131,9 @@ private:
     OpenGLScene *m_currentScene;
 
     std::unique_ptr<BasicForestScene> m_basicForestScene;
+    std::unique_ptr<BasicFireScene> m_basicFireScene;
     CameraConfig m_basicForestSceneCameraConfig;
+    CameraConfig m_basicFireSceneCameraConfig;
 
     MainWindow *m_mainWindowParent;
 

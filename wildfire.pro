@@ -43,6 +43,7 @@ SOURCES += ui/mainwindow.cpp \
     support/lib/CS123XmlSceneParser.cpp \
     support/lib/RGBA.cpp \
     support/lib/ResourceLoader.cpp \
+    support/scenegraph/BasicFireScene.cpp \
     support/scenegraph/BasicForestScene.cpp \
     support/scenegraph/OpenGLScene.cpp \
     support/scenegraph/Scene.cpp \
@@ -62,6 +63,7 @@ SOURCES += ui/mainwindow.cpp \
     trees/LSystem.cpp \
     trees/MeshGenerator.cpp \
     trees/terrain.cpp \
+    fire/fire.cpp \
     voxels/voxel.cpp \
     voxels/voxelgrid.cpp \
     voxels/voxelgridline.cpp
@@ -94,6 +96,7 @@ HEADERS += ui/mainwindow.h \
     support/lib/CS123XmlSceneParser.h \
     support/lib/RGBA.h \
     support/lib/ResourceLoader.h \
+    support/scenegraph/BasicFireScene.h \
     support/scenegraph/BasicForestScene.h \
     support/scenegraph/OpenGLScene.h \
     support/scenegraph/Scene.h \
@@ -117,6 +120,7 @@ HEADERS += ui/mainwindow.h \
     trees/terrain.h \
     ui_mainwindow.h \
     glew-1.10.0/include/GL/glew.h \
+    fire/fire.h \
     voxels/voxel.h \
     voxels/voxelgrid.h \
     voxels/voxelgridline.h

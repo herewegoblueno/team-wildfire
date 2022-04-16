@@ -117,5 +117,17 @@ void MainWindow::on_vizualizeForestVoxelGrid_stateChanged(int state)
 {
     settings.visualizeForestVoxelGrid = state == Qt::CheckState::Checked;
     signalSettingsChanged();
+
+}
+
+void MainWindow::on_useSmoke_stateChanged(int arg1)
+{
+
+}
+
+
+void MainWindow::on_useOrbitingCameraFire_stateChanged(int arg1)
+{
+
 }
 

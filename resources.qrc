@@ -4,8 +4,16 @@
         <file alias="default.vert">shaders/shader.vert</file>
         <file alias="gridline.frag">shaders/gridline.frag</file>
         <file alias="gridline.vert">shaders/gridline.vert</file>
+        <file alias="fire_draw.frag">shaders/fire_draw.frag</file>
+        <file alias="fire_draw.vert">shaders/fire_draw.vert</file>
+        <file alias="fire_update.frag">shaders/fire_update.frag</file>
+        <file alias="quad.vert">shaders/quad.vert</file>
     </qresource>
     <qresource prefix="/xmlScenes">
         <file>xmlScenes/basicScene.xml</file>
+    </qresource>
+    <qresource prefix="/textures">
+        <file alias="fire.png">fire/fire_particle.png</file>
+        <file alias="fire2.png">fire/fire_particle2.png</file>
     </qresource>
 </RCC>

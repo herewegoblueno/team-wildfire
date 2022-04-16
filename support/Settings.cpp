@@ -100,6 +100,9 @@ int Settings::getSceneMode() {
     if (this->currentTab == FOREST_TAB) {
         return FOREST_SCENE_MODE;
     }
+    if (this->currentTab == FIRE_TAB) {
+        return FIRE_SCENE_MODE;
+    }
     return -1; //Should never happen
 }
 
