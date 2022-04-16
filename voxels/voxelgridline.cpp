@@ -6,6 +6,7 @@
 #include "support/camera/Camera.h"
 #include "voxelgrid.h"
 #include "support/Settings.h"
+#include <math.h>
 
 
 //Modified from https://stackoverflow.com/questions/14486291/how-to-draw-line-in-opengl
@@ -14,8 +15,6 @@ void VoxelGridLine::init(VoxelGrid *grid)
     this->grid = grid;
     pv = mat4(1.0f);
     updateValuesFromSettings();
-    temperatureThreshold = 0.3;
-    temperatureMax = 4;
 
     generateGridVertices(grid);
 
@@ -54,12 +53,17 @@ void VoxelGridLine::draw(SupportCanvas3D *) {
     shader->setUniform("tempMin", temperatureThreshold);
     shader->setUniform("tempMax", temperatureMax);
 
-    int resolution = grid->getResolution();
+    Voxel *eyeVoxel = grid->getVoxelClosestToPoint(eyeCenter);
+    int eyeRadiusInVoxels = (int)ceil(eyeRadius / grid->cellSideLength());
+    int eyeVoxelX = eyeVoxel->XIndex;
+    int eyeVoxelY = eyeVoxel->YIndex;
+    int eyeVoxelZ = eyeVoxel->ZIndex;
 
     glBindVertexArray(VAO);
-    for (int x = 0; x < resolution; x++){
-        for (int y = 0; y < resolution; y++){
-            for (int z = 0; z < resolution; z++){
+    for (int x = eyeVoxelX - eyeRadiusInVoxels; x <= eyeVoxelX + eyeRadiusInVoxels; x++){
+        for (int y = eyeVoxelY - eyeRadiusInVoxels; y <= eyeVoxelY + eyeRadiusInVoxels; y++){
+            for (int z = eyeVoxelZ - eyeRadiusInVoxels; z <= eyeVoxelZ + eyeRadiusInVoxels; z++){
+                if (grid->getVoxel(x, y, z) == nullptr) continue;
                 float temperature = grid->getVoxel(x, y, z)->temperature;
                 vec3 pos = grid->getVoxel(x, y, z)->centerInWorldSpace;
 
@@ -84,6 +88,8 @@ VoxelGridLine::~VoxelGridLine() {
 }
 
 void VoxelGridLine::updateValuesFromSettings(){
+    temperatureThreshold = settings.visualizeForestVoxelGridMinTemp;
+    temperatureMax = settings.visualizeForestVoxelGridMaxTemp;
     eyeCenter = vec3(
                 settings.visualizeForestVoxelGridEyeX,
                 settings.visualizeForestVoxelGridEyeY,

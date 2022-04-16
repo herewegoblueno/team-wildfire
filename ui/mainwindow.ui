@@ -95,7 +95,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>269</width>
-                <height>365</height>
+                <height>387</height>
                </rect>
               </property>
               <attribute name="label">
@@ -104,8 +104,8 @@
               <widget class="QWidget" name="verticalLayoutWidget_2">
                <property name="geometry">
                 <rect>
-                 <x>10</x>
-                 <y>60</y>
+                 <x>9</x>
+                 <y>99</y>
                  <width>103</width>
                  <height>42</height>
                 </rect>
@@ -141,8 +141,8 @@
               <widget class="QWidget" name="verticalLayoutWidget_3">
                <property name="geometry">
                 <rect>
-                 <x>10</x>
-                 <y>110</y>
+                 <x>9</x>
+                 <y>149</y>
                  <width>103</width>
                  <height>42</height>
                 </rect>
@@ -178,8 +178,8 @@
               <widget class="QWidget" name="verticalLayoutWidget">
                <property name="geometry">
                 <rect>
-                 <x>11</x>
-                 <y>11</y>
+                 <x>10</x>
+                 <y>50</y>
                  <width>103</width>
                  <height>42</height>
                 </rect>
@@ -215,8 +215,8 @@
               <widget class="QWidget" name="verticalLayoutWidget_4">
                <property name="geometry">
                 <rect>
-                 <x>10</x>
-                 <y>160</y>
+                 <x>9</x>
+                 <y>199</y>
                  <width>103</width>
                  <height>42</height>
                 </rect>
@@ -249,6 +249,63 @@
                 </item>
                </layout>
               </widget>
+              <widget class="QWidget" name="verticalLayoutWidget_5">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>270</y>
+                 <width>160</width>
+                 <height>80</height>
+                </rect>
+               </property>
+               <layout class="QVBoxLayout" name="forestVisualizationTemperatureSuperParent">
+                <item>
+                 <widget class="QLabel" name="forestVisualizationTemperatureLabel">
+                  <property name="text">
+                   <string>Temperature Range</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_4">
+                  <item>
+                   <widget class="QLabel" name="forestVisualizationTemperatureMinValue">
+                    <property name="text">
+                     <string>0</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="forestVisualizationTemperatureMaxValue">
+                    <property name="text">
+                     <string>0</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="ctkRangeSlider" name="visualizationTemperatureRangeSlider">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QLabel" name="visualizationEyePosition">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>20</y>
+                 <width>269</width>
+                 <height>16</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Eye Position For Visualization</string>
+               </property>
+              </widget>
              </widget>
              <widget class="QWidget" name="page_2">
               <property name="geometry">
@@ -256,20 +313,13 @@
                 <x>0</x>
                 <y>0</y>
                 <width>269</width>
-                <height>365</height>
+                <height>387</height>
                </rect>
               </property>
               <attribute name="label">
                <string>Page 2</string>
               </attribute>
              </widget>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="visualizationEyePosition">
-             <property name="text">
-              <string>Eye Position For Visualization</string>
-             </property>
             </widget>
            </item>
            <item>
@@ -339,6 +389,16 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>ctkRangeSlider</class>
+   <extends>QSlider</extends>
+   <header>ui/extrawidgets/ctkrangeslider.h</header>
+   <slots>
+    <signal>valuesChanged(int,int)</signal>
+   </slots>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
