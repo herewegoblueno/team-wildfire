@@ -43,7 +43,13 @@ struct Settings
     int recursionDepth;
     float leafDensity;
     float branchStochasticity;
+
+    //Forest vizualization
     bool visualizeForestVoxelGrid;
+    float visualizeForestVoxelGridEyeX;
+    float visualizeForestVoxelGridEyeY;
+    float visualizeForestVoxelGridEyeZ;
+    float visualizeForestVoxelGridEyeRadius;
 
     // Shapes
     int shapeParameter1;

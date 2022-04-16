@@ -34,8 +34,13 @@ void Settings::loadSettingsOrDefaults() {
     recursionDepth = s.value("recursionDepth", 8).toInt();
     leafDensity = s.value("leafDensity", 1.0).toDouble();
     branchStochasticity = s.value("branchStochasticity", 0.5).toDouble();
-    visualizeForestVoxelGrid = s.value("visualizeForestVoxelGrid", false).toBool();
 
+    //Forest Visualization (some of these are not saved
+    visualizeForestVoxelGrid = s.value("visualizeForestVoxelGrid", false).toBool();
+    visualizeForestVoxelGridEyeX =  s.value("visualizeForestVoxelGridEyeX", 0).toDouble();
+    visualizeForestVoxelGridEyeY =  s.value("visualizeForestVoxelGridEyeY", 0).toDouble();
+    visualizeForestVoxelGridEyeZ =  s.value("visualizeForestVoxelGridEyeZ", 0).toDouble();
+    visualizeForestVoxelGridEyeRadius =  s.value("visualizeForestVoxelGridEyeRadius", 0.5).toDouble();
 
     // Shape Tesselation Settings
     shapeParameter1 = s.value("shapeParameter1", 15).toInt();

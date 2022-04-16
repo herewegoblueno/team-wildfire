@@ -18,7 +18,7 @@ using namespace CS123::GL;
 #include <iostream>
 
 BasicForestScene::BasicForestScene():
-     voxelGrids(3, vec3(0,0,0), 30)
+     voxelGrids(12, vec3(0,0,0), 128)
 {
     defineShapeOptions();
     voxelGrids.getVisualization()->toggle(settings.visualizeForestVoxelGrid);
@@ -66,7 +66,7 @@ void BasicForestScene::render(SupportCanvas3D *context) {
     }
 
     Camera *camera = context->getCamera();
-    voxelGrids.getVisualization()->setMVP(camera->getProjectionMatrix() * camera->getViewMatrix());
+    voxelGrids.getVisualization()->setPV(camera->getProjectionMatrix() * camera->getViewMatrix());
     voxelGrids.getVisualization()->draw(context);
 
     //Trigger another render
@@ -106,6 +106,7 @@ void BasicForestScene::setLights()
 
 void BasicForestScene::settingsChanged() {
      voxelGrids.getVisualization()->toggle(settings.visualizeForestVoxelGrid);
+     voxelGrids.getVisualization()->updateValuesFromSettings();
 }
 
 

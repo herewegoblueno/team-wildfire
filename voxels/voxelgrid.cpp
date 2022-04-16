@@ -1,7 +1,6 @@
 #include "voxelgrid.h"
 
 VoxelGrid::VoxelGrid(int axisSize, vec3 offset, int resolution) :
-    gridlines(axisSize, offset, resolution),
     resolution(resolution),
     axisSize(axisSize),
     offset(offset)
@@ -12,7 +11,7 @@ VoxelGrid::VoxelGrid(int axisSize, vec3 offset, int resolution) :
 
     //Making the grid....
     minXYZ = offset - vec3(axisSize, axisSize, axisSize) / 2.f;
-    float voxelAxisSize = axisSize * (1.f / resolution);
+    float voxelAxisSize = cellSideLength();
 
     voxels.resize(resolution);
     for (int x = 0; x < resolution; x++){
@@ -26,6 +25,8 @@ VoxelGrid::VoxelGrid(int axisSize, vec3 offset, int resolution) :
             }
         }
     }
+
+    gridlines.init(this);
 }
 
 void VoxelGrid::toggleVisualization(bool enabled){
@@ -38,6 +39,10 @@ VoxelGridLine *VoxelGrid::getVisualization(){
 
 int VoxelGrid::getResolution(){
     return resolution;
+}
+
+float VoxelGrid::cellSideLength(){
+    return axisSize * (1.f / resolution);
 }
 
 Voxel *VoxelGrid::getVoxel(int xIndex, int yIndex, int zIndex){

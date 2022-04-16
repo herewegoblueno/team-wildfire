@@ -85,6 +85,194 @@
             </widget>
            </item>
            <item>
+            <widget class="QToolBox" name="forestToolBox">
+             <property name="currentIndex">
+              <number>0</number>
+             </property>
+             <widget class="QWidget" name="ForestVisualization">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>269</width>
+                <height>365</height>
+               </rect>
+              </property>
+              <attribute name="label">
+               <string>Voxel Visualization Options</string>
+              </attribute>
+              <widget class="QWidget" name="verticalLayoutWidget_2">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>60</y>
+                 <width>103</width>
+                 <height>42</height>
+                </rect>
+               </property>
+               <layout class="QVBoxLayout" name="forestVisualizationEyeYSliderSuperParent">
+                <item>
+                 <layout class="QHBoxLayout" name="forestVisualizationEyeYSliderParent">
+                  <item>
+                   <widget class="QLabel" name="forestVisualizationEyeYLabel">
+                    <property name="text">
+                     <string>Y</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSlider" name="forestVisualizationEyeYSlider">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QLabel" name="forestVisualizationEyeYValue">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="verticalLayoutWidget_3">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>110</y>
+                 <width>103</width>
+                 <height>42</height>
+                </rect>
+               </property>
+               <layout class="QVBoxLayout" name="forestVisualizationEyeZSliderSuperParent">
+                <item>
+                 <layout class="QHBoxLayout" name="forestVisualizationEyeZSliderParent">
+                  <item>
+                   <widget class="QLabel" name="forestVisualizationEyeZLabel">
+                    <property name="text">
+                     <string>Z</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSlider" name="forestVisualizationEyeZSlider">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QLabel" name="forestVisualizationEyeZValue">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="verticalLayoutWidget">
+               <property name="geometry">
+                <rect>
+                 <x>11</x>
+                 <y>11</y>
+                 <width>103</width>
+                 <height>42</height>
+                </rect>
+               </property>
+               <layout class="QVBoxLayout" name="forestVisualizationEyeXSliderSuperParent">
+                <item>
+                 <layout class="QHBoxLayout" name="forestVisualizationEyeXSliderParent">
+                  <item>
+                   <widget class="QLabel" name="forestVisualizationEyeXLabel">
+                    <property name="text">
+                     <string>X</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSlider" name="forestVisualizationEyeXSlider">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QLabel" name="forestVisualizationEyeXValue">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="verticalLayoutWidget_4">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>160</y>
+                 <width>103</width>
+                 <height>42</height>
+                </rect>
+               </property>
+               <layout class="QVBoxLayout" name="forestVisualizationEyeRSliderSuperParent">
+                <item>
+                 <layout class="QHBoxLayout" name="forestVisualizationEyeRSliderParent">
+                  <item>
+                   <widget class="QLabel" name="forestVisualizationEyeRLabel">
+                    <property name="text">
+                     <string>R</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSlider" name="forestVisualizationEyeRSlider">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QLabel" name="forestVisualizationEyeRValue">
+                  <property name="text">
+                   <string>TextLabel</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+             <widget class="QWidget" name="page_2">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>269</width>
+                <height>365</height>
+               </rect>
+              </property>
+              <attribute name="label">
+               <string>Page 2</string>
+              </attribute>
+             </widget>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="visualizationEyePosition">
+             <property name="text">
+              <string>Eye Position For Visualization</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QCheckBox" name="useLightingForShaders">
              <property name="text">
               <string>Use Lighting (point)</string>

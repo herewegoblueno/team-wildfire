@@ -3,9 +3,11 @@
  layout (location = 0) in vec3 aPos;
  out vec3 worldPosition;
 
- uniform mat4 MVP;
+ uniform mat4 PV;
+ uniform vec3 m;
+
  void main()
  {
-    worldPosition = aPos;
-    gl_Position = MVP * vec4(aPos.x, aPos.y, aPos.z, 1.0);
+    worldPosition = aPos + m;
+    gl_Position =  PV * vec4(worldPosition, 1.0);
  }
