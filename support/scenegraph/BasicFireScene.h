@@ -30,7 +30,7 @@ public:
     std::vector<std::unique_ptr<CS123::GL::CS123Shader>> * getShaderPrograms();
 
 private:
-    std::unique_ptr<Fire> fire;
+     std::vector<std::unique_ptr<Fire>> fires;
 
     void setShaderSceneUniforms(SupportCanvas3D *context);
     void setLights();

@@ -20,8 +20,12 @@ using namespace CS123::GL;
 BasicFireScene::BasicFireScene():
      voxelGrids(3, vec3(0,0,0), 30)
 {
-    fire = std::make_unique<Fire> (10, glm::vec3(0));
-    voxelGrids.getVisualization()->toggle(false);
+    fires.clear();
+    fires.push_back(  std::make_unique<Fire> (5000, glm::vec3(0)) );
+    fires.push_back(  std::make_unique<Fire> (5000, glm::vec3(0.3, 0, 0.1)) );
+    fires.push_back(  std::make_unique<Fire> (5000, glm::vec3(0, 0, -0.3)) );
+
+    voxelGrids.getVisualization()->toggle(true);
     constructShaders();
 }
 
@@ -66,9 +70,13 @@ void BasicFireScene::render(SupportCanvas3D *context) {
     voxelGrids.getVisualization()->draw(context);
     current_shader->unbind();
 
+    int len = fires.size();
+    for (int f=0; f<len;f++)
+    {
+        fires[f]->setViewProjection(camera->getViewMatrix(), camera->getProjectionMatrix());
+        fires[f]->drawParticles();
+    }
 
-    fire->setViewProjection(camera->getViewMatrix(), camera->getProjectionMatrix());
-    fire->drawParticles();
 
     //Trigger another render
     context->update();

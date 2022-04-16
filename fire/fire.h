@@ -37,9 +37,9 @@ public:
 
 private:
     int m_density;
-    bool m_firstPass;
-    bool m_evenPass;
-    float fire_frame_rate = 0.0001;
+    float fire_frame_rate = 0.1;
+    float m_life = 5.0f;
+    int m_respawn_num = 2;
     std::vector<Particle> m_particles;
 
     glm::mat4x4 m_p;
@@ -62,7 +62,7 @@ private:
 
 
     const float mean = 0.0;
-    const float stddev = 1;
+    const float stddev = 0.3;
     std::default_random_engine generator;
     std::normal_distribution<float> dist;
 

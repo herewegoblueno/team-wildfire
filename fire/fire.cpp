@@ -31,6 +31,9 @@ Fire::Fire(int density, glm::vec3 center):
 
     dist = std::normal_distribution<float>(mean, stddev);
 
+    assert(m_density>2);
+    m_respawn_num = fire_frame_rate * (m_density-2) / m_life;
+
     InitRender();
 }
 
@@ -76,12 +79,13 @@ Fire::~Fire()
 
 void Fire::update_particles()
 {
-    unsigned int nr_new_particles = 3;
+    unsigned int nr_new_particles = m_respawn_num;
     // add new particles
     for (unsigned int i = 0; i < nr_new_particles; ++i)
     {
         int unusedParticle = FirstUnusedParticle();
-        RespawnParticle(m_particles[unusedParticle]);
+        if(unusedParticle<m_density)
+            RespawnParticle(m_particles[unusedParticle]);
     }
     // update all particles
     for (unsigned int i = 0; i < m_density; ++i)
@@ -91,10 +95,79 @@ void Fire::update_particles()
         if (p.Life > 0.0f)
         {	// particle is alive, thus update
             p.Position += p.Velocity * fire_frame_rate;
+            p.Velocity.x = p.Velocity.x*0.9;
+            p.Velocity.z = p.Velocity.z*0.9;
             p.Color.a -= fire_frame_rate * 2.5f;
         }
     }
 }
+
+
+
+
+void Fire::RespawnParticle(Particle &particle)
+{
+
+    float random_x = dist(generator) / 10.0f;
+    float random_y = dist(generator) / 10.0f;
+    float random_z = dist(generator) / 10.0f;
+//    float random_x = ((rand() % 100) - 50) / 120.0f;
+//    float random_y = ((rand() % 100) - 100) / 240.0f;
+//    float random_z = ((rand() % 100) - 50) / 120.0f;
+//    glm::vec3 offset(random_x, random_y, random_z);
+    glm::vec3 offset(random_x, random_y, random_z);
+    offset = offset*3.f;
+
+    float rColor = 0.5f + ((rand() % 50) / 100.0f);
+    particle.Position = m_center + offset;
+    particle.Color = glm::vec4(rColor, rColor, rColor, 1.0f);
+    particle.Life = m_life;
+
+    float vec_y = (rand() % 50)/ 50.0f;
+    float vec_x = (rand() % 100 - 50)/ 120.0f * (1.3-vec_y);
+    float vec_z = (rand() % 100 - 50)/ 120.0f * (1.3-vec_y);
+    particle.Velocity = glm::vec3(vec_x, vec_y*0.3f+0.1 , vec_z);
+}
+
+void Fire::drawParticles() {
+    update_particles();
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+    // use additive blending to give it a 'glow' effect
+    m_particleDrawProgram->bind();
+    m_particleDrawProgram->setUniform("p", m_p);
+    m_particleDrawProgram->setUniform("v", m_v);
+
+
+    // bind texture
+    TextureParametersBuilder builder;
+    builder.setFilter(TextureParameters::FILTER_METHOD::LINEAR);
+    builder.setWrap(TextureParameters::WRAP_METHOD::REPEAT);
+
+    TextureParameters parameters = builder.build();
+    parameters.applyTo(*m_texture);
+    std::string filename = "fire2.png";
+    m_particleDrawProgram->setTexture(filename, *m_texture);
+    for (Particle particle : m_particles)
+    {
+        if (particle.Life > 0.0f)
+        {
+            m_particleDrawProgram->setUniform("color", particle.Color);
+            glm::mat4 M_fire = glm::translate(glm::mat4(), particle.Position);
+            m_particleDrawProgram->setUniform("m", M_fire);
+            m_particleDrawProgram->setUniform("life", particle.Life);
+
+
+            m_quad->draw();
+        }
+    }
+    // don't forget to reset to default blending mode
+    m_particleDrawProgram->unbind();
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
 
 unsigned int Fire::FirstUnusedParticle()
 {
@@ -115,53 +188,4 @@ unsigned int Fire::FirstUnusedParticle()
     // override first particle if all others are alive
     lastUsedParticle = 0;
     return 0;
-}
-
-
-void Fire::RespawnParticle(Particle &particle)
-{
-
-    float random_x = dist(generator) / 100.0f;
-    float random_y = dist(generator) / 100.0f;
-    float random_z = dist(generator) / 100.0f;
-//    glm::vec3 offset(random_x, random_y, random_z);
-    glm::vec3 offset(random_x, random_y, random_z);
-    float rColor = 0.5f + ((rand() % 100) / 100.0f);
-    particle.Position = m_center + offset;
-    particle.Color = glm::vec4(rColor, rColor, rColor, 1.0f);
-    particle.Life = 2.0f;
-    particle.Velocity = glm::vec3(0, 0, 0);
-}
-
-void Fire::drawParticles() {
-    update_particles();
-
-    // use additive blending to give it a 'glow' effect
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    m_particleDrawProgram->bind();
-    m_particleDrawProgram->setUniform("p", m_p);
-    m_particleDrawProgram->setUniform("v", m_v);
-    for (Particle particle : m_particles)
-    {
-        if (particle.Life > 0.0f)
-        {
-            m_particleDrawProgram->setUniform("color", particle.Color);
-            glm::mat4 M_fire = glm::translate(glm::mat4(), particle.Position);
-            m_particleDrawProgram->setUniform("m", M_fire);
-
-            TextureParametersBuilder builder;
-            builder.setFilter(TextureParameters::FILTER_METHOD::LINEAR);
-            builder.setWrap(TextureParameters::WRAP_METHOD::REPEAT);
-
-            TextureParameters parameters = builder.build();
-            parameters.applyTo(*m_texture);
-            std::string filename = "fire2.png";
-            m_particleDrawProgram->setTexture(filename, *m_texture);
-            m_quad->draw();
-        }
-    }
-    // don't forget to reset to default blending mode
-    m_particleDrawProgram->unbind();
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
