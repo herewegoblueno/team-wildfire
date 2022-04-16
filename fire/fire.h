@@ -29,7 +29,7 @@ struct Particle {
 class Fire
 {
 public:
-    Fire(int density, glm::vec3 center);
+    Fire(int density, glm::vec3 center, float size);
     ~Fire();
 
     void setViewProjection(glm::mat4x4 v, glm::mat4x4 p);
@@ -37,6 +37,7 @@ public:
 
 private:
     int m_density;
+    float m_size;
     float fire_frame_rate = 0.1;
     float m_life = 5.0f;
     int m_respawn_num = 2;
@@ -62,7 +63,7 @@ private:
 
 
     const float mean = 0.0;
-    const float stddev = 0.3;
+    const float stddev = 0.2;
     std::default_random_engine generator;
     std::normal_distribution<float> dist;
 

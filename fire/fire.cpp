@@ -22,8 +22,8 @@
 
 using namespace CS123::GL;
 
-Fire::Fire(int density, glm::vec3 center):
-    m_density(density), m_center(center)
+Fire::Fire(int density, glm::vec3 center, float size):
+    m_density(density), m_size(size), m_center(center)
 {
     m_particles.clear();
     for (unsigned int i = 0; i < density; ++i)
@@ -32,7 +32,7 @@ Fire::Fire(int density, glm::vec3 center):
     dist = std::normal_distribution<float>(mean, stddev);
 
     assert(m_density>2);
-    m_respawn_num = fire_frame_rate * (m_density-2) / m_life;
+    m_respawn_num = fire_frame_rate * m_density / m_life;
 
     InitRender();
 }
@@ -96,6 +96,7 @@ void Fire::update_particles()
         {	// particle is alive, thus update
             p.Position += p.Velocity * fire_frame_rate;
             p.Velocity.x = p.Velocity.x*0.9;
+//            p.Velocity.y = p.Velocity.y*1.1;
             p.Velocity.z = p.Velocity.z*0.9;
             p.Color.a -= fire_frame_rate * 2.5f;
         }
@@ -108,13 +109,11 @@ void Fire::update_particles()
 void Fire::RespawnParticle(Particle &particle)
 {
 
-    float random_x = dist(generator) / 10.0f;
-    float random_y = dist(generator) / 10.0f;
-    float random_z = dist(generator) / 10.0f;
-//    float random_x = ((rand() % 100) - 50) / 120.0f;
-//    float random_y = ((rand() % 100) - 100) / 240.0f;
-//    float random_z = ((rand() % 100) - 50) / 120.0f;
-//    glm::vec3 offset(random_x, random_y, random_z);
+    float random_x = dist(generator) / 10.0f*m_size;
+//    float random_y = dist(generator) / 20.0f*m_size;
+    float random_y = 0;
+//    float random_y = ((rand() % 100) - 100) / 500.0f*m_size;
+    float random_z = dist(generator) / 10.0f*m_size;
     glm::vec3 offset(random_x, random_y, random_z);
     offset = offset*3.f;
 
@@ -123,9 +122,9 @@ void Fire::RespawnParticle(Particle &particle)
     particle.Color = glm::vec4(rColor, rColor, rColor, 1.0f);
     particle.Life = m_life;
 
-    float vec_y = (rand() % 50)/ 50.0f;
-    float vec_x = (rand() % 100 - 50)/ 120.0f * (1.3-vec_y);
-    float vec_z = (rand() % 100 - 50)/ 120.0f * (1.3-vec_y);
+    float vec_y = (rand() % 50)/ 50.0f + 0.2;
+    float vec_x = (rand() % 100 - 50)/ 120.0f * (1-vec_y)*m_size;
+    float vec_z = (rand() % 100 - 50)/ 120.0f * (1-vec_y)*m_size;
     particle.Velocity = glm::vec3(vec_x, vec_y*0.3f+0.1 , vec_z);
 }
 
@@ -159,10 +158,10 @@ void Fire::drawParticles() {
             m_particleDrawProgram->setUniform("m", M_fire);
             m_particleDrawProgram->setUniform("life", particle.Life);
 
-
             m_quad->draw();
         }
     }
+
     // don't forget to reset to default blending mode
     m_particleDrawProgram->unbind();
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
