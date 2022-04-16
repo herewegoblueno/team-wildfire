@@ -21,7 +21,7 @@ BasicFireScene::BasicFireScene():
      voxelGrids(3, vec3(0,0,0), 30)
 {
     fire = std::make_unique<Fire> (10, glm::vec3(0));
-    voxelGrids.getVisualization()->toggle(true);
+    voxelGrids.getVisualization()->toggle(false);
     constructShaders();
 }
 
@@ -62,7 +62,7 @@ void BasicFireScene::render(SupportCanvas3D *context) {
 
     current_shader->bind();
     Camera *camera = context->getCamera();
-    voxelGrids.getVisualization()->setMVP(camera->getProjectionMatrix() * camera->getViewMatrix());
+    voxelGrids.getVisualization()->setPV(camera->getProjectionMatrix() * camera->getViewMatrix());
     voxelGrids.getVisualization()->draw(context);
     current_shader->unbind();
 
