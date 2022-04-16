@@ -25,7 +25,7 @@ BasicFireScene::BasicFireScene():
     fires.push_back(  std::make_unique<Fire> (5000, glm::vec3(0.3, 0, 0.1)) );
     fires.push_back(  std::make_unique<Fire> (5000, glm::vec3(0, 0, -0.3)) );
 
-    voxelGrids.getVisualization()->toggle(true);
+    voxelGrids.getVisualization()->toggle(false);
     constructShaders();
 }
 

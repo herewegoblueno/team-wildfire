@@ -317,7 +317,7 @@
                </rect>
               </property>
               <attribute name="label">
-               <string>Page 2</string>
+               <string>N/A</string>
               </attribute>
              </widget>
             </widget>
@@ -340,7 +340,7 @@
          </widget>
          <widget class="QWidget" name="fireTab">
           <attribute name="title">
-           <string>fire</string>
+           <string>Fire</string>
           </attribute>
           <widget class="QCheckBox" name="useSmoke">
            <property name="geometry">
