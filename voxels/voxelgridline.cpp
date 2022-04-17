@@ -115,7 +115,7 @@ void VoxelGridLine::generateGridVertices(VoxelGrid *grid){
         vec2(4, 7),
         vec2(6, 7),
         vec2(6, 5),
-        vec2(6, 5),
+        vec2(5, 4),
         vec2(4, 0),
         vec2(5, 1),
         vec2(6, 2),
