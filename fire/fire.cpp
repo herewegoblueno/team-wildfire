@@ -14,6 +14,7 @@
 #include <glm/gtx/transform.hpp>
 
 #include "fire/fire.h"
+#include "voxels/voxelgrid.h"
 
 #include <iostream>
 #include <QImage>
@@ -22,18 +23,31 @@
 
 using namespace CS123::GL;
 
-Fire::Fire(int density, glm::vec3 center, float size):
-    m_density(density), m_size(size), m_center(center)
+
+Fire::Fire(int density, glm::vec3 center, float size, VoxelGrid* grid):
+    m_density(density), m_size(size), m_center(center), m_grid(grid)
 {
-    // init particle
+    // init particles and preset speed
     m_particles.clear();
-    for (unsigned int i = 0; i < density; ++i)
-        m_particles.push_back(Particle());
-    // init gaussian distribution
+    m_vels.clear();
+    m_poss.clear();
     dist = std::normal_distribution<float>(mean, stddev);
+    for (unsigned int i = 0; i < density; ++i)
+    {
+        float random_x = dist(generator) / 10.0f;
+        float random_y = 0;
+        float random_z = dist(generator) / 10.0f;
+        float vec_y = (rand() % 50)/ 50.0f;
+        float vec_x = (rand() % 100 - 50)/ 150.0f * (1-vec_y);
+        float vec_z = (rand() % 100 - 50)/ 150.0f * (1-vec_y);
+        m_particles.push_back(Particle());
+        m_poss.push_back(glm::vec3(random_x, random_y, random_z));
+        m_vels.push_back(glm::vec3(vec_x, vec_y*0.3, vec_z));
+    }
     //set respawn rate based on given density
     assert(m_density>2);
     m_respawn_num = fire_frame_rate * m_density / m_life;
+//    m_respawn_num = 5;
     // init renderer
     InitRender();
     // init smoke
@@ -78,54 +92,68 @@ void Fire::update_particles()
     {
         int unusedParticle = FirstUnusedParticle();
         if(unusedParticle<m_density)
-            RespawnParticle(m_particles[unusedParticle]);
+            RespawnParticle(unusedParticle);
     }
     // update all particles
     for (unsigned int i = 0; i < m_density; ++i)
     {
         Particle &p = m_particles[i];
-        p.Life -= fire_frame_rate; // reduce life
-
+//        p.Life -= fire_frame_rate*p.Temp*burn_coef;
+        p.Life -= fire_frame_rate;
 
         if (p.Life > 0.0f)
-        {	// particle is alive, thus update
-            p.Position += p.Velocity * fire_frame_rate;
-            p.Velocity.x = p.Velocity.x*0.9;
-            p.Velocity.y = std::max(p.Velocity.y-0.001, 0.1);
-            p.Velocity.z = p.Velocity.z*0.9;
-            p.Color.a -= fire_frame_rate * 2.5f;
-        }
-
-
-        if(p.Life < fire_frame_rate*1.5)
         {
-            m_smoke->RespawnParticle(i, p.Position, p.Velocity);
+            // particle is alive, thus update
+            Voxel* vox = m_grid->getVoxelClosestToPoint(p.Position);
+
+            glm::vec3 u = vox->u; // we don't have velocity field yet
+            float c_dis = glm::distance(p.Position, m_center);
+            u = glm::normalize(p.Position + glm::vec3(0,1,0) - m_center)*std::min(0.05f+0.2f/c_dis, 0.1f);
+
+            glm::vec3 b = -thermal_expansion*gravity*(p.Temp - vox->temperature); // Buoyancy
+
+            p.Position += (b+u) * fire_frame_rate;
+
+            float neighbor_temp = vox->temperature;
+            float var = 0.6;
+            float var2 = var*var;
+            for(int j = 0; j<m_density;j++)
+            {
+                if(i == j) continue;
+                Particle& p_nei = m_particles[j];
+                float dis = glm::distance(p.Position, p_nei.Position)*2;
+                neighbor_temp += 0.56/var*std::exp(-0.5*dis*dis/var2)*p_nei.Temp;
+            }
+            neighbor_temp = neighbor_temp/m_density;
+            p.Temp = alpha_temp*p.Temp + beta_temp*(neighbor_temp + vox->temperature);
+
+            if(p.Life < fire_frame_rate*1.5 || p.Temp < 10)
+            {
+                m_smoke->RespawnParticle(i, p.Position, u);
+                p.Life = 0;
+            }
         }
+
+
+
     }
 }
 
 
 
-void Fire::RespawnParticle(Particle &particle)
+void Fire::RespawnParticle(int index)
 {
-
-    float random_x = dist(generator) / 10.0f*m_size;
-//    float random_y = dist(generator) / 20.0f*m_size;
-    float random_y = 0;
-//    float random_y = ((rand() % 100) - 100) / 500.0f*m_size;
-    float random_z = dist(generator) / 10.0f*m_size;
-    glm::vec3 offset(random_x, random_y, random_z);
-    offset = offset*3.f;
+    Particle &particle = m_particles[index];
+    glm::vec3 offset = m_poss[index];
+    offset = offset*5.f*m_size;
 
     float rColor = 0.5f + ((rand() % 50) / 100.0f);
     particle.Position = m_center + offset;
     particle.Color = glm::vec4(rColor, rColor, rColor, 1.0f);
     particle.Life = m_life;
+    particle.Temp = 15;
 
-    float vec_y = (rand() % 50)/ 50.0f + 0.2;
-    float vec_x = (rand() % 100 - 50)/ 120.0f * (1-vec_y)*m_size;
-    float vec_z = (rand() % 100 - 50)/ 120.0f * (1-vec_y)*m_size;
-    particle.Velocity = glm::vec3(vec_x, vec_y*0.3f+0.1 , vec_z);
+    particle.Velocity = m_size*m_vels[index];
 }
 
 
@@ -136,7 +164,6 @@ void Fire::drawSmoke(CS123::GL::CS123Shader* shader) {
 
 void Fire::drawParticles(CS123::GL::CS123Shader* shader) {
     update_particles();
-
 
 //    // bind texture
     TextureParametersBuilder builder;
@@ -155,7 +182,7 @@ void Fire::drawParticles(CS123::GL::CS123Shader* shader) {
             shader->setUniform("color", particle.Color);
             glm::mat4 M_fire = glm::translate(glm::mat4(), particle.Position);
             shader->setUniform("m", M_fire);
-            shader->setUniform("life", particle.Life);
+            shader->setUniform("temp", particle.Temp);
 
             m_quad->draw();
         }

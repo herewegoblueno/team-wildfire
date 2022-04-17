@@ -22,6 +22,7 @@ struct Voxel {
     //Set and changed over the course of simulation
     float mass;
     float temperature;
+    vec3 u;  // velocity
 };
 
 #endif // VOXEL_H

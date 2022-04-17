@@ -18,13 +18,13 @@ namespace CS123 { namespace GL {
 }}
 
 class OpenGLShape;
-
+class VoxelGrid;
 
 
 class Fire
 {
 public:
-    Fire(int density, glm::vec3 center, float size);
+    Fire(int density, glm::vec3 center, float size, VoxelGrid* grid);
     ~Fire();
 
     void drawParticles( CS123::GL::CS123Shader* shader);
@@ -34,10 +34,12 @@ private:
     // particle cluster property
     int m_density;
     float m_size;
-    float fire_frame_rate = 0.1;
+    float fire_frame_rate = 0.05;
     float m_life = 5.0f;
     int m_respawn_num = 2;
     glm::vec3 m_center;
+    std::vector<glm::vec3> m_vels;
+    std::vector<glm::vec3> m_poss;
     std::vector<Particle> m_particles;
     std::unique_ptr<Smoke> m_smoke;
 
@@ -45,9 +47,10 @@ private:
     unsigned int lastUsedParticle = 0;
     void update_particles();
     unsigned int FirstUnusedParticle();
-    void RespawnParticle(Particle &particle);
+    void RespawnParticle(int index);
 
     // render components
+    VoxelGrid* m_grid;
     std::unique_ptr<OpenGLShape> m_quad;
     std::unique_ptr<CS123::GL::Texture2D> m_texture;
     void InitRender();

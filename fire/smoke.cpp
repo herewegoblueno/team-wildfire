@@ -85,8 +85,8 @@ void Smoke::update_particles()
 void Smoke::RespawnParticle(int index, glm::vec3 pos, glm::vec3 vel)
 {
 
-    float vec_x = (rand() % 100 - 50)/ 120.0f * 0.1;
-    float vec_z = (rand() % 100 - 50)/ 120.0f * 0.1;
+    float vec_x = (rand() % 100 - 50)/ 120.0f * 0.2;
+    float vec_z = (rand() % 100 - 50)/ 120.0f * 0.2;
 
     Particle &particle = m_particles[2*index];
     particle.Life = 1;
@@ -97,7 +97,7 @@ void Smoke::RespawnParticle(int index, glm::vec3 pos, glm::vec3 vel)
     particle = m_particles[2*index+1];
     particle.Life = 1;
     particle.Position = pos;
-    particle.Velocity = glm::vec3(vel.x+vec_x, 1.f - vel.y, vel.z+vec_z);
+    particle.Velocity = glm::vec3(vec_x*m_size, m_size*1.f - vel.y, vec_z*m_size);
     particle.Color = glm::vec4(0.5, 0.5, 0.5, 1.0f);
 }
 
@@ -111,7 +111,7 @@ void Smoke::drawParticles(CS123::GL::CS123Shader* shader) {
             shader->setUniform("color", particle.Color);
             glm::mat4 M_fire = glm::translate(glm::mat4(), particle.Position);
             shader->setUniform("m", M_fire);
-            shader->setUniform("life", particle.Life);
+            shader->setUniform("temp", particle.Life);
 
             m_quad->draw();
         }

@@ -21,8 +21,8 @@ BasicFireScene::BasicFireScene():
      voxelGrids(3, vec3(0,0,0), 30)
 {
     fires.clear();
-    fires.push_back(  std::make_unique<Fire> (3000, glm::vec3(0, -2, 0), 1) );
-    fires.push_back(  std::make_unique<Fire> (3000, glm::vec3(0, -2, 0), 2) );
+    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, -1, 0), 0.5, &voxelGrids) );
+    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, -1, 0), 0.6, &voxelGrids) );
 
     voxelGrids.getVisualization()->toggle(false);
     constructShaders();
@@ -61,10 +61,7 @@ void BasicFireScene::render(SupportCanvas3D *context) {
     glClearColor(0.2, 0.2, 0.2, 0.3);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-//    std::cout << "render fire" << std::endl<< std::flush;
-
     current_shader = shader_bank[0].get();
-//    voxelGrids.getVisualization()->toggle(true);
 
     current_shader->bind();
     Camera *camera = context->getCamera();
@@ -83,6 +80,7 @@ void BasicFireScene::render(SupportCanvas3D *context) {
     fire_shader->bind();
     fire_shader->setUniform("p", camera->getProjectionMatrix());
     fire_shader->setUniform("v", camera->getViewMatrix());
+    smoke_shader->setUniform("scale", 0.03f);
 
     int len = fires.size();
     for (int f=0; f<len;f++)
@@ -94,6 +92,7 @@ void BasicFireScene::render(SupportCanvas3D *context) {
     smoke_shader->bind();
     smoke_shader->setUniform("p", camera->getProjectionMatrix());
     smoke_shader->setUniform("v", camera->getViewMatrix());
+    smoke_shader->setUniform("scale", 0.05f);
 
     for (int f=0; f<len;f++)
     {
