@@ -28,7 +28,6 @@ uniform vec3 specular_color;
 uniform float shininess;
 
 uniform bool useLighting;     // Whether to calculate lighting using lighting equation
-uniform bool useArrowOffsets; // True if rendering the arrowhead of a normal for Shapes
 
 void main()
 {
@@ -39,13 +38,6 @@ void main()
 
     vec4 position_worldSpace = m * vec4(position, 1.0);
     vec4 normal_worldSpace = vec4(normalize(mat3(transpose(inverse(m))) * normal), 0);
-
-    if (useArrowOffsets)
-    {
-        // Figure out the axis to use in order for the triangle to be billboarded correctly
-        vec3 offsetAxis = normalize(cross(vec3(position_cameraSpace), vec3(normal_cameraSpace)));
-        position_cameraSpace += arrowOffset * vec4(offsetAxis, 0);
-    }
 
     gl_Position = p * position_cameraSpace;
 

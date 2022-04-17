@@ -53,7 +53,6 @@ SOURCES += ui/mainwindow.cpp \
     support/shapes/Cone.cpp \
     support/shapes/Cube.cpp \
     support/shapes/Cylinder.cpp \
-    support/shapes/ExampleShape.cpp \
     support/shapes/Fruit.cpp \
     support/shapes/Leaf.cpp \
     support/shapes/OpenGLShape.cpp \
@@ -111,7 +110,6 @@ HEADERS += ui/mainwindow.h \
     support/shapes/Cone.h \
     support/shapes/Cube.h \
     support/shapes/Cylinder.h \
-    support/shapes/ExampleShape.h \
     support/shapes/Fruit.h \
     support/shapes/Leaf.h \
     support/shapes/OpenGLShape.h \
