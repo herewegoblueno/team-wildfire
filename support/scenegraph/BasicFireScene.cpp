@@ -21,9 +21,8 @@ BasicFireScene::BasicFireScene():
      voxelGrids(3, vec3(0,0,0), 30)
 {
     fires.clear();
-    fires.push_back(  std::make_unique<Fire> (5000, glm::vec3(0)) );
-    fires.push_back(  std::make_unique<Fire> (5000, glm::vec3(0.3, 0, 0.1)) );
-    fires.push_back(  std::make_unique<Fire> (5000, glm::vec3(0, 0, -0.3)) );
+    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, -1, 0), 0.5, &voxelGrids) );
+    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, -1, 0), 0.6, &voxelGrids) );
 
     voxelGrids.getVisualization()->toggle(false);
     constructShaders();
@@ -41,13 +40,16 @@ void BasicFireScene::onNewSceneLoaded(){
 void BasicFireScene::constructShaders() {
     shader_bank.clear();
     std::string vertexSource = ResourceLoader::loadResourceFileToString(":/shaders/default.vert");
+    std::string fragmentSource = ResourceLoader::loadResourceFileToString(":/shaders/default.frag");
+    shader_bank.push_back(std::make_unique<CS123Shader>(vertexSource, fragmentSource));
 
-    //This is here so that with a little bit of modification, you could have different shaders for each primitive
-    //TODO: this might need to be improved since if we have a lot of primitives, we'll have a shader for each one of them
-    for (int i = 0; i < 1; i ++){
-        std::string fragmentSource = ResourceLoader::loadResourceFileToString(":/shaders/default.frag");
-        shader_bank.push_back(std::make_unique<CS123Shader>(vertexSource, fragmentSource));
-    }
+    vertexSource = ResourceLoader::loadResourceFileToString(":/shaders/particle.vert");
+    fragmentSource = ResourceLoader::loadResourceFileToString(":/shaders/fire.frag");
+    shader_bank.push_back(std::make_unique<CS123Shader>(vertexSource, fragmentSource));
+
+    vertexSource = ResourceLoader::loadResourceFileToString(":/shaders/particle.vert");
+    fragmentSource = ResourceLoader::loadResourceFileToString(":/shaders/smoke.frag");
+    shader_bank.push_back(std::make_unique<CS123Shader>(vertexSource, fragmentSource));
 }
 
 
@@ -59,10 +61,7 @@ void BasicFireScene::render(SupportCanvas3D *context) {
     glClearColor(0.2, 0.2, 0.2, 0.3);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-//    std::cout << "render fire" << std::endl<< std::flush;
-
     current_shader = shader_bank[0].get();
-//    voxelGrids.getVisualization()->toggle(true);
 
     current_shader->bind();
     Camera *camera = context->getCamera();
@@ -70,13 +69,39 @@ void BasicFireScene::render(SupportCanvas3D *context) {
     voxelGrids.getVisualization()->draw(context);
     current_shader->unbind();
 
+    std::vector<std::unique_ptr<CS123Shader>> *shaders = getShaderPrograms();
+    CS123Shader* fire_shader = shaders->at(1).get();
+    CS123Shader* smoke_shader = shaders->at(2).get();
+
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+    fire_shader->bind();
+    fire_shader->setUniform("p", camera->getProjectionMatrix());
+    fire_shader->setUniform("v", camera->getViewMatrix());
+    smoke_shader->setUniform("scale", 0.03f);
+
     int len = fires.size();
     for (int f=0; f<len;f++)
     {
-        fires[f]->setViewProjection(camera->getViewMatrix(), camera->getProjectionMatrix());
-        fires[f]->drawParticles();
+        fires[f]->drawParticles(fire_shader);
     }
+    fire_shader->unbind();
 
+    smoke_shader->bind();
+    smoke_shader->setUniform("p", camera->getProjectionMatrix());
+    smoke_shader->setUniform("v", camera->getViewMatrix());
+    smoke_shader->setUniform("scale", 0.05f);
+
+    for (int f=0; f<len;f++)
+    {
+        fires[f]->drawSmoke(smoke_shader);
+    }
+    smoke_shader->unbind();
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_BLEND);
 
     //Trigger another render
     context->update();
