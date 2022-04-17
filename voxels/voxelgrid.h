@@ -9,7 +9,7 @@
 using namespace glm;
 using namespace std;
 
-struct Voxel;
+class Voxel;
 
 class VoxelGrid
 {

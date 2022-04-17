@@ -34,7 +34,6 @@ BasicFireScene::~BasicFireScene()
 
 void BasicFireScene::onNewSceneLoaded(){
    constructShaders();
-
 }
 
 void BasicFireScene::constructShaders() {

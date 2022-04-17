@@ -104,7 +104,7 @@ void Fire::update_particles()
         if (p.Life > 0.0f)
         {
             // particle is alive, thus update
-            Voxel* vox = m_grid->getVoxelClosestToPoint(p.Position);
+            VoxelPhysicalData* vox = m_grid->getVoxelClosestToPoint(p.Position)->getCurrentState();
 
             glm::vec3 u = vox->u; // we don't have velocity field yet
             float c_dis = glm::distance(p.Position, m_center);
