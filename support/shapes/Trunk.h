@@ -7,11 +7,11 @@
 #include "TriMesh.h"
 #include "Shape.h"
 #include "CircleBase.h"
-#include "trees/MeshGenerator.h"
+#include "trees/TreeGenerator.h"
 
 /**
  * Tapered cylinder bounded by a 1x1x1 cube centered at the origin.
- * Taper amount based on branchDecay in MeshGenerator.h
+ * Taper amount based on branchDecay in TreeGenerator.h
  */
 class Trunk : public Shape
 {

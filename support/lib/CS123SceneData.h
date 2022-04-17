@@ -17,13 +17,13 @@ enum class LightType {
 };
 
 enum class PrimitiveType {
+    PRIMITIVE_TRUNK,
+    PRIMITIVE_LEAF,
     PRIMITIVE_CUBE,
     PRIMITIVE_CONE,
     PRIMITIVE_CYLINDER,
     PRIMITIVE_SPHERE,
-    PRIMITIVE_MESH,
-    PRIMITIVE_TRUNK,
-    PRIMITIVE_LEAF
+    PRIMITIVE_MESH
 };
 
 // Enumeration for types of transformations that can be applied to objects, lights, and cameras.
@@ -150,6 +150,11 @@ struct CS123ScenePrimitive {
 struct PrimitiveBundle {
    CS123ScenePrimitive primitive;
    glm::mat4 model;
+   PrimitiveBundle(CS123ScenePrimitive primitive, glm::mat4 model) :
+       primitive(primitive),
+       model(model)
+   {
+   }
 };
 
 // Data for transforming a scene object. Aside from the TransformationType, the remaining of the

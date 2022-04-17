@@ -1,11 +1,23 @@
-#ifndef MESHGENERATOR_H
-#define MESHGENERATOR_H
+#ifndef TREEGENERATOR_H
+#define TREEGENERATOR_H
 
 #include "support/lib/CS123SceneData.h"
 #include "LSystem.h"
+#include "module.h"
+#include <unordered_set>
+
+struct Tree {
+    Branch *root;
+    BranchSet branches;
+    Tree(Branch *root, BranchSet branches) :
+        root(root), branches(branches)
+    {}
+};
 
 const float m_pi = 3.14159265359;
 
+const int recursionDepth = 6;
+const float trunkInitRadius = 0.5;
 // Min/max branching levels for adding leaves
 const int minLeafRecursiveDepth = 2;
 const int maxLeafRecursiveDepth = 9;
@@ -18,30 +30,24 @@ const float baseXRotation = 0.3;
 // Amount to scale x, z size of each successive iteration
 const float branchWidthDecay = 0.7;
 
-class MeshGenerator
+class TreeGenerator
 {
 public:
-    MeshGenerator();
+    TreeGenerator();
+    ~TreeGenerator();
     void generateTree();
-    std::vector<CS123ScenePrimitive> getPrimitives();
-    std::vector<glm::mat4> getTransformations();
+    Tree getTree();
 private:
-    std::unique_ptr<LSystem> m_lSystem;
+    std::unique_ptr<LSystem> _lSystem;
     void initializeLSystem();
     void parseLSystem(std::string lSystemString);
 
-    std::unique_ptr<CS123ScenePrimitive> m_trunk;
-    glm::mat4 m_trunkPreTransform;
-    void initializeTrunkPrimitive();
+    glm::mat4 _trunkPreTransform;
+    glm::mat4 _leafPreTransform;
 
-    std::unique_ptr<CS123ScenePrimitive> m_leaf;
-    glm::mat4 m_leafPreTransform;
-    glm::mat4 m_leafPostTransform;
-    void initializeLeafPrimitive();
-
-    void addPrimitive(CS123ScenePrimitive scenePrimitive, glm::mat4 transformation);
-    std::vector<CS123ScenePrimitive> m_primitives;
-    std::vector<glm::mat4> m_transformations;
+    BranchSet _branches;
+    Branch *_root;
+    BranchSet _lifetimeBranches; // for memory management
 
     float getYRotateAnglePlus();
     float getYRotateAngleMinus();
@@ -49,4 +55,4 @@ private:
     float getBranchLength();
 };
 
-#endif // MESHGENERATOR_H
+#endif // TREEGENERATOR_H

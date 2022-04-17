@@ -61,7 +61,9 @@ SOURCES += ui/mainwindow.cpp \
     support/shapes/Tessellator.cpp \
     support/shapes/Trunk.cpp \
     trees/LSystem.cpp \
-    trees/MeshGenerator.cpp \
+    trees/TreeGenerator.cpp \
+    trees/forest.cpp \
+    trees/module.cpp \
     trees/terrain.cpp \
     fire/fire.cpp \
     ui/extrawidgets/ctkrangeslider.cpp \
@@ -116,8 +118,10 @@ HEADERS += ui/mainwindow.h \
     support/shapes/TriMesh.h \
     support/shapes/Trunk.h \
     trees/LSystem.h \
-    trees/MeshGenerator.h \
+    trees/TreeGenerator.h \
     trees/Random.h \
+    trees/forest.h \
+    trees/module.h \
     trees/terrain.h \
     ui/extrawidgets/ctkrangeslider.h \
     ui_mainwindow.h \

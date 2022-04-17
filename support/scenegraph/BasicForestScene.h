@@ -8,7 +8,13 @@
 #include <vector>
 #include "support/shapes/Shape.h"
 #include "voxels/voxelgrid.h"
+#include "trees/forest.h"
+#include "support/shapes/Trunk.h"
+#include "support/shapes/Leaf.h"
 
+const int numTrees = 20;
+const float forestHeight = 10;
+const float forestWidth = 10;
 
 namespace CS123 { namespace GL {
 
@@ -25,23 +31,25 @@ public:
 
     virtual void render(SupportCanvas3D *context) override;
     virtual void settingsChanged() override;
-    void onNewSceneLoaded();
-
-    void constructShaders();
-    std::vector<std::unique_ptr<CS123::GL::CS123Shader>> * getShaderPrograms();
 
 private:
+    void updateFromForest();
 
-    void setShaderSceneUniforms(SupportCanvas3D *context);
+    void renderGeometry();
+    void loadPhongShader();
+    void tessellateShapes();
+
+    void defineLights();
+    void defineGlobalData();
     void setLights();
-    void defineShapeOptions();
-    void drawPrimitiveWithShader(int shapeIndex, glm::mat4x4 modelMat, CS123SceneMaterial mat, Shape *shape, SupportCanvas3D *c);
+    void setGlobalData();
+    void setSceneUniforms(SupportCanvas3D *context);
 
-    std::vector<std::unique_ptr<Shape>> shapeOptions;
-    std::vector<std::unique_ptr<CS123::GL::CS123Shader>> shader_bank;
-    CS123::GL::CS123Shader *current_shader;
-    VoxelGrid voxelGrids;
-
+    std::unique_ptr<CS123::GL::CS123Shader> _phongShader;
+    VoxelGrid _voxelGrids;
+    std::unique_ptr<Forest> _forest;
+    std::unique_ptr<Trunk> _trunk;
+    std::unique_ptr<Leaf> _leaf;
 };
 
 
