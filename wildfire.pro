@@ -19,6 +19,7 @@ win32 {
 }
 
 SOURCES += ui/mainwindow.cpp \
+    fire/smoke.cpp \
     main.cpp \
     glew-1.10.0/src/glew.c \
     support/Settings.cpp \
@@ -71,6 +72,8 @@ SOURCES += ui/mainwindow.cpp \
 
 
 HEADERS += ui/mainwindow.h \
+    fire/particle.h \
+    fire/smoke.h \
     support/Settings.h \
     support/camera/Camera.h \
     support/camera/CamtransCamera.h \

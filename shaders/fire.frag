@@ -24,6 +24,6 @@ void main()
     if(ParticleLife < 3) color.a = 1 - f*6;
     else color.a = 1;
     if(f>0.045*ParticleLife) discard;
-//    if(f>0.25) color.a = 0;
-//    color = ParticleColor;
+
+//    color = vec4(1,1,1,1);
 }

@@ -25,30 +25,24 @@ using namespace CS123::GL;
 Fire::Fire(int density, glm::vec3 center, float size):
     m_density(density), m_size(size), m_center(center)
 {
+    // init particle
     m_particles.clear();
     for (unsigned int i = 0; i < density; ++i)
         m_particles.push_back(Particle());
-
+    // init gaussian distribution
     dist = std::normal_distribution<float>(mean, stddev);
-
+    //set respawn rate based on given density
     assert(m_density>2);
     m_respawn_num = fire_frame_rate * m_density / m_life;
-
+    // init renderer
     InitRender();
+    // init smoke
+    m_smoke = std::make_unique<Smoke>(density, fire_frame_rate, size);
 }
 
-
-void Fire::setViewProjection(glm::mat4x4 v, glm::mat4x4 p)
-{
-    m_p = p;
-    m_v = v;
-}
 
 void Fire::InitRender()
 {
-    std::string vertexSource = ResourceLoader::loadResourceFileToString(":/shaders/fire_draw.vert");
-    std::string fragmentSource = ResourceLoader::loadResourceFileToString(":/shaders/fire_draw.frag");
-    m_particleDrawProgram = std::make_unique<CS123Shader>(vertexSource, fragmentSource);
 
     std::vector<float> particle_quad = { -1, 1, 0, 0, 0,
                                -1, -1, 0, 0, 1,
@@ -73,7 +67,6 @@ void Fire::InitRender()
 
 Fire::~Fire()
 {
-//    glDeleteVertexArrays(1, &m_particlesVAO);
 }
 
 
@@ -92,17 +85,24 @@ void Fire::update_particles()
     {
         Particle &p = m_particles[i];
         p.Life -= fire_frame_rate; // reduce life
+
+
         if (p.Life > 0.0f)
         {	// particle is alive, thus update
             p.Position += p.Velocity * fire_frame_rate;
             p.Velocity.x = p.Velocity.x*0.9;
-//            p.Velocity.y = p.Velocity.y*1.1;
+            p.Velocity.y = std::max(p.Velocity.y-0.001, 0.1);
             p.Velocity.z = p.Velocity.z*0.9;
             p.Color.a -= fire_frame_rate * 2.5f;
         }
+
+
+        if(p.Life < fire_frame_rate*1.5)
+        {
+            m_smoke->RespawnParticle(i, p.Position, p.Velocity);
+        }
     }
 }
-
 
 
 
@@ -128,19 +128,17 @@ void Fire::RespawnParticle(Particle &particle)
     particle.Velocity = glm::vec3(vec_x, vec_y*0.3f+0.1 , vec_z);
 }
 
-void Fire::drawParticles() {
+
+
+void Fire::drawSmoke(CS123::GL::CS123Shader* shader) {
+    m_smoke->drawParticles(shader);
+}
+
+void Fire::drawParticles(CS123::GL::CS123Shader* shader) {
     update_particles();
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-    // use additive blending to give it a 'glow' effect
-    m_particleDrawProgram->bind();
-    m_particleDrawProgram->setUniform("p", m_p);
-    m_particleDrawProgram->setUniform("v", m_v);
-
-
-    // bind texture
+//    // bind texture
     TextureParametersBuilder builder;
     builder.setFilter(TextureParameters::FILTER_METHOD::LINEAR);
     builder.setWrap(TextureParameters::WRAP_METHOD::REPEAT);
@@ -148,23 +146,21 @@ void Fire::drawParticles() {
     TextureParameters parameters = builder.build();
     parameters.applyTo(*m_texture);
     std::string filename = "fire2.png";
-    m_particleDrawProgram->setTexture(filename, *m_texture);
+    shader->setTexture(filename, *m_texture);
+
     for (Particle particle : m_particles)
     {
         if (particle.Life > 0.0f)
         {
-            m_particleDrawProgram->setUniform("color", particle.Color);
+            shader->setUniform("color", particle.Color);
             glm::mat4 M_fire = glm::translate(glm::mat4(), particle.Position);
-            m_particleDrawProgram->setUniform("m", M_fire);
-            m_particleDrawProgram->setUniform("life", particle.Life);
+            shader->setUniform("m", M_fire);
+            shader->setUniform("life", particle.Life);
 
             m_quad->draw();
         }
     }
 
-    // don't forget to reset to default blending mode
-    m_particleDrawProgram->unbind();
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 

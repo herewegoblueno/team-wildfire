@@ -8,6 +8,9 @@
 #include "GL/glew.h"
 #include <glm.hpp>
 
+#include "particle.h"
+#include "smoke.h"
+
 namespace CS123 { namespace GL {
     class Shader;
     class CS123Shader;
@@ -16,14 +19,6 @@ namespace CS123 { namespace GL {
 
 class OpenGLShape;
 
-struct Particle {
-    glm::vec3 Position, Velocity;
-    glm::vec4 Color;
-    float     Life;
-
-    Particle()
-      : Position(0.0f), Velocity(0.0f), Color(1.0f), Life(0.0f) { }
-};
 
 
 class Fire
@@ -32,36 +27,32 @@ public:
     Fire(int density, glm::vec3 center, float size);
     ~Fire();
 
-    void setViewProjection(glm::mat4x4 v, glm::mat4x4 p);
-    void drawParticles();
+    void drawParticles( CS123::GL::CS123Shader* shader);
+    void drawSmoke( CS123::GL::CS123Shader* shader);
 
 private:
+    // particle cluster property
     int m_density;
     float m_size;
     float fire_frame_rate = 0.1;
     float m_life = 5.0f;
     int m_respawn_num = 2;
-    std::vector<Particle> m_particles;
-
-    glm::mat4x4 m_p;
-    glm::mat4x4 m_v;
     glm::vec3 m_center;
+    std::vector<Particle> m_particles;
+    std::unique_ptr<Smoke> m_smoke;
+
+    // particle life cycle
     unsigned int lastUsedParticle = 0;
     void update_particles();
     unsigned int FirstUnusedParticle();
     void RespawnParticle(Particle &particle);
 
+    // render components
+    std::unique_ptr<OpenGLShape> m_quad;
     std::unique_ptr<CS123::GL::Texture2D> m_texture;
-
     void InitRender();
 
-    std::unique_ptr<CS123::GL::CS123Shader> m_particleUpdateProgram;
-    std::unique_ptr<CS123::GL::CS123Shader> m_particleDrawProgram;
-
-    std::unique_ptr<OpenGLShape> m_quad;
-    GLuint m_particlesVAO;
-
-
+    // gaussian random generator
     const float mean = 0.0;
     const float stddev = 0.2;
     std::default_random_engine generator;
