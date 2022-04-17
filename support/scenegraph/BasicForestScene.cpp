@@ -25,6 +25,7 @@ BasicForestScene::BasicForestScene():
     _voxelGrids.getVisualization()->toggle(settings.visualizeForestVoxelGrid);
     _forest = std::make_unique<Forest>(numTrees, forestWidth, forestHeight);
     updateFromForest();
+    _simulator.init();
 }
 
 BasicForestScene::~BasicForestScene()
@@ -46,6 +47,9 @@ void BasicForestScene::loadPhongShader() {
 }
 
 void BasicForestScene::render(SupportCanvas3D *context) {
+
+    _simulator.step(&_voxelGrids);
+
     Camera *camera = context->getCamera();
     glClearColor(0.2, 0.2, 0.2, 0.3);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

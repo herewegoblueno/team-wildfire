@@ -22,6 +22,7 @@ SOURCES += ui/mainwindow.cpp \
     fire/smoke.cpp \
     main.cpp \
     glew-1.10.0/src/glew.c \
+    simulation/simulator.cpp \
     support/Settings.cpp \
     support/camera/CamtransCamera.cpp \
     support/camera/OrbitingCamera.cpp \
@@ -75,6 +76,7 @@ SOURCES += ui/mainwindow.cpp \
 HEADERS += ui/mainwindow.h \
     fire/particle.h \
     fire/smoke.h \
+    simulation/simulator.h \
     support/Settings.h \
     support/camera/Camera.h \
     support/camera/CamtransCamera.h \

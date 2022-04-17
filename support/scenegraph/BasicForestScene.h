@@ -11,6 +11,7 @@
 #include "trees/forest.h"
 #include "support/shapes/Trunk.h"
 #include "support/shapes/Leaf.h"
+#include "simulation/simulator.h"
 
 const int numTrees = 20;
 const float forestHeight = 10;
@@ -50,6 +51,7 @@ private:
     std::unique_ptr<Forest> _forest;
     std::unique_ptr<Trunk> _trunk;
     std::unique_ptr<Leaf> _leaf;
+    Simulator _simulator;
 };
 
 
