@@ -50,8 +50,9 @@ Fire::Fire(int density, glm::vec3 center, float size, VoxelGrid* grid):
 //    m_respawn_num = 5;
     // init renderer
     InitRender();
+    generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
     // init smoke
-    m_smoke = std::make_unique<Smoke>(density, fire_frame_rate, size);
+    m_smoke = std::make_unique<Smoke>(density, fire_frame_rate, size, m_grid);
 }
 
 
@@ -104,7 +105,7 @@ void Fire::update_particles()
         if (p.Life > 0.0f)
         {
             // particle is alive, thus update
-            Voxel* vox = m_grid->getVoxelClosestToPoint(p.Position);
+            VoxelPhysicalData* vox = m_grid->getVoxelClosestToPoint(p.Position)->getCurrentState();
 
             glm::vec3 u = vox->u; // we don't have velocity field yet
             float c_dis = glm::distance(p.Position, m_center);
@@ -114,22 +115,15 @@ void Fire::update_particles()
 
             p.Position += (b+u) * fire_frame_rate;
 
-            float neighbor_temp = vox->temperature;
-            float var = 0.6;
-            float var2 = var*var;
-            for(int j = 0; j<m_density;j++)
-            {
-                if(i == j) continue;
-                Particle& p_nei = m_particles[j];
-                float dis = glm::distance(p.Position, p_nei.Position)*2;
-                neighbor_temp += 0.56/var*std::exp(-0.5*dis*dis/var2)*p_nei.Temp;
-            }
-            neighbor_temp = neighbor_temp/m_density;
+            glm::vec3 adjust_vec = p.Position - m_center;
+            adjust_vec.y = adjust_vec.y*0.5;
+            float adjust_len = glm::length(adjust_vec);
+            float neighbor_temp = 5 + 10*std::exp(-0.5*adjust_len*adjust_len/0.005);
             p.Temp = alpha_temp*p.Temp + beta_temp*(neighbor_temp + vox->temperature);
 
             if(p.Life < fire_frame_rate*1.5 || p.Temp < 10)
             {
-                m_smoke->RespawnParticle(i, p.Position, u);
+                m_smoke->RespawnParticle(i, p);
                 p.Life = 0;
             }
         }

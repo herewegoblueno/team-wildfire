@@ -17,24 +17,25 @@ namespace CS123 { namespace GL {
 }}
 
 class OpenGLShape;
-
+class VoxelGrid;
 
 
 class Smoke
 {
 public:
-    Smoke(int density, float frame_rate, float size);
+    Smoke(int density, float frame_rate, float size, VoxelGrid* grid);
     ~Smoke();
 
     void drawParticles(CS123::GL::CS123Shader* shader);
     void update_particles();
-    void RespawnParticle(int index, glm::vec3 pos, glm::vec3 vel);
+    void RespawnParticle(int index, Particle& fire_particle);
 
 private:
     int m_density;
     float m_size;
     float m_frame_rate;
     float m_life_max = 5.0f;
+    VoxelGrid* m_grid;
     std::vector<Particle> m_particles;
 
     glm::vec3 m_center;

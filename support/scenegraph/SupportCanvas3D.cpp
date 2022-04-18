@@ -153,14 +153,11 @@ void SupportCanvas3D::setSceneFromSettings() {
 }
 
 void SupportCanvas3D::loadSceneFromParserForForestScene(CS123XmlSceneParser &parser) {
-//    assert(settings.getSceneMode() == FOREST_SCENE_MODE);
     //The basic forest scene is currently the only scene who is designed to load from an xml file
     m_basicForestScene = std::make_unique<BasicForestScene>();
     Scene::parse(m_basicForestScene.get(), &parser);
     m_settingsDirty = true;
-
-    if(settings.getSceneMode() == FOREST_SCENE_MODE)
-        applyCameraConfig(m_basicForestSceneCameraConfig);
+    if(settings.getSceneMode() == FOREST_SCENE_MODE) applyCameraConfig(m_basicForestSceneCameraConfig);
 }
 
 void SupportCanvas3D::applyCameraConfig(CameraConfig c){

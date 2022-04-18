@@ -14,6 +14,7 @@
 #include <glm/gtx/transform.hpp>
 
 #include "fire/smoke.h"
+#include "voxels/voxelgrid.h"
 
 #include <iostream>
 #include <QImage>
@@ -22,8 +23,8 @@
 
 using namespace CS123::GL;
 
-Smoke::Smoke(int density, float frame_rate, float size):
-    m_density(density*2), m_size(size), m_frame_rate(frame_rate)
+Smoke::Smoke(int density, float frame_rate, float size, VoxelGrid* grid):
+    m_density(density*2), m_size(size), m_frame_rate(frame_rate), m_grid(grid)
 {
     m_particles.clear();
     for (unsigned int i = 0; i < m_density; ++i)
@@ -71,33 +72,45 @@ void Smoke::update_particles()
         Particle &p = m_particles[i];
         if (p.Life > 0.9f)
         {	// particle is alive, thus update
-            p.Life += m_frame_rate; // reduce life
-            p.Position += p.Velocity * m_frame_rate;
-            p.Velocity.x = p.Velocity.x*1.01;
-            p.Velocity.y = std::max(p.Velocity.y-0.001, 0.3);
-            p.Velocity.z = p.Velocity.z*1.01;
+            // particle is alive, thus update
+            VoxelPhysicalData* vox = m_grid->getVoxelClosestToPoint(p.Position)->getCurrentState();
+
+            glm::vec3 u = vox->u; // we don't have velocity field yet
+            u = glm::vec3(0, 0.1, 0);
+
+            glm::vec3 b = -thermal_expansion*gravity*(p.Temp - vox->temperature); // Buoyancy
+            b.y = std::max(b.y, 0.1f);
+
+            p.Position += (b+u+p.Velocity) * m_frame_rate;
+            p.Temp = alpha_temp*p.Temp + beta_temp*(vox->temperature);
+
+            p.Velocity = p.Velocity*0.9f;
         }
     }
 }
 
 
 
-void Smoke::RespawnParticle(int index, glm::vec3 pos, glm::vec3 vel)
+void Smoke::RespawnParticle(int index, Particle& fire_particle)
 {
 
     float vec_x = (rand() % 100 - 50)/ 120.0f * 0.2;
     float vec_z = (rand() % 100 - 50)/ 120.0f * 0.2;
 
+    glm::vec3 turbulance(vec_x, 0, vec_z);
+
     Particle &particle = m_particles[2*index];
     particle.Life = 1;
-    particle.Position = pos;
-    particle.Velocity = glm::vec3(vel.x-vec_x, 1.f - vel.y, vel.z-vec_z);
+    particle.Temp = fire_particle.Temp;
+    particle.Position = fire_particle.Position;
+    particle.Velocity = turbulance;
     particle.Color = glm::vec4(0.5, 0.5, 0.5, 1.0f);
 
     particle = m_particles[2*index+1];
     particle.Life = 1;
-    particle.Position = pos;
-    particle.Velocity = glm::vec3(vec_x*m_size, m_size*1.f - vel.y, vec_z*m_size);
+    particle.Temp = fire_particle.Temp;
+    particle.Position = fire_particle.Position;
+    particle.Velocity = - turbulance;
     particle.Color = glm::vec4(0.5, 0.5, 0.5, 1.0f);
 }
 
@@ -111,7 +124,7 @@ void Smoke::drawParticles(CS123::GL::CS123Shader* shader) {
             shader->setUniform("color", particle.Color);
             glm::mat4 M_fire = glm::translate(glm::mat4(), particle.Position);
             shader->setUniform("m", M_fire);
-            shader->setUniform("temp", particle.Life);
+            shader->setUniform("temp", particle.Temp);
 
             m_quad->draw();
         }

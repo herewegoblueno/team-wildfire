@@ -24,6 +24,22 @@ BasicFireScene::BasicFireScene():
     fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, -1, 0), 0.5, &voxelGrids) );
     fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, -1, 0), 0.6, &voxelGrids) );
 
+
+    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, -1, 2), 0.5, &voxelGrids) );
+    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, -1, 2), 0.6, &voxelGrids) );
+
+
+    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(-0.8, -0.5, 1.2), 0.5, &voxelGrids) );
+    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(-0.8, -0.5, 1.2), 0.6, &voxelGrids) );
+
+
+    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(1.6, -0.3, -1.2), 0.5, &voxelGrids) );
+    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(1.6, -0.3, -1.2), 0.6, &voxelGrids) );
+
+
+    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(2, -0.5, 0.8), 0.5, &voxelGrids) );
+    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(2, -0.5, 0.8), 0.6, &voxelGrids) );
+
     voxelGrids.getVisualization()->toggle(false);
     constructShaders();
 }
@@ -34,7 +50,6 @@ BasicFireScene::~BasicFireScene()
 
 void BasicFireScene::onNewSceneLoaded(){
    constructShaders();
-
 }
 
 void BasicFireScene::constructShaders() {

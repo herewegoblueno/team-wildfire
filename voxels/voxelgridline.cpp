@@ -64,7 +64,7 @@ void VoxelGridLine::draw(SupportCanvas3D *) {
         for (int y = eyeVoxelY - eyeRadiusInVoxels; y <= eyeVoxelY + eyeRadiusInVoxels; y++){
             for (int z = eyeVoxelZ - eyeRadiusInVoxels; z <= eyeVoxelZ + eyeRadiusInVoxels; z++){
                 if (grid->getVoxel(x, y, z) == nullptr) continue;
-                float temperature = grid->getVoxel(x, y, z)->temperature;
+                float temperature = grid->getVoxel(x, y, z)->getCurrentState()->temperature;
                 vec3 pos = grid->getVoxel(x, y, z)->centerInWorldSpace;
 
                 //We'd love to do this in the shader, but its better to do this here for performance
