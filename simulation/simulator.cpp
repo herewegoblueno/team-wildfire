@@ -18,8 +18,8 @@ void Simulator::step(VoxelGrid *grid){
     for (int x = 0; x < gridResolution; x++){
         for (int y = 0; y < gridResolution; y++){
             for (int z = 0; z < gridResolution; z++){
-                grid->getVoxel(x, y, z)->getCurrentState()->temperature = rand() % 5;
-                grid->getVoxel(x, y, z)->getCurrentState()->u = vec3(rand() % 5 - 2.5, rand() % 1, rand() % 5 - 2.5);
+                grid->getVoxel(x, y, z)->getCurrentState()->temperature = rand() % 5 *0.4 + 1;
+                grid->getVoxel(x, y, z)->getCurrentState()->u = 0.3f*vec3(rand() % 3 - 1.5, rand() % 1, rand() % 2 - 1);
             }
         }
     }

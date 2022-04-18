@@ -109,7 +109,7 @@ void Fire::update_particles()
 
             glm::vec3 u = vox->u*0.07f; // we don't have velocity field yet
             float c_dis = glm::distance(p.Position, m_center);
-//            u = glm::normalize(p.Position + glm::vec3(0,1,0) - m_center)*std::min(0.05f+0.2f/c_dis, 0.1f);
+            u = glm::normalize(p.Position + glm::vec3(0,1,0) - m_center)*std::min(0.05f+0.2f/c_dis, 0.1f);
 
             glm::vec3 b = -thermal_expansion*gravity*(p.Temp - vox->temperature); // Buoyancy
 
