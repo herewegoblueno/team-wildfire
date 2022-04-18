@@ -41,6 +41,8 @@ BasicFireScene::BasicFireScene():
     fires.push_back(  std::make_unique<Fire> (500, glm::vec3(2, -0.5, 0.8), 0.6, &voxelGrids) );
 
     voxelGrids.getVisualization()->toggle(false);
+
+    simulator.init();
     constructShaders();
 }
 
@@ -73,6 +75,8 @@ std::vector<std::unique_ptr<CS123Shader>> *BasicFireScene::getShaderPrograms(){
 }
 
 void BasicFireScene::render(SupportCanvas3D *context) {
+    simulator.step(&voxelGrids);
+
     glClearColor(0.2, 0.2, 0.2, 0.3);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

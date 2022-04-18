@@ -107,9 +107,9 @@ void Fire::update_particles()
             // particle is alive, thus update
             VoxelPhysicalData* vox = m_grid->getVoxelClosestToPoint(p.Position)->getCurrentState();
 
-            glm::vec3 u = vox->u; // we don't have velocity field yet
+            glm::vec3 u = vox->u*0.07f; // we don't have velocity field yet
             float c_dis = glm::distance(p.Position, m_center);
-            u = glm::normalize(p.Position + glm::vec3(0,1,0) - m_center)*std::min(0.05f+0.2f/c_dis, 0.1f);
+//            u = glm::normalize(p.Position + glm::vec3(0,1,0) - m_center)*std::min(0.05f+0.2f/c_dis, 0.1f);
 
             glm::vec3 b = -thermal_expansion*gravity*(p.Temp - vox->temperature); // Buoyancy
 

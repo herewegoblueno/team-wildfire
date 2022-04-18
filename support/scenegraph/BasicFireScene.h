@@ -1,14 +1,12 @@
 #ifndef BASICFIRESCENE_H
 #define BASICFIRESCENE_H
 
-
-#include "OpenGLScene.h"
-#include "voxels/voxelgrid.h"
-
 #include <memory>
 #include <vector>
-
+#include "OpenGLScene.h"
+#include "voxels/voxelgrid.h"
 #include "fire/fire.h"
+#include "simulation/simulator.h"
 
 namespace CS123 { namespace GL {
     class Shader;
@@ -39,6 +37,7 @@ private:
     std::vector<std::unique_ptr<CS123::GL::CS123Shader>> shader_bank;
     CS123::GL::CS123Shader *current_shader;
     VoxelGrid voxelGrids;
+    Simulator simulator;
 
 };
 
