@@ -34,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainTabWidget->setCurrentIndex(settings.currentTab);
     ui->useOrbitingCamera->setCheckState(settings.useOrbitCamera ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
     ui->vizualizeForestVoxelGrid->setCheckState(settings.visualizeForestVoxelGrid ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+    ui->vizualizeForestWindField->setCheckState(settings.visualizeWindField ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 
     ui->forestVisualizationEyeXSlider->setRange(-50, 50);
     ui->forestVisualizationEyeXSlider->setValue(settings.visualizeForestVoxelGridEyeX * 10);
@@ -45,7 +46,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->forestVisualizationEyeRSlider->setValue(settings.visualizeForestVoxelGridEyeRadius * 10);
     ui->visualizationTemperatureRangeSlider->setRange(0, 50);
     ui->visualizationTemperatureRangeSlider->setValues(settings.visualizeForestVoxelGridMinTemp * 10, settings.visualizeForestVoxelGridMaxTemp * 10);
-
 }
 
 MainWindow::~MainWindow()
