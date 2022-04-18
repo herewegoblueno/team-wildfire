@@ -46,6 +46,7 @@ struct Settings
 
     //Forest vizualization
     bool visualizeForestVoxelGrid;
+    bool visualizeWindField;
     float visualizeForestVoxelGridEyeX;
     float visualizeForestVoxelGridEyeY;
     float visualizeForestVoxelGridEyeZ;

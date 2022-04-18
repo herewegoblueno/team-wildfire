@@ -85,6 +85,13 @@
             </widget>
            </item>
            <item>
+            <widget class="QCheckBox" name="vizualizeForestWindField">
+             <property name="text">
+              <string>Vizualize Wind Field</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QToolBox" name="forestToolBox">
              <property name="currentIndex">
               <number>0</number>
@@ -95,11 +102,11 @@
                 <x>0</x>
                 <y>0</y>
                 <width>269</width>
-                <height>387</height>
+                <height>359</height>
                </rect>
               </property>
               <attribute name="label">
-               <string>Voxel Visualization Options</string>
+               <string>Voxel + Wind Visualization Options</string>
               </attribute>
               <widget class="QWidget" name="verticalLayoutWidget_2">
                <property name="geometry">
@@ -313,7 +320,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>269</width>
-                <height>387</height>
+                <height>359</height>
                </rect>
               </property>
               <attribute name="label">

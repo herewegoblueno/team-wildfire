@@ -22,7 +22,7 @@ BasicForestScene::BasicForestScene():
 {
     loadPhongShader();
     tessellateShapes();
-    _voxelGrids.getVisualization()->toggle(settings.visualizeForestVoxelGrid);
+    _voxelGrids.getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeWindField);
     _forest = std::make_unique<Forest>(numTrees, forestWidth, forestHeight);
     updateFromForest();
     _simulator.init();
@@ -48,7 +48,7 @@ void BasicForestScene::loadPhongShader() {
 
 void BasicForestScene::render(SupportCanvas3D *context) {
 
-    _simulator.step(&_voxelGrids);
+    //_simulator.step(&_voxelGrids);
 
     Camera *camera = context->getCamera();
     glClearColor(0.2, 0.2, 0.2, 0.3);
@@ -134,6 +134,6 @@ void BasicForestScene::setSceneUniforms(SupportCanvas3D *context) {
 }
 
 void BasicForestScene::settingsChanged() {
-     _voxelGrids.getVisualization()->toggle(settings.visualizeForestVoxelGrid);
+     _voxelGrids.getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeWindField);
      _voxelGrids.getVisualization()->updateValuesFromSettings();
 }

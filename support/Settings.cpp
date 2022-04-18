@@ -36,6 +36,7 @@ void Settings::loadSettingsOrDefaults() {
 
     //Forest Visualization (some of these are not saved)
     visualizeForestVoxelGrid = s.value("visualizeForestVoxelGrid", false).toBool();
+    visualizeWindField = s.value("visualizeWindField", false).toBool();
     visualizeForestVoxelGridEyeX =  s.value("visualizeForestVoxelGridEyeX", 0).toDouble();
     visualizeForestVoxelGridEyeY =  s.value("visualizeForestVoxelGridEyeY", 0).toDouble();
     visualizeForestVoxelGridEyeZ =  s.value("visualizeForestVoxelGridEyeZ", 0).toDouble();
@@ -78,6 +79,7 @@ void Settings::saveSettings() {
 
     // Forest 
     s.setValue("visualizeForestVoxelGrid", visualizeForestVoxelGrid);
+    s.setValue("visualizeWindField", visualizeWindField);
 
     // Shapes
     s.setValue("shapeParameter1", shapeParameter1);

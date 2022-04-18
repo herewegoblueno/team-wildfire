@@ -129,8 +129,14 @@ void MainWindow::on_vizualizeForestVoxelGrid_stateChanged(int state)
 {
     settings.visualizeForestVoxelGrid = state == Qt::CheckState::Checked;
     signalSettingsChanged();
-
 }
+
+void MainWindow::on_vizualizeForestWindField_stateChanged(int state)
+{
+    settings.visualizeWindField = state == Qt::CheckState::Checked;
+    signalSettingsChanged();
+}
+
 
 void MainWindow::on_useSmoke_stateChanged(int arg1)
 {
@@ -184,4 +190,3 @@ void MainWindow::on_visualizationTemperatureRangeSlider_valuesChanged(int min, i
     ui->forestVisualizationTemperatureMaxValue->setText(QString::number(max / 10.0));
     signalSettingsChanged();
 }
-

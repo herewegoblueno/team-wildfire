@@ -23,7 +23,7 @@ public:
     void setColor(vec4 color);
     void setPV(mat4 pv);
     void draw(SupportCanvas3D *context);
-    void toggle(bool enabled);
+    void toggle(bool enableVoxels, bool enableWind);
     void updateValuesFromSettings();
     vec3 getEyeCenter();
     void setEyeCenter(vec3 v);
@@ -42,7 +42,8 @@ private:
     float temperatureThreshold;
     float temperatureMax;
 
-    bool isEnabled = false;
+    bool voxelsGridEnabled = false;
+    bool windFieldEnabled = false;
 
     VoxelGrid *grid;
 };
