@@ -1,6 +1,7 @@
 #include "module.h"
 
-Module::Module()
+Module::Module() :
+    includesRoot(false)
 {
 
 }

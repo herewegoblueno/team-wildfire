@@ -12,8 +12,8 @@ Forest::Forest(int numTrees, float forestWidth, float forestHeight) :
         float z = randomFloat() * forestHeight - forestHeight / 2;
         glm::mat4 trans = glm::translate(glm::vec3(x, 0, z));
         m_treeGenerator->generateTree();
-        Tree tree = m_treeGenerator->getTree();
-        addPrimitivesFromBranches(tree.branches, trans);
+        BranchSet branches = m_treeGenerator->getBranches();
+        addPrimitivesFromBranches(branches, trans);
     }
 }
 

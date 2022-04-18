@@ -23,6 +23,9 @@ TreeGenerator::~TreeGenerator() {
     for (Branch *branch : _lifetimeBranches) {
         delete branch;
     }
+    for (Module *module : _lifetimeModules) {
+        delete module;
+    }
 }
 
 /**
@@ -49,14 +52,7 @@ void TreeGenerator::parseLSystem(std::string lSystemString) {
     glm::mat4 baseCtm = glm::mat4(1.0f); // model matrix for base of branch
     glm::mat4 branchCtm = glm::mat4(1.0f); // scaling for branch
     glm::vec3 branchVector = glm::vec3(0, 1, 0); // current dir and length of branch
-    Branch *root = new Branch;
-    root->radius = trunkInitRadius;
-    root->model = _trunkPreTransform;
-    root->parent = nullptr;
-    _branches.insert(root);
-    _lifetimeBranches.insert(root);
-    _root = root;
-    Branch *currentParent = root;
+    Branch *currentParent = nullptr;
     int recursiveDepth = 0;
     for (int i = 0; i < lSystemString.length(); i++) {
         glm::mat4 yRotate; // rotation around y-axis
@@ -104,9 +100,17 @@ void TreeGenerator::parseLSystem(std::string lSystemString) {
             Branch *branch = new Branch;
             _branches.insert(branch);
             _lifetimeBranches.insert(branch);
-            branch->radius = currentParent->radius * branchWidthDecay;
-            branch->parent = currentParent;
-            branch->model = branchCtm * _trunkPreTransform;
+            if (currentParent == nullptr) {
+                branch->radius = trunkInitRadius;
+                branch->parent = nullptr;
+                branch->model = _trunkPreTransform;
+                _root = branch;
+            } else {
+                branch->radius = currentParent->radius * branchWidthDecay;
+                branch->parent = currentParent;
+                branch->model = branchCtm * _trunkPreTransform;
+                currentParent->children.insert(branch);
+            }
             // Add leaves to branch based on leaf density
             bool canAddLeaves = recursiveDepth > minLeafRecursiveDepth
                     && recursiveDepth < maxLeafRecursiveDepth;
@@ -122,6 +126,7 @@ void TreeGenerator::parseLSystem(std::string lSystemString) {
             glm::mat4 translate = glm::translate(branchVector);
             baseCtm = translate * baseCtm;
             branchCtm = translate * branchCtm;
+            currentParent = branch;
             break;
         }
     }
@@ -138,6 +143,80 @@ void TreeGenerator::initializeLSystem() {
     outputDistribution.push_back(branchLeftOnly);
     _lSystem->addRule('X', outputDistribution);
 }
+
+
+/**
+ *  Given a tree as a directed graph of branches, split the graph into
+ *  a few modules, each containing a portion of the tree
+ */
+ModuleTree TreeGenerator::branchTreeToModules(BranchTree branchTree) {
+    ModuleSet treeModules;
+    Branch *rootBranch = branchTree.root;
+    Module *rootModule = new Module;
+    _lifetimeModules.insert(rootModule);
+    treeModules.insert(rootModule);
+    ModuleSet newModules = splitIntoModules(rootBranch, rootModule);
+    for (Module *module : newModules) {
+        treeModules.insert(module);
+    }
+    for (int i = 0; i < numModuleIterations; i++) {
+        ModuleSet updatedNewModules;
+        for (Module *module : newModules) {
+           ModuleSet toAdd = splitIntoModules(module->rootBranch, module);
+           for (Module *moduleToAdd : toAdd) {
+               treeModules.insert(moduleToAdd);
+               updatedNewModules.insert(moduleToAdd);
+           }
+        }
+        newModules = updatedNewModules;
+    }
+    std::cout << treeModules.size() << " modules on this tree" << std::endl;
+    return ModuleTree(rootModule, treeModules);
+}
+
+/**
+ * Takes in a root branch and a reference to a root module
+ * to use as the branching point for splitting a tree into (usually 3) modules.
+ * Return the new modules.
+ */
+ModuleSet TreeGenerator::splitIntoModules(Branch *rootBranch, Module *rootModule) {
+    ModuleSet newModules;
+    rootModule->includesRoot = true;
+    rootModule->branches.insert(rootBranch);
+    for (Branch *branch : rootBranch->children) {
+        rootModule->branches.insert(branch);
+        Module *module = accumulateModuleFrom(branch);
+        module->parent = rootModule;
+        module->rootBranch = branch;
+        rootModule->children.insert(module);
+        newModules.insert(module);
+    }
+    return newModules;
+}
+
+/**
+ *  Use DFS to accumulate all branches from root into a module.
+ *  Don't include the root branch in the returned module.
+ */
+Module *TreeGenerator::accumulateModuleFrom(Branch *root) {
+    Module *module = new Module;
+    _lifetimeModules.insert(module);
+    std::stack<Branch *> stack;
+    stack.push(root);
+    while (!stack.empty()) {
+        Branch *v = stack.top();
+        stack.pop();
+        if (!module->branches.count(v)) {
+            module->branches.insert(v);
+            for (Branch *child : v->children) {
+                stack.push(child);
+            }
+        }
+    }
+    module->branches.erase(root);
+    return module;
+}
+
 
 /** Return y-axis rotation angle for '+' symbol */
 float TreeGenerator::getYRotateAnglePlus() {
@@ -160,6 +239,11 @@ float TreeGenerator::getBranchLength() {
 }
 
 /** Return the root and branches */
-Tree TreeGenerator::getTree() {
-    return Tree(_root, _branches);
+ModuleTree TreeGenerator::getModuleTree() {
+    BranchTree branchTree(_root, _branches);
+    return branchTreeToModules(branchTree);
+}
+
+BranchSet TreeGenerator::getBranches() {
+    return _branches;
 }

@@ -4,24 +4,46 @@
 #include <unordered_set>
 #include "glm/glm.hpp"
 
+class Module;
+
+struct Branch;
+typedef std::unordered_set<Branch *> BranchSet;
 struct Branch {
     Branch *parent;
-    //std::vector<Branch *> children;
+    BranchSet children;
     glm::mat4 model; // gives branch world-space position
     double radius; // radius of base
     std::vector<glm::mat4> leafModels; // gives leaves world-space position
 };
+struct BranchTree {
+    Branch *root;
+    BranchSet branches;
+    BranchTree(Branch *root, BranchSet branches) :
+        root(root), branches(branches)
+    {}
+};
 
-typedef std::unordered_set<Branch *> BranchSet;
+typedef std::unordered_set<Module *> ModuleSet;
+struct ModuleTree {
+    Module *root;
+    ModuleSet modules;
+    ModuleTree(Module *root, ModuleSet modules) :
+        root(root), modules(modules)
+    {}
+};
 
 class Module
 {
 public:
     Module();
-
+    Module *parent;
+    ModuleSet children;
+    Branch *rootBranch;
+    BranchSet branches;
+    // whether root is a branch in the module or just a pointer
+    bool includesRoot;
 
 private:
-    std::vector<Branch> _branches;
     // total mass of branches, updated during combustion
     double _mass;
     // surface temperature of module

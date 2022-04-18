@@ -6,18 +6,13 @@
 #include "module.h"
 #include <unordered_set>
 
-struct Tree {
-    Branch *root;
-    BranchSet branches;
-    Tree(Branch *root, BranchSet branches) :
-        root(root), branches(branches)
-    {}
-};
-
 const float m_pi = 3.14159265359;
 
 const int recursionDepth = 6;
 const float trunkInitRadius = 0.5;
+// How many extra times to repeat the process of splitting
+// tree into modules
+const int numModuleIterations = 0;
 // Min/max branching levels for adding leaves
 const int minLeafRecursiveDepth = 2;
 const int maxLeafRecursiveDepth = 9;
@@ -36,7 +31,8 @@ public:
     TreeGenerator();
     ~TreeGenerator();
     void generateTree();
-    Tree getTree();
+    ModuleTree getModuleTree();
+    BranchSet getBranches();
 private:
     std::unique_ptr<LSystem> _lSystem;
     void initializeLSystem();
@@ -45,9 +41,17 @@ private:
     glm::mat4 _trunkPreTransform;
     glm::mat4 _leafPreTransform;
 
+
+    ModuleSet splitIntoModules(Branch *rootBranch, Module *rootModule);
+    Module *accumulateModuleFrom(Branch *root);
+    ModuleTree branchTreeToModules(BranchTree branchTree);
+
     BranchSet _branches;
     Branch *_root;
-    BranchSet _lifetimeBranches; // for memory management
+
+    // for memory management
+    BranchSet _lifetimeBranches;
+    ModuleSet _lifetimeModules;
 
     float getYRotateAnglePlus();
     float getYRotateAngleMinus();
