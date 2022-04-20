@@ -33,6 +33,8 @@ public:
     float getEyeRadius();
     void setEyeRadius(float r);
 
+    static std::string getVectorFieldModeExplanation(VectorFieldVisualizationModes mode);
+
 private:
     void generateGridVertices(VoxelGrid *grid);
     unique_ptr<CS123::GL::CS123Shader> shader;

@@ -10,6 +10,7 @@
 #include "support/camera/CamtransCamera.h"
 #include "support/lib/CS123XmlSceneParser.h"
 #include <chrono>
+#include "voxels/voxelgridline.h"
 
 using namespace std::chrono;
 
@@ -227,5 +228,7 @@ void MainWindow::on_VoxelVisOptionsDropbox_currentIndexChanged(int index)
 void MainWindow::on_FieldVisOptionsDropbox_currentIndexChanged(int index)
 {
     settings.vectorGridMode = static_cast<VectorFieldVisualizationModes>(index);
+    auto explanation = VoxelGridLine::getVectorFieldModeExplanation(static_cast<VectorFieldVisualizationModes>(index));
+    ui->VectorFieldExplanation->setText(QString::fromStdString(explanation));
     signalSettingsChanged();
 }

@@ -37,6 +37,15 @@ void VoxelGridLine::init(VoxelGrid *grid)
     glBindVertexArray(0);
 }
 
+std::string VoxelGridLine::getVectorFieldModeExplanation(VectorFieldVisualizationModes mode){
+    switch (mode){
+    case UFIELD:
+        return "The lines follow the u-field of the simulation (mostly wind)";
+    case TEMP_GRADIENT:
+        return "The lines point towards higher temperature. Heat will flow in the opposite direction.";
+    }
+}
+
 void VoxelGridLine::setPV(mat4 pv) {
     this->pv = pv;
 }
