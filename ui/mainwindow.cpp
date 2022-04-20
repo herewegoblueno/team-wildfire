@@ -48,6 +48,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->forestVisualizationEyeRSlider->setValue(settings.visualizeForestVoxelGridEyeRadius * 10);
     ui->visualizationTemperatureRangeSlider->setRange(0, 50);
     ui->visualizationTemperatureRangeSlider->setValues(settings.visualizeForestVoxelGridMinTemp * 10, settings.visualizeForestVoxelGridMaxTemp * 10);
+
+    #ifdef QT_DEBUG
+      ui->DebugBuildWarning->show();
+    #else
+      ui->DebugBuildWarning->hide();
+    #endif
 }
 
 MainWindow::~MainWindow()

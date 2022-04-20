@@ -14,7 +14,7 @@
    <string>KILL IT WITH FIRE</string>
   </property>
   <widget class="QWidget" name="MainContent">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <property name="leftMargin">
      <number>0</number>
     </property>
@@ -28,7 +28,34 @@
      <number>0</number>
     </property>
     <item>
-     <layout class="QGridLayout" name="CanvasParent"/>
+     <layout class="QVBoxLayout" name="CanvasParent" stretch="0">
+      <item>
+       <widget class="QLabel" name="DebugBuildWarning">
+        <property name="maximumSize">
+         <size>
+          <width>300</width>
+          <height>15</height>
+         </size>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel{
+    background-color: rgb(150, 0, 0);
+	color: rgb(248, 247, 255);
+}
+</string>
+        </property>
+        <property name="text">
+         <string>This is a debug build! Things will be slower.</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -73,7 +100,7 @@
 </string>
          </property>
          <property name="text">
-          <string>TextLabel</string>
+          <string>[FPS Counter]</string>
          </property>
          <property name="margin">
           <number>3</number>
