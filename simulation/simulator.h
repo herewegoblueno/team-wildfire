@@ -6,12 +6,16 @@
 
 using namespace std::chrono;
 
+
 class Simulator
 {
 public:
+    static const int NUMBER_OF_SIMULATION_THREADS;
     Simulator();
     void init();
     void step(VoxelGrid *grid);
+    void stepThreadHandler(VoxelGrid *grid, int deltaTime, int resolution, int minX, int maxX);
+
 
 private:
     milliseconds timeLastFrame;

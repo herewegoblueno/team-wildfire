@@ -18,7 +18,7 @@ using namespace CS123::GL;
 #include <iostream>
 
 BasicFireScene::BasicFireScene():
-     voxelGrids(3, vec3(0,0,0), 30)
+     voxelGrids(3, vec3(0,0,0), 40)
 {
     fires.clear();
     fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, -1, 0), 0.5, &voxelGrids) );

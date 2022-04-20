@@ -48,7 +48,7 @@ void BasicForestScene::loadPhongShader() {
 
 void BasicForestScene::render(SupportCanvas3D *context) {
 
-    //_simulator.step(&_voxelGrids);
+    _simulator.step(&_voxelGrids);
 
     Camera *camera = context->getCamera();
     glClearColor(0.2, 0.2, 0.2, 0.3);

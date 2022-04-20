@@ -9,7 +9,9 @@
 #include <QMessageBox>
 #include "support/camera/CamtransCamera.h"
 #include "support/lib/CS123XmlSceneParser.h"
+#include <chrono>
 
+using namespace std::chrono;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -63,12 +65,26 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 //for us to start rendering anything
 void MainWindow::onSupportCanvasInitialized(){
     openXmlFileForForestScene(":/xmlScenes/xmlScenes/basicScene.xml");
+    initializeFrameCounting();
 }
 
 
 void MainWindow::signalSettingsChanged() {
     //The canvas contains scenes, it'll call settingsChanged in those scenes so don't worry about that
     m_canvas3D->settingsChanged();
+}
+
+void MainWindow::notifyFrameCompleted(){
+    numberOfFramesRecorded ++;
+    int currentTime = duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
+    int timeDiff = currentTime - timeSinceStartedCounting;
+    double averageFrameDuration = timeDiff / (double) numberOfFramesRecorded;
+    ui->fpscounter->setText("Avg. FPS: " + QString::number(1 / (double)averageFrameDuration));
+}
+
+void MainWindow::initializeFrameCounting(){
+    numberOfFramesRecorded = 0;
+    timeSinceStartedCounting = duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
 }
 
 
@@ -115,6 +131,7 @@ void MainWindow::on_useLightingForShaders_stateChanged(int state)
 void MainWindow::on_mainTabWidget_currentChanged(int index)
 {
     settings.currentTab = index;
+    initializeFrameCounting();
     signalSettingsChanged();
 }
 

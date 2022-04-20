@@ -128,6 +128,7 @@ void SupportCanvas3D::paintGL() {
     glViewport(0, 0, width() * ratio, height() * ratio);
     getCamera()->setAspectRatio(static_cast<float>(width()) / static_cast<float>(height()));
     m_currentScene->render(this);
+    m_mainWindowParent->notifyFrameCompleted();
 }
 
 void SupportCanvas3D::settingsChanged() {
