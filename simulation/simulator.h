@@ -17,6 +17,7 @@ public:
     Simulator();
     void init();
     void step(VoxelGrid *grid);
+    void cleanupForNextStep(VoxelGrid *grid);
 
 
 private:

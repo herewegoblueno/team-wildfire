@@ -72,6 +72,7 @@ void BasicForestScene::render(SupportCanvas3D *context) {
     _voxelGrids.getVisualization()->draw(context);
 
     //Trigger another render
+    _simulator.cleanupForNextStep(&_voxelGrids);
     context->update();
 }
 

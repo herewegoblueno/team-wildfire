@@ -9,6 +9,12 @@ Voxel::Voxel(VoxelGrid *grid, int XIndex, int YIndex, int ZIndex, vec3 center) :
 {
     lastFramePhysicalState.temperature = getAmbientTemperature(center);
     currentPhysicalState.temperature = getAmbientTemperature(center);
+
+    //for testing
+    int targetIndex = ceil(grid->getResolution() / 2.f);
+    if (XIndex == targetIndex && YIndex == targetIndex && ZIndex == targetIndex){
+        lastFramePhysicalState.temperature = 10;
+    }
 }
 
 //TODO: consider memoization for immediate neighbours

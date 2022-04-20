@@ -123,6 +123,7 @@ void BasicFireScene::render(SupportCanvas3D *context) {
     glDisable(GL_BLEND);
 
     //Trigger another render
+    simulator.cleanupForNextStep(&voxelGrids);
     context->update();
 }
 

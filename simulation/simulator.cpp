@@ -20,16 +20,23 @@ void Simulator::step(VoxelGrid *grid){
     std::vector<std::thread> threads;
     for (int x = 0; x < gridResolution; x += jumpPerThread)
         threads.emplace_back(&Simulator::stepThreadHandler, this, grid, deltaTime.count(), gridResolution, x, x + jumpPerThread);
-
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
-    threads.clear();
+}
+
+void Simulator::cleanupForNextStep(VoxelGrid *grid){
+    //No need for asserts here, same asserts as in step()
+    int gridResolution = grid->getResolution();
+    int jumpPerThread = gridResolution / NUMBER_OF_SIMULATION_THREADS;
+
+    std::vector<std::thread> threads;
     for (int x = 0; x < gridResolution; x += jumpPerThread)
         threads.emplace_back(&Simulator::stepCleanupThreadHandler, this, grid, gridResolution, x, x + jumpPerThread);
 
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
 
-    timeLastFrame = currentTime;
+    timeLastFrame = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 }
+
 
 void Simulator::stepThreadHandler(VoxelGrid *grid, int deltaTime, int resolution, int minXInclusive, int maxXExclusive){
     for (int x = minXInclusive; x < maxXExclusive; x++){
