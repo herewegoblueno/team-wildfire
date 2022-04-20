@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainTabWidget->setCurrentIndex(settings.currentTab);
     ui->useOrbitingCamera->setCheckState(settings.useOrbitCamera ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
     ui->vizualizeForestVoxelGrid->setCheckState(settings.visualizeForestVoxelGrid ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
-    ui->vizualizeForestWindField->setCheckState(settings.visualizeWindField ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+    ui->vizualizeForestField->setCheckState(settings.visualizeVectorField ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 
     ui->forestVisualizationEyeXSlider->setRange(-50, 50);
     ui->forestVisualizationEyeXSlider->setValue(settings.visualizeForestVoxelGridEyeX * 10);
@@ -44,10 +44,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->forestVisualizationEyeYSlider->setValue(settings.visualizeForestVoxelGridEyeY * 10);
     ui->forestVisualizationEyeZSlider->setRange(-50, 50);
     ui->forestVisualizationEyeZSlider->setValue(settings.visualizeForestVoxelGridEyeZ * 10);
-    ui->forestVisualizationEyeRSlider->setRange(0, 10);
+    ui->forestVisualizationEyeRSlider->setRange(0, 15);
     ui->forestVisualizationEyeRSlider->setValue(settings.visualizeForestVoxelGridEyeRadius * 10);
     ui->visualizationTemperatureRangeSlider->setRange(0, 50);
     ui->visualizationTemperatureRangeSlider->setValues(settings.visualizeForestVoxelGridMinTemp * 10, settings.visualizeForestVoxelGridMaxTemp * 10);
+
+    ui->FieldVisOptionsDropbox->setCurrentIndex(settings.vectorGridMode);
+    ui->VoxelVisOptionsDropbox->setCurrentIndex(settings.voxelGridMode);
 
     #ifdef QT_DEBUG
       ui->DebugBuildWarning->show();
@@ -154,9 +157,9 @@ void MainWindow::on_vizualizeForestVoxelGrid_stateChanged(int state)
     signalSettingsChanged();
 }
 
-void MainWindow::on_vizualizeForestWindField_stateChanged(int state)
+void MainWindow::on_vizualizeForestField_stateChanged(int state)
 {
-    settings.visualizeWindField = state == Qt::CheckState::Checked;
+    settings.visualizeVectorField = state == Qt::CheckState::Checked;
     signalSettingsChanged();
 }
 
@@ -211,5 +214,18 @@ void MainWindow::on_visualizationTemperatureRangeSlider_valuesChanged(int min, i
     settings.visualizeForestVoxelGridMaxTemp = max / 10.0;
     ui->forestVisualizationTemperatureMinValue->setText(QString::number(min / 10.0));
     ui->forestVisualizationTemperatureMaxValue->setText(QString::number(max / 10.0));
+    signalSettingsChanged();
+}
+
+void MainWindow::on_VoxelVisOptionsDropbox_currentIndexChanged(int index)
+{
+    settings.voxelGridMode = static_cast<VoxelVisualizationModes>(index);
+    signalSettingsChanged();
+}
+
+
+void MainWindow::on_FieldVisOptionsDropbox_currentIndexChanged(int index)
+{
+    settings.vectorGridMode = static_cast<VectorFieldVisualizationModes>(index);
     signalSettingsChanged();
 }

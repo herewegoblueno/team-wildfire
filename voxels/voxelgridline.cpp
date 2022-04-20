@@ -42,7 +42,7 @@ void VoxelGridLine::setPV(mat4 pv) {
 }
 
 void VoxelGridLine::draw(SupportCanvas3D *) {
-    if (!voxelsGridEnabled && !windFieldEnabled) return;
+    if (!voxelsGridEnabled && !vectorFieldEnabled) return;
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -73,18 +73,22 @@ void VoxelGridLine::draw(SupportCanvas3D *) {
                 if (glm::length(vec3(pos - eyeCenter)) > eyeRadius) continue;
 
                 shader->setUniform("m", pos);
-                shader->setUniform("u", vox->getCurrentState()->u);
 
                 if (voxelsGridEnabled){
                     //Drawing the cube of the voxel itself...
                     shader->setUniform("temp", temperature);
-                    shader->setUniform("renderingufield", false);
+                    shader->setUniform("renderingVectorField", false);
                     glDrawArrays(GL_LINES, 0, vertices.size() / 3 - 2);
                 }
 
-                if (windFieldEnabled){
-                    //Now using the last part of the VAO to render u field
-                    shader->setUniform("renderingufield", true);
+                if (vectorFieldEnabled){
+                    //Now using the last part of the VAO to render vector field
+                    if (vectorMode == UFIELD){
+                        shader->setUniform("u", vox->getCurrentState()->u);
+                    }else{
+                        shader->setUniform("u", vox->getCurrentState()->tempGradientFromPrevState);
+                    }
+                    shader->setUniform("renderingVectorField", true);
                     glDrawArrays(GL_LINES,  (vertices.size() / 3) - 2, 2);
                 }
             }
@@ -107,6 +111,8 @@ void VoxelGridLine::updateValuesFromSettings(){
                 settings.visualizeForestVoxelGridEyeY,
                 settings.visualizeForestVoxelGridEyeZ);
     eyeRadius = settings.visualizeForestVoxelGridEyeRadius;
+    voxelMode = settings.voxelGridMode;
+    vectorMode = settings.vectorGridMode;
 }
 
 void VoxelGridLine::generateGridVertices(VoxelGrid *grid){
@@ -147,13 +153,13 @@ void VoxelGridLine::generateGridVertices(VoxelGrid *grid){
 
     }
 
-    //Add two more points that we'll use for drawing the u field
+    //Add two more points that we'll use for drawing vector fields
     vertices.insert(vertices.end(), { 0, 0, 0, 0, halfCellLength * 5, 0});
 }
 
 void VoxelGridLine::toggle(bool enableVoxels, bool enableWind){
     voxelsGridEnabled = enableVoxels;
-    windFieldEnabled = enableWind;
+    vectorFieldEnabled = enableWind;
 }
 
 vec3 VoxelGridLine::getEyeCenter(){

@@ -10,6 +10,7 @@
 
 #include <QObject>
 #include "support/lib/RGBA.h"
+#include "voxels/voxelgridline.h"
 
 // Enumeration values for the currently selected UI tab
 enum UITab {
@@ -46,7 +47,9 @@ struct Settings
 
     //Forest vizualization
     bool visualizeForestVoxelGrid;
-    bool visualizeWindField;
+    VoxelVisualizationModes voxelGridMode;
+    VectorFieldVisualizationModes vectorGridMode;
+    bool visualizeVectorField;
     float visualizeForestVoxelGridEyeX;
     float visualizeForestVoxelGridEyeY;
     float visualizeForestVoxelGridEyeZ;

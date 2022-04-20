@@ -18,11 +18,11 @@ using namespace CS123::GL;
 #include <iostream>
 
 BasicForestScene::BasicForestScene():
-     _voxelGrids(12, vec3(0,0,0), 128)
+     _voxelGrids(8, vec3(0,0,0), 60)
 {
     loadPhongShader();
     tessellateShapes();
-    _voxelGrids.getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeWindField);
+    _voxelGrids.getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeVectorField);
     _forest = std::make_unique<Forest>(numTrees, forestWidth, forestHeight);
     updateFromForest();
     _simulator.init();
@@ -148,6 +148,6 @@ void BasicForestScene::setSceneUniforms(SupportCanvas3D *context) {
 }
 
 void BasicForestScene::settingsChanged() {
-     _voxelGrids.getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeWindField);
+     _voxelGrids.getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeVectorField);
      _voxelGrids.getVisualization()->updateValuesFromSettings();
 }

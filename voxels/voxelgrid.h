@@ -30,7 +30,9 @@ private:
     vec3 minXYZ;
     int overallNumberOfCells;
     vec3 offset;
-    vector<vector<vector<std::unique_ptr<Voxel>>>> voxels; //3D array of Voxels...
+    //3D array of Voxels...
+    //Interstingly, flattening this to 1D is slower
+    vector<vector<vector<std::unique_ptr<Voxel>>>> voxels;
     float cellVolume;
 };
 

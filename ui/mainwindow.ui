@@ -96,6 +96,7 @@
          <property name="styleSheet">
           <string notr="true">QLabel{
     background-color: rgb(50, 50, 50);
+	color: rgb(200,200,200);
 }
 </string>
          </property>
@@ -121,17 +122,76 @@
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>
-            <widget class="QCheckBox" name="vizualizeForestVoxelGrid">
-             <property name="text">
-              <string>Visualize Voxel Grid</string>
-             </property>
+            <widget class="QWidget" name="VoxelVisOptionsParent" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QCheckBox" name="vizualizeForestVoxelGrid">
+                <property name="text">
+                 <string>See voxel field</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="VoxelVisOptionsDropbox">
+                <item>
+                 <property name="text">
+                  <string>Temperature</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="vizualizeForestWindField">
-             <property name="text">
-              <string>Vizualize Wind Field</string>
-             </property>
+            <widget class="QWidget" name="FieldVisOptionsParent" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QCheckBox" name="vizualizeForestField">
+                <property name="text">
+                 <string>See vector field</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="FieldVisOptionsDropbox">
+                <item>
+                 <property name="text">
+                  <string>u Field</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Temp Gradient</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </item>
            <item>
@@ -145,7 +205,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>269</width>
-                <height>331</height>
+                <height>327</height>
                </rect>
               </property>
               <attribute name="label">
@@ -155,7 +215,7 @@
                <property name="geometry">
                 <rect>
                  <x>9</x>
-                 <y>99</y>
+                 <y>79</y>
                  <width>103</width>
                  <height>42</height>
                 </rect>
@@ -192,7 +252,7 @@
                <property name="geometry">
                 <rect>
                  <x>9</x>
-                 <y>149</y>
+                 <y>129</y>
                  <width>103</width>
                  <height>42</height>
                 </rect>
@@ -229,7 +289,7 @@
                <property name="geometry">
                 <rect>
                  <x>10</x>
-                 <y>50</y>
+                 <y>30</y>
                  <width>103</width>
                  <height>42</height>
                 </rect>
@@ -266,7 +326,7 @@
                <property name="geometry">
                 <rect>
                  <x>9</x>
-                 <y>199</y>
+                 <y>179</y>
                  <width>103</width>
                  <height>42</height>
                 </rect>
@@ -303,7 +363,7 @@
                <property name="geometry">
                 <rect>
                  <x>0</x>
-                 <y>270</y>
+                 <y>230</y>
                  <width>160</width>
                  <height>80</height>
                 </rect>
@@ -347,10 +407,15 @@
                <property name="geometry">
                 <rect>
                  <x>0</x>
-                 <y>20</y>
+                 <y>0</y>
                  <width>269</width>
                  <height>16</height>
                 </rect>
+               </property>
+               <property name="font">
+                <font>
+                 <bold>true</bold>
+                </font>
                </property>
                <property name="text">
                 <string>Eye Position For Visualization</string>
@@ -363,7 +428,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>269</width>
-                <height>331</height>
+                <height>327</height>
                </rect>
               </property>
               <attribute name="label">

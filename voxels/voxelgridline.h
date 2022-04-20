@@ -11,6 +11,9 @@
 using namespace glm;
 using namespace std;
 
+enum VoxelVisualizationModes { TEMPERATURE };
+enum VectorFieldVisualizationModes { UFIELD, TEMP_GRADIENT };
+
 class VoxelGrid;
 
 class VoxelGridLine
@@ -42,8 +45,10 @@ private:
     float temperatureThreshold;
     float temperatureMax;
 
+    VoxelVisualizationModes voxelMode;
+    VectorFieldVisualizationModes vectorMode;
     bool voxelsGridEnabled = false;
-    bool windFieldEnabled = false;
+    bool vectorFieldEnabled = false;
 
     VoxelGrid *grid;
 };
