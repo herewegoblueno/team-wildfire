@@ -30,8 +30,10 @@ void Simulator::stepThreadHandler(VoxelGrid *grid, int deltaTime, int resolution
     for (int x = minXInclusive; x < maxXExclusive; x++){
         for (int y = 0; y < resolution; y++){
             for (int z = 0; z < resolution; z++){
-                grid->getVoxel(x, y, z)->getCurrentState()->temperature = rand() % 5 *0.4 + 1;
-                grid->getVoxel(x, y, z)->getCurrentState()->u = 0.3f*vec3(rand() % 3 - 1.5, rand() % 2, rand() % 2 - 1);
+                Voxel *vox = grid->getVoxel(x, y, z);
+                VoxelPhysicalData *voxData = vox->getCurrentState();
+                voxData->temperature = rand() % 5 *0.4 + 1;
+                voxData->u = 0.3f*vec3(rand() % 3 - 1.5, rand() % 2, rand() % 2 - 1);
             }
         }
     }

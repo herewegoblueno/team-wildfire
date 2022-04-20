@@ -63,16 +63,17 @@ void VoxelGridLine::draw(SupportCanvas3D *) {
     for (int x = eyeVoxelX - eyeRadiusInVoxels; x <= eyeVoxelX + eyeRadiusInVoxels; x++){
         for (int y = eyeVoxelY - eyeRadiusInVoxels; y <= eyeVoxelY + eyeRadiusInVoxels; y++){
             for (int z = eyeVoxelZ - eyeRadiusInVoxels; z <= eyeVoxelZ + eyeRadiusInVoxels; z++){
-                if (grid->getVoxel(x, y, z) == nullptr) continue;
-                float temperature = grid->getVoxel(x, y, z)->getCurrentState()->temperature;
-                vec3 pos = grid->getVoxel(x, y, z)->centerInWorldSpace;
+                Voxel *vox = grid->getVoxel(x, y, z);
+                if (vox == nullptr) continue;
+                float temperature = vox->getCurrentState()->temperature;
+                vec3 pos = vox->centerInWorldSpace;
 
                 //We'd love to do this in the shader, but its better to do this here for performance
                 if (temperature < temperatureThreshold) continue;
                 if (glm::length(vec3(pos - eyeCenter)) > eyeRadius) continue;
 
-                shader->setUniform("m", grid->getVoxel(x, y, z)->centerInWorldSpace);
-                shader->setUniform("u", grid->getVoxel(x, y, z)->getCurrentState()->u);
+                shader->setUniform("m", pos);
+                shader->setUniform("u", vox->getCurrentState()->u);
 
                 if (voxelsGridEnabled){
                     //Drawing the cube of the voxel itself...
@@ -89,7 +90,6 @@ void VoxelGridLine::draw(SupportCanvas3D *) {
             }
         }
     }
-
 
     glDisable(GL_BLEND);
 }
@@ -113,14 +113,14 @@ void VoxelGridLine::generateGridVertices(VoxelGrid *grid){
 
     float halfCellLength = (grid->cellSideLength() / 2.0) * 0.8;
     vec3 offsets [] = {
-        vec3(-halfCellLength, -halfCellLength, -halfCellLength), //(0, 0, 0) 0
-        vec3(halfCellLength, -halfCellLength, -halfCellLength), //(1, 0, 0) 1
-        vec3(halfCellLength, halfCellLength, -halfCellLength), //(1, 1, 0) 2
-        vec3(-halfCellLength, halfCellLength, -halfCellLength), //(0, 1, 0) 3
-        vec3(-halfCellLength, -halfCellLength, halfCellLength), //(0, 0, 1) 4
-        vec3(halfCellLength, -halfCellLength, halfCellLength), //(1, 0, 1) 5
-        vec3(halfCellLength, halfCellLength, halfCellLength), //(1, 1, 1) 6
-        vec3(-halfCellLength, halfCellLength, halfCellLength) //(0, 1, 1) 7
+        vec3(-halfCellLength, -halfCellLength, -halfCellLength), //(0, 0, 0)
+        vec3(halfCellLength, -halfCellLength, -halfCellLength), //(1, 0, 0)
+        vec3(halfCellLength, halfCellLength, -halfCellLength), //(1, 1, 0)
+        vec3(-halfCellLength, halfCellLength, -halfCellLength), //(0, 1, 0)
+        vec3(-halfCellLength, -halfCellLength, halfCellLength), //(0, 0, 1)
+        vec3(halfCellLength, -halfCellLength, halfCellLength), //(1, 0, 1)
+        vec3(halfCellLength, halfCellLength, halfCellLength), //(1, 1, 1)
+        vec3(-halfCellLength, halfCellLength, halfCellLength) //(0, 1, 1)
     };
 
     vec2 lines [] = {

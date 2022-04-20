@@ -8,8 +8,8 @@ Voxel::Voxel(VoxelGrid *grid, int XIndex, int YIndex, int ZIndex, vec3 center) :
     centerInWorldSpace(center)
 {
     //Just for testing...
-    currentPhysicalState.temperature =  (rand() % 5);
-    currentPhysicalState.u =  vec3(1, 1, 0);
+//    currentPhysicalState.temperature =  (rand() % 5);
+//    currentPhysicalState.u =  vec3(1, 1, 0);
 }
 
 

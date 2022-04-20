@@ -13,7 +13,12 @@
     vec3 inputPosition = aPos;
 
     if (renderingufield && normalize(u) != vec3(0,1,0)){
-        //We need to do more things!
+        //Hide the line if there's no u
+        if (length(u) == 0){
+            inputPosition *= length(u);
+        }
+
+        //Make a rotation matrix (R) to align the input line (0,1,0) to the acutal u field line
         //https://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d
         vec3 a = vec3(0,1,0);
         vec3 b = normalize(u);
