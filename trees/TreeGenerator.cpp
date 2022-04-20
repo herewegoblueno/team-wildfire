@@ -144,7 +144,6 @@ void TreeGenerator::initializeLSystem() {
     _lSystem->addRule('X', outputDistribution);
 }
 
-
 /**
  *  Given a tree as a directed graph of branches, split the graph into
  *  a few modules, each containing a portion of the tree

@@ -35,8 +35,14 @@ BasicForestScene::~BasicForestScene()
 void BasicForestScene::updateFromForest() {
     primitives.clear();
     std::vector<PrimitiveBundle> forestPrimitives = _forest->getPrimitives();
-    for (PrimitiveBundle &primitive : forestPrimitives) {
-        primitives.push_back(primitive);
+    PrimitiveType type;
+    for (PrimitiveBundle &bundle : forestPrimitives) {
+        type = bundle.primitive.type;
+        if (type == PrimitiveType::PRIMITIVE_TRUNK) {
+            _trunks.push_back(bundle);
+        } else if (type == PrimitiveType::PRIMITIVE_LEAF) {
+            _leaves.push_back(bundle);
+        }
     }
 }
 
@@ -80,20 +86,28 @@ void BasicForestScene::tessellateShapes() {
 /** Render each primitive's shape */
 void BasicForestScene::renderGeometry() {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    renderTrunks();
+    renderLeaves();
+}
 
-    for (PrimitiveBundle &bundle : primitives) {
-        // Set model (object -> world) matrix uniform on GPU
+void BasicForestScene::renderTrunks() {
+    _trunk->bindVAO();
+    for (PrimitiveBundle &bundle : _trunks) {
         _phongShader->setUniform("m",  bundle.model);
-        // Set object material
         _phongShader->applyMaterial(bundle.primitive.material);
-        // Draw the shape
-        PrimitiveType primitiveType = bundle.primitive.type;
-        if (primitiveType == PrimitiveType::PRIMITIVE_TRUNK) {
-            _trunk->draw();
-        } else if (primitiveType == PrimitiveType::PRIMITIVE_LEAF) {
-            _leaf->draw();
-        }
+        _trunk->drawVAO();
     }
+    _trunk->unbindVAO();
+}
+
+void BasicForestScene::renderLeaves() {
+    _leaf->bindVAO();
+    for (PrimitiveBundle &bundle : _leaves) {
+        _phongShader->setUniform("m",  bundle.model);
+        _phongShader->applyMaterial(bundle.primitive.material);
+        _leaf->drawVAO();
+    }
+    _leaf->unbindVAO();
 }
 
 void BasicForestScene::defineLights() {

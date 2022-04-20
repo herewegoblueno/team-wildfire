@@ -32,6 +32,18 @@ void OpenGLShape::draw() {
     }
 }
 
+void OpenGLShape::bindVAO() {
+    m_VAO->bind();
+}
+
+void OpenGLShape::unbindVAO() {
+    m_VAO->unbind();
+}
+
+void OpenGLShape::drawVAO() {
+    m_VAO->draw();
+}
+
 void OpenGLShape::setVertexData()
 {
 

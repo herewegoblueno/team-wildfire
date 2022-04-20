@@ -35,6 +35,8 @@ public:
 private:
     void updateFromForest();
 
+    void renderTrunks();
+    void renderLeaves();
     void renderGeometry();
     void loadPhongShader();
     void tessellateShapes();
@@ -50,6 +52,8 @@ private:
     std::unique_ptr<Forest> _forest;
     std::unique_ptr<Trunk> _trunk;
     std::unique_ptr<Leaf> _leaf;
+    std::vector<PrimitiveBundle> _trunks;
+    std::vector<PrimitiveBundle> _leaves;
     Simulator _simulator;
 };
 

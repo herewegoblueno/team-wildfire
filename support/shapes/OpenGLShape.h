@@ -34,6 +34,9 @@ public:
 
     void setVertexData();
     void buildVAO();
+    void bindVAO();
+    void drawVAO();
+    void unbindVAO();
 
     /**
      * initializes the relavant openGL properties for the shape
