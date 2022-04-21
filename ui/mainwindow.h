@@ -33,6 +33,7 @@ protected:
     void signalSettingsChanged(); //We could have done this with signals and slots; not a priority now
 
 private slots:
+    void toggleSeeBranchModules();
 
     void on_useLightingForShaders_stateChanged(int arg1);
 

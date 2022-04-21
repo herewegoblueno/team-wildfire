@@ -46,6 +46,7 @@ struct Settings
     float branchStochasticity;
 
     //Forest vizualization
+    bool seeBranchModules;
     bool visualizeForestVoxelGrid;
     VoxelVisualizationModes voxelGridMode;
     VectorFieldVisualizationModes vectorGridMode;

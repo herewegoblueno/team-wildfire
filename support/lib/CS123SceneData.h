@@ -150,9 +150,17 @@ struct CS123ScenePrimitive {
 struct PrimitiveBundle {
    CS123ScenePrimitive primitive;
    glm::mat4 model;
+   int moduleID;             // Only applicable to trunks
+   PrimitiveBundle(CS123ScenePrimitive primitive, glm::mat4 model, int moduleID) :
+       primitive(primitive),
+       model(model),
+       moduleID(moduleID)
+   {
+   }
    PrimitiveBundle(CS123ScenePrimitive primitive, glm::mat4 model) :
        primitive(primitive),
-       model(model)
+       model(model),
+       moduleID(0)
    {
    }
 };

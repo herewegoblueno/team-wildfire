@@ -35,6 +35,7 @@ void Settings::loadSettingsOrDefaults() {
     branchStochasticity = s.value("branchStochasticity", 0.5).toDouble();
 
     //Forest Visualization (some of these are not saved)
+    seeBranchModules = s.value("seeBranchModules", false).toBool();
     visualizeForestVoxelGrid = s.value("visualizeForestVoxelGrid", false).toBool();
     voxelGridMode = static_cast<VoxelVisualizationModes>(s.value("voxelGridMode", TEMPERATURE).toInt());
     visualizeVectorField = s.value("visualizeVectorField", false).toBool();

@@ -12,6 +12,7 @@
 #include "support/shapes/Trunk.h"
 #include "support/shapes/Leaf.h"
 #include "simulation/simulator.h"
+#include <unordered_map>
 
 const int numTrees = 20;
 const float forestHeight = 10;
@@ -35,6 +36,7 @@ public:
 private:
     void updateFromForest();
 
+    void renderTrunksVisualizedModules();
     void renderTrunks();
     void renderLeaves();
     void renderGeometry();
@@ -54,6 +56,7 @@ private:
     std::unique_ptr<Leaf> _leaf;
     std::vector<PrimitiveBundle> _trunks;
     std::vector<PrimitiveBundle> _leaves;
+    std::unordered_map<int, CS123SceneMaterial> _moduleIDToMat;
     Simulator _simulator;
 };
 

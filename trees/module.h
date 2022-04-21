@@ -14,6 +14,7 @@ struct Branch {
     glm::mat4 model; // gives branch world-space position
     double radius; // radius of base
     std::vector<glm::mat4> leafModels; // gives leaves world-space position
+    int moduleID; // lets us identify modules for visual debugging
 };
 struct BranchTree {
     Branch *root;

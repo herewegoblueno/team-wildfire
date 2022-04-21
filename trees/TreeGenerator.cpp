@@ -169,7 +169,6 @@ ModuleTree TreeGenerator::branchTreeToModules(BranchTree branchTree) {
         }
         newModules = updatedNewModules;
     }
-    std::cout << treeModules.size() << " modules on this tree" << std::endl;
     return ModuleTree(rootModule, treeModules);
 }
 

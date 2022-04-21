@@ -122,6 +122,13 @@
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>
+            <widget class="QCheckBox" name="seeBranchModules">
+             <property name="text">
+              <string>See branch modules</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QWidget" name="VoxelVisOptionsParent" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout">
               <property name="leftMargin">
@@ -218,7 +225,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>269</width>
-                <height>459</height>
+                <height>431</height>
                </rect>
               </property>
               <attribute name="label">
@@ -427,6 +434,7 @@
                </property>
                <property name="font">
                 <font>
+                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -441,7 +449,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>269</width>
-                <height>459</height>
+                <height>431</height>
                </rect>
               </property>
               <attribute name="label">
@@ -528,5 +536,25 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>seeBranchModules</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>toggleSeeBranchModules()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>134</x>
+     <y>92</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>488</x>
+     <y>118</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>toggleSeeBranchModules()</slot>
+ </slots>
 </ui>

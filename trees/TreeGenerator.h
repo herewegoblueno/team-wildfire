@@ -8,11 +8,12 @@
 
 const float m_pi = 3.14159265359;
 
-const int recursionDepth = 6;
-const float trunkInitRadius = 0.5;
 // How many extra times to repeat the process of splitting
 // tree into modules
-const int numModuleIterations = 0;
+const int numModuleIterations = 1;
+
+const int recursionDepth = 6;
+const float trunkInitRadius = 0.5;
 // Min/max branching levels for adding leaves
 const int minLeafRecursiveDepth = 2;
 const int maxLeafRecursiveDepth = 9;

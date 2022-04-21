@@ -87,8 +87,33 @@ void BasicForestScene::tessellateShapes() {
 /** Render each primitive's shape */
 void BasicForestScene::renderGeometry() {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    renderTrunks();
-    renderLeaves();
+    if (settings.seeBranchModules) {
+        renderTrunksVisualizedModules();
+    } else {
+        renderTrunks();
+        renderLeaves();
+    }
+}
+
+/** Color each branch based on the module it's in */
+void BasicForestScene::renderTrunksVisualizedModules() {
+    _trunk->bindVAO();
+    for (PrimitiveBundle &bundle : _trunks) {
+        _phongShader->setUniform("m",  bundle.model);
+        int moduleID = bundle.moduleID;
+        if (_moduleIDToMat.count(moduleID)) {
+            _phongShader->applyMaterial(_moduleIDToMat[moduleID]);
+        } else {
+            CS123SceneMaterial mat = bundle.primitive.material;
+            mat.cAmbient.r = randomFloat();
+            mat.cAmbient.g = randomFloat();
+            mat.cAmbient.b = randomFloat();
+            _moduleIDToMat[moduleID] = mat;
+            _phongShader->applyMaterial(mat);
+        }
+        _trunk->drawVAO();
+    }
+    _trunk->unbindVAO();
 }
 
 void BasicForestScene::renderTrunks() {

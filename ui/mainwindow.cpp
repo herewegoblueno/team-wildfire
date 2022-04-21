@@ -232,3 +232,7 @@ void MainWindow::on_FieldVisOptionsDropbox_currentIndexChanged(int index)
     ui->VectorFieldExplanation->setText(QString::fromStdString(explanation));
     signalSettingsChanged();
 }
+
+void MainWindow::toggleSeeBranchModules() {
+    settings.seeBranchModules = !settings.seeBranchModules;
+}

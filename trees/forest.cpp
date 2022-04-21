@@ -2,38 +2,57 @@
 #include "glm/gtx/transform.hpp"
 
 Forest::Forest(int numTrees, float forestWidth, float forestHeight) :
-    m_treeGenerator(nullptr)
+    _treeGenerator(nullptr),
+    _moduleNum(0)
 {
     initializeTrunkPrimitive();
     initializeLeafPrimitive();
-    m_treeGenerator = std::make_unique<TreeGenerator>();
+    _treeGenerator = std::make_unique<TreeGenerator>();
     for (int i = 0; i < numTrees; i++) {
         float x = randomFloat() * forestWidth - forestWidth / 2;
         float z = randomFloat() * forestHeight - forestHeight / 2;
         glm::mat4 trans = glm::translate(glm::vec3(x, 0, z));
-        m_treeGenerator->generateTree();
-        BranchSet branches = m_treeGenerator->getBranches();
-        addPrimitivesFromBranches(branches, trans);
+        _treeGenerator->generateTree();
+        ModuleTree moduleTree = _treeGenerator->getModuleTree();
+        addPrimitivesFromModules(moduleTree.modules, trans);
     }
 }
 
 /**
- * Parse a tree into primitives and model matrices, and apply a final transformation
+ * Parse modules into primitives and model matrices, and apply a final transformation
+ * to get the tree in the desired position
+ */
+void Forest::addPrimitivesFromModules(const ModuleSet &modules, glm::mat4 trans) {
+    for (Module *module : modules) {
+        _moduleNum++;
+        for (Branch *branch : module->branches) {
+            PrimitiveBundle branchPrimitive(*_trunk, trans * branch->model, _moduleNum);
+            _primitives.push_back(branchPrimitive);
+            for (glm::mat4 &leafModel : branch->leafModels) {
+                PrimitiveBundle leafPrimitive(*_leaf, trans * leafModel);
+                _primitives.push_back(leafPrimitive);
+            }
+        }
+    }
+}
+
+/**
+ * Parse branches into primitives and model matrices, and apply a final transformation
  * to get the tree in the desired position
  */
 void Forest::addPrimitivesFromBranches(const BranchSet &branches, glm::mat4 trans) {
     for (Branch *branch : branches) {
-        PrimitiveBundle branchPrimitive(*m_trunk, trans * branch->model);
-        m_primitives.push_back(branchPrimitive);
+        PrimitiveBundle branchPrimitive(*_trunk, trans * branch->model);
+        _primitives.push_back(branchPrimitive);
         for (glm::mat4 &leafModel : branch->leafModels) {
-            PrimitiveBundle leafPrimitive(*m_leaf, trans * leafModel);
-            m_primitives.push_back(leafPrimitive);
+            PrimitiveBundle leafPrimitive(*_leaf, trans * leafModel);
+            _primitives.push_back(leafPrimitive);
         }
     }
 }
 
 std::vector<PrimitiveBundle> Forest::getPrimitives() {
-    return m_primitives;
+    return _primitives;
 }
 
 /** Initialize the cylinder building block of our tree trunk/branches */
@@ -48,7 +67,7 @@ void Forest::initializeTrunkPrimitive() {
     material->cDiffuse.g = 0.2f;
     material->cDiffuse.b = 0.2f;
     // Create primitive object
-    m_trunk = std::make_unique<CS123ScenePrimitive>(
+    _trunk = std::make_unique<CS123ScenePrimitive>(
                 PrimitiveType::PRIMITIVE_TRUNK, *material);
 }
 
@@ -65,6 +84,6 @@ void Forest::initializeLeafPrimitive() {
     material->cDiffuse.g = 0.5f;
     material->cDiffuse.b = 0.02f;
     // Create primitive object
-    m_leaf = std::make_unique<CS123ScenePrimitive>(
+    _leaf = std::make_unique<CS123ScenePrimitive>(
                 PrimitiveType::PRIMITIVE_LEAF, *material);
 }
