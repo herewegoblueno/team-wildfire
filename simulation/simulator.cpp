@@ -1,5 +1,6 @@
 #include "simulator.h"
 #include <thread>
+#include "support/Settings.h"
 
 const int Simulator::NUMBER_OF_SIMULATION_THREADS = 4;
 
@@ -11,7 +12,8 @@ void Simulator::init(){
 
 void Simulator::step(VoxelGrid *grid){
     milliseconds currentTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-    milliseconds deltaTime = currentTime - timeLastFrame;
+    int deltaTime = (currentTime - timeLastFrame).count();
+    deltaTime *= settings.simulatorTimescale;
 
     int gridResolution = grid->getResolution();
     assert(gridResolution % NUMBER_OF_SIMULATION_THREADS == 0);
@@ -19,7 +21,7 @@ void Simulator::step(VoxelGrid *grid){
 
     std::vector<std::thread> threads;
     for (int x = 0; x < gridResolution; x += jumpPerThread)
-        threads.emplace_back(&Simulator::stepThreadHandler, this, grid, deltaTime.count(), gridResolution, x, x + jumpPerThread);
+        threads.emplace_back(&Simulator::stepThreadHandler, this, grid, deltaTime, gridResolution, x, x + jumpPerThread);
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
 }
 

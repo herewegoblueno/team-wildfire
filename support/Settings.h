@@ -58,6 +58,8 @@ struct Settings
     float visualizeForestVoxelGridMinTemp;
     float visualizeForestVoxelGridMaxTemp;
 
+    float simulatorTimescale;
+
     // Shapes
     int shapeParameter1;
     int shapeParameter2;
