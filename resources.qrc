@@ -16,4 +16,7 @@
         <file alias="fire.png">fire/fire_particle.png</file>
         <file alias="fire2.png">fire/fire_particle2.png</file>
     </qresource>
+    <qresource prefix="/icon">
+        <file>icon/killWithFire.png</file>
+    </qresource>
 </RCC>

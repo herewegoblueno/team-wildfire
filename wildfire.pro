@@ -12,6 +12,7 @@ macx {
     QMAKE_CFLAGS_X86_64 += -mmacosx-version-min=10.7
     QMAKE_CXXFLAGS_X86_64 = $$QMAKE_CFLAGS_X86_64
     CONFIG += c++11
+    ICON = $$PWD/killWithFire.icns
 }
 win32 {
     DEFINES += GLEW_STATIC
