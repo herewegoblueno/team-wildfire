@@ -30,7 +30,6 @@ class TreeGenerator
 {
 public:
     TreeGenerator();
-    ~TreeGenerator();
     void generateTree();
     ModuleTree getModuleTree();
     BranchSet getBranches();
@@ -49,10 +48,6 @@ private:
 
     BranchSet _branches;
     Branch *_root;
-
-    // for memory management
-    BranchSet _lifetimeBranches;
-    ModuleSet _lifetimeModules;
 
     float getYRotateAnglePlus();
     float getYRotateAngleMinus();

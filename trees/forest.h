@@ -7,14 +7,17 @@ class Forest
 {
 public:
     Forest(int numTrees, float forestWidth, float forestHeight);
+    ~Forest();
+    void update();
     std::vector<PrimitiveBundle> getPrimitives();
 
 private:
-    void addPrimitivesFromModules(const ModuleSet &modules, glm::mat4 trans);
-    void addPrimitivesFromBranches(const BranchSet &branches, glm::mat4 trans);
+    void addTreeToForest(const ModuleSet &modules, glm::mat4 trans);
     void initializeTrunkPrimitive();
     void initializeLeafPrimitive();
 
+    BranchSet _branches;
+    ModuleSet _modules;
     std::vector<PrimitiveBundle> _primitives;
     std::unique_ptr<TreeGenerator> _treeGenerator;
     std::unique_ptr<CS123ScenePrimitive> _trunk;

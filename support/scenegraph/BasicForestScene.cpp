@@ -34,6 +34,7 @@ BasicForestScene::~BasicForestScene()
 
 void BasicForestScene::updateFromForest() {
     primitives.clear();
+    _forest->update();
     std::vector<PrimitiveBundle> forestPrimitives = _forest->getPrimitives();
     PrimitiveType type;
     for (PrimitiveBundle &bundle : forestPrimitives) {

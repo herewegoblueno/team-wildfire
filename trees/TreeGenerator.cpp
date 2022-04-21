@@ -19,15 +19,6 @@ TreeGenerator::TreeGenerator() :
     _trunkPreTransform = trunkTranslate * trunkScale;
 }
 
-TreeGenerator::~TreeGenerator() {
-    for (Branch *branch : _lifetimeBranches) {
-        delete branch;
-    }
-    for (Module *module : _lifetimeModules) {
-        delete module;
-    }
-}
-
 /**
  *  Generate a new tree. Regenerating the L-system creates potentially
  *  new topology, while random elements of the mesh generation ensure other
@@ -99,7 +90,6 @@ void TreeGenerator::parseLSystem(std::string lSystemString) {
             // Allocate new branch object
             Branch *branch = new Branch;
             _branches.insert(branch);
-            _lifetimeBranches.insert(branch);
             if (currentParent == nullptr) {
                 branch->radius = trunkInitRadius;
                 branch->parent = nullptr;
@@ -152,7 +142,8 @@ ModuleTree TreeGenerator::branchTreeToModules(BranchTree branchTree) {
     ModuleSet treeModules;
     Branch *rootBranch = branchTree.root;
     Module *rootModule = new Module;
-    _lifetimeModules.insert(rootModule);
+    rootModule->includesRoot = true;
+    rootModule->branches.insert(rootBranch);
     treeModules.insert(rootModule);
     ModuleSet newModules = splitIntoModules(rootBranch, rootModule);
     for (Module *module : newModules) {
@@ -179,11 +170,12 @@ ModuleTree TreeGenerator::branchTreeToModules(BranchTree branchTree) {
  */
 ModuleSet TreeGenerator::splitIntoModules(Branch *rootBranch, Module *rootModule) {
     ModuleSet newModules;
-    rootModule->includesRoot = true;
-    rootModule->branches.insert(rootBranch);
     for (Branch *branch : rootBranch->children) {
         rootModule->branches.insert(branch);
         Module *module = accumulateModuleFrom(branch);
+        for (Branch *toRemove : module->branches) {
+            rootModule->branches.erase(toRemove);
+        }
         module->parent = rootModule;
         module->rootBranch = branch;
         rootModule->children.insert(module);
@@ -198,7 +190,6 @@ ModuleSet TreeGenerator::splitIntoModules(Branch *rootBranch, Module *rootModule
  */
 Module *TreeGenerator::accumulateModuleFrom(Branch *root) {
     Module *module = new Module;
-    _lifetimeModules.insert(module);
     std::stack<Branch *> stack;
     stack.push(root);
     while (!stack.empty()) {

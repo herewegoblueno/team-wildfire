@@ -1,5 +1,6 @@
 #include "forest.h"
 #include "glm/gtx/transform.hpp"
+#include <iostream>
 
 Forest::Forest(int numTrees, float forestWidth, float forestHeight) :
     _treeGenerator(nullptr),
@@ -8,45 +9,65 @@ Forest::Forest(int numTrees, float forestWidth, float forestHeight) :
     initializeTrunkPrimitive();
     initializeLeafPrimitive();
     _treeGenerator = std::make_unique<TreeGenerator>();
+    int totalModules = 0;
     for (int i = 0; i < numTrees; i++) {
         float x = randomFloat() * forestWidth - forestWidth / 2;
         float z = randomFloat() * forestHeight - forestHeight / 2;
         glm::mat4 trans = glm::translate(glm::vec3(x, 0, z));
         _treeGenerator->generateTree();
         ModuleTree moduleTree = _treeGenerator->getModuleTree();
-        addPrimitivesFromModules(moduleTree.modules, trans);
+        addTreeToForest(moduleTree.modules, trans);
+        totalModules += moduleTree.modules.size();
+    }
+    std::cout << (float)totalModules / (float)numTrees << " modules per tree" << std::endl;
+}
+
+Forest::~Forest() {
+    for (Branch *branch : _branches) {
+        delete branch;
+    }
+    for (Module *module : _modules) {
+        delete module;
     }
 }
 
-/**
- * Parse modules into primitives and model matrices, and apply a final transformation
- * to get the tree in the desired position
- */
-void Forest::addPrimitivesFromModules(const ModuleSet &modules, glm::mat4 trans) {
-    for (Module *module : modules) {
-        _moduleNum++;
-        for (Branch *branch : module->branches) {
-            PrimitiveBundle branchPrimitive(*_trunk, trans * branch->model, _moduleNum);
-            _primitives.push_back(branchPrimitive);
-            for (glm::mat4 &leafModel : branch->leafModels) {
-                PrimitiveBundle leafPrimitive(*_leaf, trans * leafModel);
-                _primitives.push_back(leafPrimitive);
-            }
+/** Update primitives based on branches */
+void Forest::update() {
+    _primitives.clear();
+    for (Branch *branch : _branches) {
+        PrimitiveBundle branchPrimitive(*_trunk, branch->model, branch->moduleID);
+        _primitives.push_back(branchPrimitive);
+        for (glm::mat4 &leafModel : branch->leafModels) {
+            PrimitiveBundle leafPrimitive(*_leaf, leafModel);
+            _primitives.push_back(leafPrimitive);
         }
     }
 }
 
 /**
- * Parse branches into primitives and model matrices, and apply a final transformation
+ * Add modules and branches to forest state, adjusted with a transformation
  * to get the tree in the desired position
  */
-void Forest::addPrimitivesFromBranches(const BranchSet &branches, glm::mat4 trans) {
-    for (Branch *branch : branches) {
-        PrimitiveBundle branchPrimitive(*_trunk, trans * branch->model);
-        _primitives.push_back(branchPrimitive);
-        for (glm::mat4 &leafModel : branch->leafModels) {
-            PrimitiveBundle leafPrimitive(*_leaf, trans * leafModel);
-            _primitives.push_back(leafPrimitive);
+void Forest::addTreeToForest(const ModuleSet &modules, glm::mat4 trans) {
+    std::unordered_set<Branch *> seen;
+    for (Module *module : modules) {
+        _modules.insert(module);
+        _moduleNum++;
+        for (Branch *branch : module->branches) {
+            if (seen.count(branch)) {
+                std::cerr << "ERROR: BRANCH IN MULTIPLE MODULES" << std::endl;
+            }
+            seen.insert(branch);
+            branch->moduleID = _moduleNum;
+            branch->model = trans * branch->model;
+            _branches.insert(branch);
+            PrimitiveBundle branchPrimitive(*_trunk, branch->model, _moduleNum);
+            _primitives.push_back(branchPrimitive);
+            for (glm::mat4 &leafModel : branch->leafModels) {
+                leafModel = trans * leafModel;
+                PrimitiveBundle leafPrimitive(*_leaf, leafModel);
+                _primitives.push_back(leafPrimitive);
+            }
         }
     }
 }
