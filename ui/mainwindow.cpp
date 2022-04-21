@@ -52,6 +52,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->FieldVisOptionsDropbox->setCurrentIndex(settings.vectorGridMode);
     ui->VoxelVisOptionsDropbox->setCurrentIndex(settings.voxelGridMode);
+    ui->seeBranchModules->setChecked(settings.seeBranchModules);
 
     #ifdef QT_DEBUG
       ui->DebugBuildWarning->show();
