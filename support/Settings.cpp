@@ -47,6 +47,8 @@ void Settings::loadSettingsOrDefaults() {
     visualizeForestVoxelGridMinTemp = s.value("visualizeForestVoxelGridMinTemp", 0).toDouble();
     visualizeForestVoxelGridMaxTemp = s.value("visualizeForestVoxelGridMaxTemp", 3).toDouble();
 
+    simulatorTimescale = s.value("simulatorTimescale", 1).toDouble();
+
     // Shape Tesselation Settings
     shapeParameter1 = s.value("shapeParameter1", 15).toInt();
     shapeParameter2 = s.value("shapeParameter2", 15).toInt();
@@ -85,6 +87,8 @@ void Settings::saveSettings() {
     s.setValue("visualizeVectorField", visualizeVectorField);
     s.setValue("voxelGridMode", voxelGridMode);
     s.setValue("vectorGridMode", vectorGridMode);
+
+    s.setValue("simulatorTimescale", simulatorTimescale);
 
 
     // Shapes

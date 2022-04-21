@@ -122,6 +122,70 @@
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>
+            <widget class="QWidget" name="TimescaleParent" native="true">
+             <layout class="QVBoxLayout" name="verticalLayout_2">
+              <property name="spacing">
+               <number>3</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QWidget" name="widget_2" native="true">
+                <layout class="QHBoxLayout" name="horizontalLayout_5">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="timescalLabel">
+                   <property name="text">
+                    <string>Timescale</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="timescaleValue">
+                   <property name="text">
+                    <string>1x</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="resetTimescaleButton">
+                   <property name="text">
+                    <string>Reset</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="TimescaleSlider">
+                <property name="value">
+                 <number>1</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
             <widget class="QCheckBox" name="seeBranchModules">
              <property name="text">
               <string>See branch modules</string>
@@ -228,7 +292,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>269</width>
-                <height>431</height>
+                <height>383</height>
                </rect>
               </property>
               <attribute name="label">
@@ -451,7 +515,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>269</width>
-                <height>431</height>
+                <height>383</height>
                </rect>
               </property>
               <attribute name="label">

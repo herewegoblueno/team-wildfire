@@ -54,6 +54,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->VoxelVisOptionsDropbox->setCurrentIndex(settings.voxelGridMode);
     ui->seeBranchModules->setChecked(settings.seeBranchModules);
 
+    ui->TimescaleSlider->setRange(0, 20);
+    ui->TimescaleSlider->setValue(settings.simulatorTimescale * 10);
+
     #ifdef QT_DEBUG
       ui->DebugBuildWarning->show();
     #else
@@ -237,3 +240,16 @@ void MainWindow::on_FieldVisOptionsDropbox_currentIndexChanged(int index)
 void MainWindow::toggleSeeBranchModules() {
     settings.seeBranchModules = !settings.seeBranchModules;
 }
+
+void MainWindow::on_TimescaleSlider_valueChanged(int value)
+{
+    settings.simulatorTimescale = value / 10.f;
+    ui->timescaleValue->setText(QString::number(value / 10.f));
+}
+
+
+void MainWindow::on_resetTimescaleButton_clicked()
+{
+    ui->TimescaleSlider->setValue(10);
+}
+
