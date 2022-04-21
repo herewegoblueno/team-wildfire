@@ -79,6 +79,7 @@ void VoxelGridLine::draw(SupportCanvas3D *) {
 
                 //We'd love to do this in the shader, but its better to do this here for performance
                 if (temperature < temperatureThreshold) continue;
+                if (temperature > temperatureMax) continue;
                 if (glm::length(vec3(pos - eyeCenter)) > eyeRadius) continue;
 
                 shader->setUniform("m", pos);
