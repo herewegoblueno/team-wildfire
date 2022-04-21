@@ -24,6 +24,7 @@ SOURCES += ui/mainwindow.cpp \
     main.cpp \
     glew-1.10.0/src/glew.c \
     simulation/simulationheattransfer.cpp \
+    simulation/simulationwaterphysics.cpp \
     simulation/simulator.cpp \
     support/Settings.cpp \
     support/camera/CamtransCamera.cpp \

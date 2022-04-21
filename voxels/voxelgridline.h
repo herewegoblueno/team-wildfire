@@ -11,7 +11,7 @@
 using namespace glm;
 using namespace std;
 
-enum VoxelVisualizationModes { TEMPERATURE };
+enum VoxelVisualizationModes { TEMPERATURE, TEMP_LAPLACE };
 enum VectorFieldVisualizationModes { UFIELD, TEMP_GRADIENT };
 
 class VoxelGrid;

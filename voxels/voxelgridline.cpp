@@ -86,7 +86,12 @@ void VoxelGridLine::draw(SupportCanvas3D *) {
 
                 if (voxelsGridEnabled){
                     //Drawing the cube of the voxel itself...
-                    shader->setUniform("temp", temperature);
+                    //TODO: improve this, still too tightly coupled with temperature ranges
+                    if (voxelMode == TEMP_LAPLACE){
+                        shader->setUniform("temp", vox->getCurrentState()->tempLaplaceFromPrevState);
+                    }else{
+                        shader->setUniform("temp", temperature);
+                    }
                     shader->setUniform("renderingVectorField", false);
                     glDrawArrays(GL_LINES, 0, vertices.size() / 3 - 2);
                 }

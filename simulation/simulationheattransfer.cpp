@@ -7,11 +7,12 @@
 //eq 21 in Fire in Paradise paper
 //TODO: add in last 2 terms
 void Simulator::stepVoxelHeatTransfer(Voxel* v, int deltaTimeInMs){
-    vec3 tempGradient = v->getTemperatureGradientFromPreviousFrame();
-    v->getCurrentState()->tempGradientFromPrevState = tempGradient;
-    float dTdt = HEAT_DIFFUSION_INTENSITY_TERM * glm::dot(tempGradient, tempGradient);
+    VoxelTemperatureGradientInfo tempGradientInfo = v->getTemperatureGradientInfoFromPreviousFrame();
+    v->getCurrentState()->tempGradientFromPrevState = tempGradientInfo.gradient;
+    v->getCurrentState()->tempLaplaceFromPrevState = tempGradientInfo.laplace;
+    float dTdt = HEAT_DIFFUSION_INTENSITY_TERM * tempGradientInfo.laplace;
     dTdt -= RADIATIVE_COOLING_TERM * pow(v->getLastFrameState()->temperature - Voxel::getAmbientTemperature(v->centerInWorldSpace), 4);
-    dTdt -= glm::dot(tempGradient, v->getLastFrameState()->u);
+    dTdt -= glm::dot(tempGradientInfo.gradient, v->getLastFrameState()->u);
     v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt * deltaTimeInMs / 1000.f;
 };
 

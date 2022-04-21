@@ -221,6 +221,11 @@
                   <string>Temperature</string>
                  </property>
                 </item>
+                <item>
+                 <property name="text">
+                  <string>Temperature Laplace</string>
+                 </property>
+                </item>
                </widget>
               </item>
              </layout>

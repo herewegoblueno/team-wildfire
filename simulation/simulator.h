@@ -27,9 +27,9 @@ private:
     milliseconds timeLastFrame;
     void stepThreadHandler(VoxelGrid *grid, int deltaTime, int resolution, int minX, int maxX);
     void stepCleanupThreadHandler(VoxelGrid *grid, int resolution, int minX, int maxX);
-    void stepVoxelHeatTransfer(Voxel* v, int deltaTimeIn);
 
-    void stepVoxelWater(Voxel* v, int deltaTimeIn);
+    void stepVoxelHeatTransfer(Voxel* v, int deltaTimeInMs);
+    void stepVoxelWater(Voxel* v, int deltaTimeInMs);
 
 
     static float advect(float field, glm::vec3 vel, glm::vec3 field_grad, float dt);

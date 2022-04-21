@@ -11,13 +11,20 @@ using namespace glm;
 struct VoxelPhysicalData {
     float mass;
     float temperature;
-    vec3 u;  // velocity field
     vec3 tempGradientFromPrevState; // ∇T (here just to make debugging easier if need be)
+    float tempLaplaceFromPrevState; // ∇^2T (here just to make debugging easier if need be)
+
+     vec3 u;  // velocity field
 
     // water coefs
     float q_v; // water vapor
     float q_c; // condensed water
 //    float q_r; // rain (ignore for now)
+};
+
+struct VoxelTemperatureGradientInfo {
+    vec3 gradient; // ∇T
+    float laplace; // ∇^2T
 };
 
 class Voxel {
@@ -38,9 +45,7 @@ public:
     const int ZIndex;
     const vec3 centerInWorldSpace;
 
-    // ∇T
-    vec3 getTemperatureGradientFromPreviousFrame();
-    // Tamb
+    VoxelTemperatureGradientInfo getTemperatureGradientInfoFromPreviousFrame();
     float static getAmbientTemperature(vec3 pos);
 
 private:
