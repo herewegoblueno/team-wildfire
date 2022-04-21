@@ -13,6 +13,11 @@ struct VoxelPhysicalData {
     float temperature;
     vec3 u;  // velocity field
     vec3 tempGradientFromPrevState; // ∇T (here just to make debugging easier if need be)
+
+    // water coefs
+    float q_v; // water vapor
+    float q_c; // condensed water
+//    float q_r; // rain (ignore for now)
 };
 
 class Voxel {

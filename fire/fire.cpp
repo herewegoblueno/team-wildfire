@@ -105,15 +105,23 @@ void Fire::update_particles()
         if (p.Life > 0.0f)
         {
             // particle is alive, thus update
-            VoxelPhysicalData* vox = m_grid->getVoxelClosestToPoint(p.Position)->getCurrentState();
+            Voxel* voxel = m_grid->getVoxelClosestToPoint(p.Position);
+            VoxelPhysicalData* vox = voxel->getCurrentState();
+            float x = p.Position.x;
+            float y = p.Position.y;
+            float z = p.Position.z;
+            float te = p.Temp;
 
             glm::vec3 u = vox->u*0.07f; // we don't have velocity field yet
-            float c_dis = glm::distance(p.Position, m_center);
+            float c_dis = glm::distance(p.Position, m_center)+0.001f;
             u = glm::normalize(p.Position + glm::vec3(0,1,0) - m_center)*std::min(0.05f+0.2f/c_dis, 0.1f);
 
             glm::vec3 b = -thermal_expansion*gravity*(p.Temp - vox->temperature); // Buoyancy
 
             p.Position += (b+u) * fire_frame_rate;
+
+            if(i==0) cout << x << " " << y << " " << z << " " << te<< endl << flush;
+            if(i==0) cout << (b+u).x << " " << (b+u).y << " " << (b+u).z << endl << flush;
 
             glm::vec3 adjust_vec = p.Position - m_center;
             adjust_vec.y = adjust_vec.y*0.5;
