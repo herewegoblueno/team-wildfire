@@ -9,22 +9,22 @@ class VoxelGrid;
 using namespace glm;
 
 struct VoxelPhysicalData {
-    float mass;
-    float temperature;
-    vec3 tempGradientFromPrevState; // ∇T (here just to make debugging easier if need be)
-    float tempLaplaceFromPrevState; // ∇^2T (here just to make debugging easier if need be)
+    double mass = 0;
+    double temperature = 0;
+    dvec3 tempGradientFromPrevState = dvec3(0,0,0); // ∇T (here just to make debugging easier if need be)
+    double tempLaplaceFromPrevState = 0; // ∇^2T (here just to make debugging easier if need be)
 
-     vec3 u;  // velocity field
+    dvec3 u = dvec3(0,0,0);  // velocity field
 
     // water coefs
-    float q_v; // water vapor
-    float q_c; // condensed water
+    float q_v = 0; // water vapor
+    float q_c = 0; // condensed water
 //    float q_r; // rain (ignore for now)
 };
 
 struct VoxelTemperatureGradientInfo {
-    vec3 gradient; // ∇T
-    float laplace; // ∇^2T
+    dvec3 gradient; // ∇T
+    double laplace; // ∇^2T
 };
 
 class Voxel {
@@ -36,7 +36,7 @@ public:
     //better to enforce that it's just the pointers being passed around
     VoxelPhysicalData *getCurrentState();
     VoxelPhysicalData *getLastFrameState();
-    void switchStates();
+    void updateLastFrameData();
 
     //Set during initialization
     VoxelGrid *grid;
@@ -46,13 +46,14 @@ public:
     const vec3 centerInWorldSpace;
 
     VoxelTemperatureGradientInfo getTemperatureGradientInfoFromPreviousFrame();
-    float static getAmbientTemperature(vec3 pos);
+    double static getAmbientTemperature(vec3 pos);
 
 private:
     //Set and changed over the course of simulation
     VoxelPhysicalData currentPhysicalState;
     VoxelPhysicalData lastFramePhysicalState;
 
+    double getNeighbourTemperature(int xOffset, int yOffset, int zOffset);
 };
 
 #endif // VOXEL_H

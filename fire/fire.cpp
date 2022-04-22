@@ -115,7 +115,7 @@ void Fire::update_particles()
             float z = p.Position.z;
             float te = p.Temp;
 
-            glm::vec3 u = vox->u*0.07f; // we don't have velocity field yet
+            glm::vec3 u = vec3(vox->u)*0.07f; // we don't have velocity field yet
             float c_dis = glm::distance(p.Position, m_center)+0.001f;
             u = glm::normalize(p.Position + glm::vec3(0,1,0) - m_center)*std::min(0.05f+0.2f/c_dis, 0.1f);
 

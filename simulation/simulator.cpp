@@ -13,7 +13,11 @@ void Simulator::init(){
 void Simulator::step(VoxelGrid *grid){
     milliseconds currentTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
     int deltaTime = (currentTime - timeLastFrame).count();
+    if (deltaTime > 100) deltaTime = 100;
     deltaTime *= settings.simulatorTimescale;
+    timeLastFrame = currentTime;
+    if (deltaTime == 0) return; //Don't bother doing anything
+
 
     int gridResolution = grid->getResolution();
     assert(gridResolution % NUMBER_OF_SIMULATION_THREADS == 0);
@@ -35,8 +39,6 @@ void Simulator::cleanupForNextStep(VoxelGrid *grid){
         threads.emplace_back(&Simulator::stepCleanupThreadHandler, this, grid, gridResolution, x, x + jumpPerThread);
 
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
-
-    timeLastFrame = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 }
 
 
@@ -54,7 +56,7 @@ void Simulator::stepCleanupThreadHandler(VoxelGrid *grid, int resolution, int mi
     for (int x = minXInclusive; x < maxXExclusive; x++){
         for (int y = 0; y < resolution; y++){
             for (int z = 0; z < resolution; z++){
-                grid->getVoxel(x, y, z)->switchStates();
+                grid->getVoxel(x, y, z)->updateLastFrameData();
             }
         }
     }

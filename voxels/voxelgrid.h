@@ -20,8 +20,8 @@ public:
     Voxel *getVoxel(int xIndex, int yIndex, int zIndex);
     Voxel *getVoxelClosestToPoint(vec3 point);
     VoxelGridLine *getVisualization();
-    float getVolumePerCell();
-    float cellSideLength();
+    double getVolumePerCell();
+    double cellSideLength();
 
 private:
     VoxelGridLine gridlines;
@@ -31,7 +31,7 @@ private:
     int overallNumberOfCells;
     vec3 offset;
     //3D array of Voxels...
-    //Interstingly, flattening this to 1D is slower
+    //Interstingly, flattening this to 1D is slower (when i tried it, at least)
     vector<vector<vector<std::unique_ptr<Voxel>>>> voxels;
     float cellVolume;
 };

@@ -75,7 +75,7 @@ void Smoke::update_particles()
             // particle is alive, thus update
             VoxelPhysicalData* vox = m_grid->getVoxelClosestToPoint(p.Position)->getCurrentState();
 
-            glm::vec3 u = vox->u; // we don't have velocity field yet
+            glm::vec3 u = vec3(vox->u); // we don't have velocity field yet
             u = glm::vec3(0, 0.1, 0);
             float ambient_T = vox->temperature;
             if(isnan(ambient_T)) ambient_T = 0;

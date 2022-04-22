@@ -6,12 +6,12 @@ VoxelGrid::VoxelGrid(int axisSize, vec3 offset, int resolution) :
     offset(offset)
 {
     overallNumberOfCells = std::pow(resolution, 3);
-    float overallVoxelSpaceVolume = std::pow(axisSize, 3);
+    double overallVoxelSpaceVolume = std::pow(axisSize, 3);
     cellVolume = overallVoxelSpaceVolume / overallNumberOfCells;
 
     //Making the grid....
     minXYZ = offset - vec3(axisSize, axisSize, axisSize) / 2.f;
-    float voxelAxisSize = cellSideLength();
+    double voxelAxisSize = cellSideLength();
 
     voxels.resize(resolution);
     for (int x = 0; x < resolution; x++){
@@ -41,8 +41,8 @@ int VoxelGrid::getResolution(){
     return resolution;
 }
 
-float VoxelGrid::cellSideLength(){
-    return axisSize * (1.f / resolution);
+double VoxelGrid::cellSideLength(){
+    return axisSize * (1.0 / resolution);
 }
 
 Voxel *VoxelGrid::getVoxel(int xIndex, int yIndex, int zIndex){
@@ -61,6 +61,6 @@ Voxel *VoxelGrid::getVoxelClosestToPoint(vec3 point){
     return getVoxel(xIndex, yIndex, zIndex);
 }
 
-float VoxelGrid::getVolumePerCell(){
+double VoxelGrid::getVolumePerCell(){
     return cellVolume;
 }

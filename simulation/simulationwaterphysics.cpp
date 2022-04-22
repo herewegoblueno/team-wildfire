@@ -4,7 +4,7 @@ void Simulator::stepVoxelWater(Voxel* v, int deltaTimeInMs)
 {
     float q_v = v->getCurrentState()->q_v;
     float q_c = v->getCurrentState()->q_c;
-    glm::vec3 u = v->getCurrentState()->u;
+    glm::dvec3 u = v->getCurrentState()->u;
     float h = v->centerInWorldSpace.y; // need discussion
 
     // TODO: gradients
