@@ -2,6 +2,7 @@
 #include "TriMesh.h"
 #include <math.h>
 #include <iostream>
+#include <string>
 #include "glm/gtx/string_cast.hpp"
 #include "glm/gtx/transform.hpp"
 
@@ -67,10 +68,39 @@ void CircleBase::initializeVertexData() {
     std::vector<glm::vec3> vertices = makeVertexGrid();
     std::vector<Triangle> faces = m_tessellator->tessellate(width, height);
     TriMesh triMesh = TriMesh(vertices, faces);
+    removeDegenerateFaces(triMesh);
     m_tessellator->setUncurvedMeshNormals(triMesh);
     m_vertexData = m_tessellator->processTriMesh(triMesh);
     m_vertices = vertices;
     m_faces = faces;
+}
+
+/** Remove faces that have two of the same vertex */
+void CircleBase::removeDegenerateFaces(TriMesh &triMesh) {
+    std::vector<Triangle> newFaces;
+    for (auto &face : triMesh.faces) {
+        std::unordered_set<std::string> seen;
+        bool degenerate = false;
+        for (int i : face.vertexIndices) {
+            std::string key = posToKey(triMesh.vertices[i]);
+            if (seen.count(key)) {
+                degenerate = true;
+            }
+            seen.insert(key);
+        }
+        if (!degenerate) {
+            newFaces.push_back(face);
+        }
+    }
+    triMesh.faces = newFaces;
+}
+
+std::string CircleBase::posToKey(glm::vec3 pos) {
+    // add 0.0 to make -0.0 => 0.0
+    std::string x = std::to_string(pos.x + 0.0);
+    std::string y = std::to_string(pos.y + 0.0);
+    std::string z = std::to_string(pos.z + 0.0);
+    return x + "," + y + "," + z;
 }
 
 std::vector<float> CircleBase::getVertexData() {
@@ -80,7 +110,6 @@ std::vector<float> CircleBase::getVertexData() {
 std::vector<glm::vec3> CircleBase::getVertices() {
     return m_vertices;
 }
-
 
 std::vector<Triangle> CircleBase::getFaces() {
     return m_faces;

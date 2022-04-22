@@ -6,6 +6,7 @@
 #include "Tessellator.h"
 #include "TriMesh.h"
 #include "Shape.h"
+#include <unordered_set>
 
 /** A top or bottom circle base, used for Cylinder and Cone */
 class CircleBase : public Shape
@@ -19,6 +20,8 @@ public:
 
 private:
     void initializeVertexData() override;
+    std::string posToKey(glm::vec3 pos);
+    void removeDegenerateFaces(TriMesh &triMesh);
     std::unique_ptr<Tessellator> m_tessellator;
     std::vector<glm::vec3> m_vertices;
     std::vector<Triangle> m_faces;
