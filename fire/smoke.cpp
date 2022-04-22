@@ -77,12 +77,14 @@ void Smoke::update_particles()
 
             glm::vec3 u = vox->u; // we don't have velocity field yet
             u = glm::vec3(0, 0.1, 0);
+            float ambient_T = vox->temperature;
+            if(isnan(ambient_T)) ambient_T = 0;
 
-            glm::vec3 b = -thermal_expansion*gravity*(p.Temp - vox->temperature); // Buoyancy
+            glm::vec3 b = -thermal_expansion*gravity*(p.Temp - ambient_T); // Buoyancy
             b.y = std::max(b.y, 0.1f);
 
             p.Position += (b+u+p.Velocity) * m_frame_rate;
-            p.Temp = alpha_temp*p.Temp + beta_temp*(vox->temperature);
+            p.Temp = alpha_temp*p.Temp + beta_temp*(ambient_T);
 
             p.Velocity = p.Velocity*0.9f;
         }

@@ -107,6 +107,9 @@ void Fire::update_particles()
             // particle is alive, thus update
             Voxel* voxel = m_grid->getVoxelClosestToPoint(p.Position);
             VoxelPhysicalData* vox = voxel->getCurrentState();
+            float ambient_T = vox->temperature;
+            if(isnan(ambient_T)) ambient_T = 0;
+
             float x = p.Position.x;
             float y = p.Position.y;
             float z = p.Position.z;
@@ -116,18 +119,22 @@ void Fire::update_particles()
             float c_dis = glm::distance(p.Position, m_center)+0.001f;
             u = glm::normalize(p.Position + glm::vec3(0,1,0) - m_center)*std::min(0.05f+0.2f/c_dis, 0.1f);
 
-            glm::vec3 b = -thermal_expansion*gravity*(p.Temp - vox->temperature); // Buoyancy
+            glm::vec3 b = -thermal_expansion*gravity*(p.Temp - ambient_T); // Buoyancy
 
             p.Position += (b+u) * fire_frame_rate;
 
-            if(i==0) cout << x << " " << y << " " << z << " " << te<< endl << flush;
-            if(i==0) cout << (b+u).x << " " << (b+u).y << " " << (b+u).z << endl << flush;
+            if(isnan(p.Position.x))
+            {
+                cout << x << " " << y << " " << z << " " << te<< endl << flush;
+                cout << (b+u).x << " " << (b+u).y << " " << (b+u).z << endl << flush;
+                cout << "crash loop";
+            }
 
             glm::vec3 adjust_vec = p.Position - m_center;
             adjust_vec.y = adjust_vec.y*0.5;
             float adjust_len = glm::length(adjust_vec);
             float neighbor_temp = 5 + 10*std::exp(-0.5*adjust_len*adjust_len/0.005);
-            p.Temp = alpha_temp*p.Temp + beta_temp*(neighbor_temp + vox->temperature);
+            p.Temp = alpha_temp*p.Temp + beta_temp*(neighbor_temp + ambient_T);
 
             if(p.Life < fire_frame_rate*1.5 || p.Temp < 10)
             {
