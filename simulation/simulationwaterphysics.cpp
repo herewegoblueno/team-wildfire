@@ -10,7 +10,7 @@ void Simulator::stepVoxelWater(Voxel* v, int deltaTimeInMs)
     float q_v = v->getLastFrameState()->q_v;
     float q_c = v->getLastFrameState()->q_c;
     float q_r = v->getLastFrameState()->q_r;
-    glm::vec3 u = v->getCurrentState()->u; // at this point u is already calculated
+    glm::vec3 u = vec3(v->getCurrentState()->u); // at this point u is already calculated
     float h = v->centerInWorldSpace.y; // need discussion
 
     q_v = advect(q_v, u, v->getGradient(get_q_v), deltaTimeInMs);
