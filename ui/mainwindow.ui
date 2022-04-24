@@ -62,7 +62,7 @@
   <widget class="QDockWidget" name="Dock">
    <property name="minimumSize">
     <size>
-     <width>300</width>
+     <width>304</width>
      <height>487</height>
     </size>
    </property>
@@ -232,6 +232,22 @@
             </widget>
            </item>
            <item>
+            <widget class="QLabel" name="VoxelModeExplanation">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+               <italic>true</italic>
+              </font>
+             </property>
+             <property name="text">
+              <string>[Explanation here]</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QWidget" name="FieldVisOptionsParent" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <property name="leftMargin">
@@ -296,8 +312,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>269</width>
-                <height>383</height>
+                <width>273</width>
+                <height>365</height>
                </rect>
               </property>
               <attribute name="label">
@@ -519,8 +535,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>269</width>
-                <height>383</height>
+                <width>273</width>
+                <height>365</height>
                </rect>
               </property>
               <attribute name="label">

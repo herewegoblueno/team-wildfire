@@ -225,6 +225,8 @@ void MainWindow::on_visualizationTemperatureRangeSlider_valuesChanged(int min, i
 void MainWindow::on_VoxelVisOptionsDropbox_currentIndexChanged(int index)
 {
     settings.voxelGridMode = static_cast<VoxelVisualizationModes>(index);
+    auto explanation = VoxelGridLine::getVoxelFieldModeExplanation(static_cast<VoxelVisualizationModes>(index));
+    ui->VoxelModeExplanation->setText(QString::fromStdString(explanation));
     signalSettingsChanged();
 }
 

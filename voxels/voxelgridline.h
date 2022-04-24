@@ -34,6 +34,7 @@ public:
     void setEyeRadius(float r);
 
     static std::string getVectorFieldModeExplanation(VectorFieldVisualizationModes mode);
+    static std::string getVoxelFieldModeExplanation(VoxelVisualizationModes mode);
 
 private:
     void generateGridVertices(VoxelGrid *grid);
@@ -49,8 +50,8 @@ private:
 
     VoxelVisualizationModes voxelMode;
     VectorFieldVisualizationModes vectorMode;
-    bool voxelsGridEnabled = false;
-    bool vectorFieldEnabled = false;
+    bool voxelsGridEnabled;
+    bool vectorFieldEnabled;
 
     VoxelGrid *grid;
 };

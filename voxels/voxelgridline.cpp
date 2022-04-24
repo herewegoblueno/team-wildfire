@@ -37,15 +37,6 @@ void VoxelGridLine::init(VoxelGrid *grid)
     glBindVertexArray(0);
 }
 
-std::string VoxelGridLine::getVectorFieldModeExplanation(VectorFieldVisualizationModes mode){
-    switch (mode){
-    case UFIELD:
-        return "The lines follow the u-field of the simulation (mostly wind)";
-    case TEMP_GRADIENT:
-        return "The lines point towards higher temperature. Heat will flow in the opposite direction.";
-    }
-}
-
 void VoxelGridLine::setPV(mat4 pv) {
     this->pv = pv;
 }
@@ -201,4 +192,22 @@ float VoxelGridLine::getEyeRadius(){
 
 void VoxelGridLine::setEyeRadius(float r){
     eyeRadius = r;
+}
+
+std::string VoxelGridLine::getVectorFieldModeExplanation(VectorFieldVisualizationModes mode){
+    switch (mode){
+    case UFIELD:
+        return "The lines follow the u-field of the simulation (mostly wind)";
+    case TEMP_GRADIENT:
+        return "The lines point towards higher temperature. Heat will flow in the opposite direction.";
+    }
+}
+
+std::string VoxelGridLine::getVoxelFieldModeExplanation(VoxelVisualizationModes mode){
+    switch (mode){
+    case TEMPERATURE:
+        return "Scale: Yellow (low temp) -> Red (high temp). Green = Invalid Temp";
+    case TEMP_LAPLACE:
+        return "Scale: Cyan (--) -> Blue (-) -> Red (+) -> Magenta (++)";
+    }
 }
