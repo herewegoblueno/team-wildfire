@@ -46,7 +46,7 @@ public:
     const vec3 centerInWorldSpace;
 
     VoxelTemperatureGradientInfo getTemperatureGradientInfoFromPreviousFrame();
-    double static getAmbientTemperature(vec3 pos);
+    double getAmbientTemperature();
 
     vec3 getGradient(float (*func)(Voxel *));
 
@@ -56,6 +56,7 @@ private:
     VoxelPhysicalData lastFramePhysicalState;
 
     double getNeighbourTemperature(int xOffset, int yOffset, int zOffset);
+    double getAmbientTempAtIndices(int x, int y, int z);
 };
 
 #endif // VOXEL_H

@@ -12,7 +12,7 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, int deltaTimeInMs){
     v->getCurrentState()->tempLaplaceFromPrevState = tempGradientInfo.laplace;
 
     double dTdt = HEAT_DIFFUSION_INTENSITY_TERM * tempGradientInfo.laplace;
-    dTdt -= RADIATIVE_COOLING_TERM * pow(v->getLastFrameState()->temperature - Voxel::getAmbientTemperature(v->centerInWorldSpace), 4);
+    dTdt -= RADIATIVE_COOLING_TERM * pow(v->getLastFrameState()->temperature - v->getAmbientTemperature(), 4);
     dTdt -= glm::dot(tempGradientInfo.gradient, v->getLastFrameState()->u);
 
     v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt * deltaTimeInMs / 1000.0;

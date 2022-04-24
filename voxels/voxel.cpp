@@ -10,8 +10,8 @@ Voxel::Voxel(VoxelGrid *grid, int XIndex, int YIndex, int ZIndex, vec3 center) :
     ZIndex(ZIndex),
     centerInWorldSpace(center)
 {
-    lastFramePhysicalState.temperature = getAmbientTemperature(center);
-    currentPhysicalState.temperature = getAmbientTemperature(center);
+    lastFramePhysicalState.temperature = getAmbientTempAtIndices(XIndex, YIndex, ZIndex);
+    currentPhysicalState.temperature = getAmbientTempAtIndices(XIndex, YIndex, ZIndex);
 
     //for testing
     int targetIndex = ceil(grid->getResolution() / 2.f);
@@ -44,15 +44,19 @@ void Voxel::updateLastFrameData(){
 }
 
 
-double Voxel::getAmbientTemperature(vec3 pos){
-    return glm::clamp(2.0 - pos.y / 4.0, 0.0, 2.0 );
+double Voxel::getAmbientTempAtIndices(int, int y, int){
+    y = glm::clamp(y, 0, grid->getResolution() - 1);
+    return glm::clamp(3.5 - y * grid->cellSideLength() / 2, 0.0, 3.5 );
+}
+
+double Voxel::getAmbientTemperature(){
+    return getAmbientTempAtIndices(XIndex, YIndex, ZIndex);
 }
 
 
 double Voxel::getNeighbourTemperature(int xOffset, int yOffset, int zOffset){
     Voxel *vox = getVoxelWithIndexOffset({xOffset, yOffset, zOffset});
-    //TODO: improve this! boundaries should not be 0
-     double temp = vox == nullptr ? 0 : vox->getLastFrameState()->temperature;
+     double temp = vox == nullptr ? getAmbientTempAtIndices(xOffset + XIndex, yOffset + YIndex, zOffset + ZIndex) : vox->getLastFrameState()->temperature;
      return temp;
 }
 
