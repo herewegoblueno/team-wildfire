@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->forestVisualizationEyeZSlider->setValue(settings.visualizeForestVoxelGridEyeZ * 10);
     ui->forestVisualizationEyeRSlider->setRange(0, 30);
     ui->forestVisualizationEyeRSlider->setValue(settings.visualizeForestVoxelGridEyeRadius * 10);
-    ui->visualizationTemperatureRangeSlider->setRange(0, 50);
+    ui->visualizationTemperatureRangeSlider->setRange(-10, 150);
     ui->visualizationTemperatureRangeSlider->setValues(settings.visualizeForestVoxelGridMinTemp * 10, settings.visualizeForestVoxelGridMaxTemp * 10);
 
     ui->FieldVisOptionsDropbox->setCurrentIndex(settings.vectorGridMode);

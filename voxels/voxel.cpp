@@ -1,4 +1,7 @@
 #include "voxel.h"
+#include "glm/ext.hpp"
+#define GLM_ENABLE_EXPERIMENTAL
+
 
 Voxel::Voxel(VoxelGrid *grid, int XIndex, int YIndex, int ZIndex, vec3 center) :
     grid(grid),
@@ -11,10 +14,14 @@ Voxel::Voxel(VoxelGrid *grid, int XIndex, int YIndex, int ZIndex, vec3 center) :
     currentPhysicalState.temperature = getAmbientTemperature(center);
 
     //for testing
-//    int targetIndex = ceil(grid->getResolution() / 2.f);
-//    if (XIndex == targetIndex && YIndex == targetIndex && ZIndex == targetIndex){
-//        lastFramePhysicalState.temperature = 10;
-//    }
+    int targetIndex = ceil(grid->getResolution() / 2.f);
+    int size = 4;
+    if (XIndex > targetIndex - size && XIndex < targetIndex + size &&
+            YIndex > targetIndex - size && YIndex < targetIndex + size &&
+            ZIndex > targetIndex - size && ZIndex < targetIndex + size){
+        lastFramePhysicalState.temperature = 10;
+        currentPhysicalState.temperature = 10;
+    }
 }
 
 //TODO: consider memoization for immediate neighbours
@@ -32,66 +39,49 @@ VoxelPhysicalData *Voxel::getCurrentState(){
     return &currentPhysicalState;
 }
 
-void Voxel::switchStates(){
-    auto prevState = lastFramePhysicalState;
+void Voxel::updateLastFrameData(){
     lastFramePhysicalState = currentPhysicalState;
-    currentPhysicalState = prevState;
 }
 
 
-float Voxel::getAmbientTemperature(vec3 pos){
-    return glm::clamp(2 - pos.y / 4.f, 0.f, 2.f );
+double Voxel::getAmbientTemperature(vec3 pos){
+    return glm::clamp(2.0 - pos.y / 4.0, 0.0, 2.0 );
 }
 
-//TODO: improve this accuracy and performance could probably be better
+
+double Voxel::getNeighbourTemperature(int xOffset, int yOffset, int zOffset){
+    Voxel *vox = getVoxelWithIndexOffset({xOffset, yOffset, zOffset});
+    //TODO: improve this! boundaries should not be 0
+     double temp = vox == nullptr ? 0 : vox->getLastFrameState()->temperature;
+     return temp;
+}
+
  VoxelTemperatureGradientInfo Voxel::getTemperatureGradientInfoFromPreviousFrame(){
-    float averageTemperatureTop = 0; // +y
-    float averageTemperatureMiddleY = 0; // y
-    float averageTemperatureBottom = 0; // -y
+    double temperatureTop = getNeighbourTemperature(0, 1 ,0); // +y
+    double temperatureBottom = getNeighbourTemperature(0, -1 ,0); // -y
+    double temperatureRight = getNeighbourTemperature(1, 0 ,0); // +x
+    double temperatureLeft = getNeighbourTemperature(-1, 0 ,0); // -x
+    double temperatureForward = getNeighbourTemperature(0, 0 ,1); // +z
+    double temperatureBack = getNeighbourTemperature(0, 0, -1); // -z
+    double temperatureMiddle = lastFramePhysicalState.temperature;
 
-    float averageTemperatureRight = 0; // +x
-    float averageTemperatureMiddleX = 0; // x
-    float averageTemperatureLeft = 0; // -x
-
-    float averageTemperatureForward = 0; // +z
-    float averageTemperatureMiddleZ = 0; // x
-    float averageTemperatureBack = 0; // -z
-
-    for (int x = 0; x < 3; x++){
-        for (int y = 0; y < 3; y++){
-            for (int z = 0; z < 3; z++){
-                vec3 offset(x - 1, y - 1, z - 1);
-                Voxel *vox = getVoxelWithIndexOffset(offset);
-                //TODO: this should actually be the getAmbientTemperature of the center of this out-of-bounds voxel, not this voxel
-                float temp = vox == nullptr ? 0 : vox->getLastFrameState()->temperature;
-                if (x == 0) averageTemperatureLeft += temp / 9.f;
-                if (x == 1) averageTemperatureMiddleX += temp / 9.f;
-                if (x == 2) averageTemperatureRight += temp / 9.f;
-
-                if (y == 0) averageTemperatureBottom += temp / 9.f;
-                if (y == 1) averageTemperatureMiddleY += temp / 9.f;
-                if (y == 2) averageTemperatureTop += temp / 9.f;
-
-                if (z == 0) averageTemperatureBack += temp / 9.f;
-                if (z == 1) averageTemperatureMiddleZ += temp / 9.f;
-                if (z == 2) averageTemperatureForward += temp / 9.f;
-            }
-        }
-    }
-
-    float cellSize = grid->cellSideLength();
+    double cellSize = grid->cellSideLength();
 
     //calculating the ∇T (gradient)
-    float yGradient = (averageTemperatureTop - averageTemperatureBottom) / (cellSize * 2);
-    float xGradient = (averageTemperatureRight - averageTemperatureLeft) / (cellSize * 2);
-    float zGradient = (averageTemperatureForward - averageTemperatureBack) / (cellSize * 2);
-    vec3 gradient = vec3(xGradient, yGradient, zGradient);
+    double yGradient = (temperatureTop - temperatureBottom) / (cellSize * 2);
+    double xGradient = (temperatureRight - temperatureLeft) / (cellSize * 2);
+    double zGradient = (temperatureForward - temperatureBack) / (cellSize * 2);
+    dvec3 gradient = dvec3(xGradient, yGradient, zGradient);
+
 
     //calculating the ∇^2T (laplace)
-    float rateOfChangeOfYGradient = (averageTemperatureMiddleY - averageTemperatureBottom) - (averageTemperatureMiddleY - averageTemperatureTop) / (cellSize * 2);
-    float rateOfChangeOfZGradient = (averageTemperatureMiddleZ - averageTemperatureBack) - (averageTemperatureMiddleZ - averageTemperatureForward) / (cellSize * 2);
-    float rateOfChangeOfXGradient = (averageTemperatureMiddleX - averageTemperatureLeft) - (averageTemperatureMiddleX - averageTemperatureRight) / (cellSize * 2);
-    float laplace = rateOfChangeOfYGradient + rateOfChangeOfZGradient + rateOfChangeOfXGradient;
+    double rateOfChangeOfYGradient = (temperatureTop - temperatureMiddle) - (temperatureMiddle - temperatureBottom);
+    rateOfChangeOfYGradient /= pow(cellSize, 2) * 2;
+    double rateOfChangeOfZGradient = (temperatureForward - temperatureMiddle) - (temperatureMiddle - temperatureBack) ;
+    rateOfChangeOfZGradient /= pow(cellSize, 2) * 2;
+    double rateOfChangeOfXGradient =  (temperatureRight - temperatureMiddle) - (temperatureMiddle - temperatureLeft);
+    rateOfChangeOfXGradient /= pow(cellSize, 2) * 2;
+    double laplace = rateOfChangeOfYGradient + rateOfChangeOfZGradient + rateOfChangeOfXGradient;
 
     return {gradient, laplace};
 }

@@ -89,6 +89,8 @@ void Settings::saveSettings() {
     s.setValue("vectorGridMode", vectorGridMode);
 
     s.setValue("simulatorTimescale", simulatorTimescale);
+    s.setValue("visualizeForestVoxelGridMinTemp", visualizeForestVoxelGridMinTemp);
+    s.setValue("visualizeForestVoxelGridMaxTemp", visualizeForestVoxelGridMaxTemp);
 
 
     // Shapes

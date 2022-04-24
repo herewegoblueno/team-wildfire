@@ -59,8 +59,9 @@ void VoxelGridLine::draw(SupportCanvas3D *) {
 
     shader.get()->bind();
     shader->setUniform("PV", pv);
-    shader->setUniform("tempMin", temperatureThreshold);
-    shader->setUniform("tempMax", temperatureMax);
+    shader->setUniform("propMin", temperatureThreshold);
+    shader->setUniform("propMax", temperatureMax);
+    shader->setUniform("propType", voxelMode);
 
     Voxel *eyeVoxel = grid->getVoxelClosestToPoint(eyeCenter);
     int eyeRadiusInVoxels = (int)ceil(eyeRadius / grid->cellSideLength());
@@ -75,12 +76,20 @@ void VoxelGridLine::draw(SupportCanvas3D *) {
                 Voxel *vox = grid->getVoxel(x, y, z);
                 if (vox == nullptr) continue;
                 float temperature = vox->getCurrentState()->temperature;
+                //Doing this to sense explosions
+                bool isValidTemperature = !isnan(temperature) && abs(temperature) < 2000;
                 vec3 pos = vox->centerInWorldSpace;
 
                 //We'd love to do this in the shader, but its better to do this here for performance
-                if (temperature < temperatureThreshold) continue;
-                if (temperature > temperatureMax) continue;
-                if (glm::length(vec3(pos - eyeCenter)) > eyeRadius) continue;
+                if (isValidTemperature){
+                    if (temperature < temperatureThreshold) continue;
+                    if (temperature > temperatureMax) continue;
+                    if (glm::length(vec3(pos - eyeCenter)) > eyeRadius) continue;
+                }else{
+                    //Uncomment this if you want the simulation to pause the simulation
+                    //once you start getting bad values....
+                    //settings.simulatorTimescale = 0;
+                }
 
                 shader->setUniform("m", pos);
 
@@ -88,9 +97,10 @@ void VoxelGridLine::draw(SupportCanvas3D *) {
                     //Drawing the cube of the voxel itself...
                     //TODO: improve this, still too tightly coupled with temperature ranges
                     if (voxelMode == TEMP_LAPLACE){
-                        shader->setUniform("temp", vox->getCurrentState()->tempLaplaceFromPrevState);
+                        shader->setUniform("prop", (float)vox->getCurrentState()->tempLaplaceFromPrevState);
                     }else{
-                        shader->setUniform("temp", temperature);
+                        shader->setUniform("selectedVoxel", !isValidTemperature);
+                        shader->setUniform("prop", temperature);
                     }
                     shader->setUniform("renderingVectorField", false);
                     glDrawArrays(GL_LINES, 0, vertices.size() / 3 - 2);
@@ -99,9 +109,9 @@ void VoxelGridLine::draw(SupportCanvas3D *) {
                 if (vectorFieldEnabled){
                     //Now using the last part of the VAO to render vector field
                     if (vectorMode == UFIELD){
-                        shader->setUniform("u", vox->getCurrentState()->u);
+                        shader->setUniform("u", vec3(vox->getCurrentState()->u));
                     }else{
-                        shader->setUniform("u", vox->getCurrentState()->tempGradientFromPrevState);
+                        shader->setUniform("u", vec3(vox->getCurrentState()->tempGradientFromPrevState));
                     }
                     shader->setUniform("renderingVectorField", true);
                     glDrawArrays(GL_LINES,  (vertices.size() / 3) - 2, 2);
