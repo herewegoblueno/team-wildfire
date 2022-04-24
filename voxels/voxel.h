@@ -19,7 +19,7 @@ struct VoxelPhysicalData {
     // water coefs
     float q_v; // water vapor
     float q_c; // condensed water
-//    float q_r; // rain (ignore for now)
+    float q_r; // rain (ignore for now)
 };
 
 struct VoxelTemperatureGradientInfo {
@@ -47,6 +47,8 @@ public:
 
     VoxelTemperatureGradientInfo getTemperatureGradientInfoFromPreviousFrame();
     float static getAmbientTemperature(vec3 pos);
+
+    vec3 getGradient(float (*func)(Voxel *));
 
 private:
     //Set and changed over the course of simulation

@@ -3,12 +3,11 @@
 
 #include <chrono>
 #include "voxels/voxelgrid.h"
+#include "physics.h"
 
 using namespace std::chrono;
 
 
-const float sealevel_temperature = 280;
-const float sealevel_pressure = 1;
 
 class Simulator
 {
@@ -32,11 +31,16 @@ private:
     void stepVoxelWater(Voxel* v, int deltaTimeInMs);
 
 
+    // water particle related equation
     static float advect(float field, glm::vec3 vel, glm::vec3 field_grad, float dt);
     static float saturate(float pressure, float temperature);
     static float absolute_temp(float height);
     static float absolute_pres(float height);
-    // water particle related equation
+    static float mole_fraction(float ratio);
+    static float avg_mole_mass(float ratio);
+    static float isentropic_exponent(float ratio);
+    static float heat_capacity(float gamma, float mass);
+
 };
 
 #endif // SIMULATOR_H
