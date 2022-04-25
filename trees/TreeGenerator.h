@@ -13,7 +13,8 @@ const float m_pi = 3.14159265359;
 const int numModuleIterations = 1;
 
 const int recursionDepth = 6;
-const float trunkInitRadius = 0.5;
+const double trunkInitLength = 1.0;
+const double trunkInitRadius = 0.5;
 // Min/max branching levels for adding leaves
 const int minLeafRecursiveDepth = 2;
 const int maxLeafRecursiveDepth = 9;
@@ -23,8 +24,6 @@ const float thetaPlus = 0.5 * m_pi;
 const float thetaMinus = 0.3 * m_pi;
 // Base amount of x-axis rotation
 const float baseXRotation = 0.3;
-// Amount to scale x, z size of each successive iteration
-const float branchWidthDecay = 0.7;
 
 class TreeGenerator
 {
@@ -52,7 +51,7 @@ private:
     float getYRotateAnglePlus();
     float getYRotateAngleMinus();
     float getXRotateAngle();
-    float getBranchLength();
+    double getBranchLength();
 };
 
 #endif // TREEGENERATOR_H

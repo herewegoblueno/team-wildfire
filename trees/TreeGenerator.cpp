@@ -94,11 +94,13 @@ void TreeGenerator::parseLSystem(std::string lSystemString) {
                 branch->radius = trunkInitRadius;
                 branch->parent = nullptr;
                 branch->model = _trunkPreTransform;
+                branch->invModel = glm::inverse(_trunkPreTransform);
                 _root = branch;
             } else {
                 branch->radius = currentParent->radius * branchWidthDecay;
                 branch->parent = currentParent;
                 branch->model = branchCtm * _trunkPreTransform;
+                branch->invModel = glm::inverse(branch->model);
                 currentParent->children.insert(branch);
             }
             // Add leaves to branch based on leaf density
@@ -112,6 +114,7 @@ void TreeGenerator::parseLSystem(std::string lSystemString) {
             }
             // Update branch direction and size based on new ctm
             branchVector = glm::vec3(branchCtm * glm::vec4(0, 1, 0, 0));
+            branch->length = glm::length(branchVector);
             // Translate along branch to get to new branching point
             glm::mat4 translate = glm::translate(branchVector);
             baseCtm = translate * baseCtm;
@@ -142,8 +145,8 @@ ModuleTree TreeGenerator::branchTreeToModules(BranchTree branchTree) {
     ModuleSet treeModules;
     Branch *rootBranch = branchTree.root;
     Module *rootModule = new Module;
-    rootModule->includesRoot = true;
-    rootModule->branches.insert(rootBranch);
+    rootModule->_includesRoot = true;
+    rootModule->_branches.insert(rootBranch);
     treeModules.insert(rootModule);
     ModuleSet newModules = splitIntoModules(rootBranch, rootModule);
     for (Module *module : newModules) {
@@ -152,7 +155,7 @@ ModuleTree TreeGenerator::branchTreeToModules(BranchTree branchTree) {
     for (int i = 0; i < numModuleIterations; i++) {
         ModuleSet updatedNewModules;
         for (Module *module : newModules) {
-           ModuleSet toAdd = splitIntoModules(module->rootBranch, module);
+           ModuleSet toAdd = splitIntoModules(module->_rootBranch, module);
            for (Module *moduleToAdd : toAdd) {
                treeModules.insert(moduleToAdd);
                updatedNewModules.insert(moduleToAdd);
@@ -171,14 +174,14 @@ ModuleTree TreeGenerator::branchTreeToModules(BranchTree branchTree) {
 ModuleSet TreeGenerator::splitIntoModules(Branch *rootBranch, Module *rootModule) {
     ModuleSet newModules;
     for (Branch *branch : rootBranch->children) {
-        rootModule->branches.insert(branch);
+        rootModule->_branches.insert(branch);
         Module *module = accumulateModuleFrom(branch);
-        for (Branch *toRemove : module->branches) {
-            rootModule->branches.erase(toRemove);
+        for (Branch *toRemove : module->_branches) {
+            rootModule->_branches.erase(toRemove);
         }
-        module->parent = rootModule;
-        module->rootBranch = branch;
-        rootModule->children.insert(module);
+        module->_parent = rootModule;
+        module->_rootBranch = branch;
+        rootModule->_children.insert(module);
         newModules.insert(module);
     }
     return newModules;
@@ -195,14 +198,14 @@ Module *TreeGenerator::accumulateModuleFrom(Branch *root) {
     while (!stack.empty()) {
         Branch *v = stack.top();
         stack.pop();
-        if (!module->branches.count(v)) {
-            module->branches.insert(v);
+        if (!module->_branches.count(v)) {
+            module->_branches.insert(v);
             for (Branch *child : v->children) {
                 stack.push(child);
             }
         }
     }
-    module->branches.erase(root);
+    module->_branches.erase(root);
     return module;
 }
 
@@ -223,7 +226,7 @@ float TreeGenerator::getXRotateAngle() {
 }
 
 /** Return relative length of next branch */
-float TreeGenerator::getBranchLength() {
+double TreeGenerator::getBranchLength() {
     return branchWidthDecay + randomFloat() * 0.1f * settings.branchStochasticity;
 }
 

@@ -5,11 +5,14 @@
 #include "GL/glew.h"
 #include "voxelgridline.h"
 #include "voxel.h"
+#include <unordered_set>
 
 using namespace glm;
 using namespace std;
 
 class Voxel;
+
+typedef std::unordered_set<Voxel *> VoxelSet;
 
 class VoxelGrid
 {

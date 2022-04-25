@@ -18,12 +18,13 @@ using namespace CS123::GL;
 #include <iostream>
 
 BasicForestScene::BasicForestScene():
-     _voxelGrids(8, vec3(0,0,0), 60)
+     _voxelGrid(8, vec3(0,0,0), 60)
 {
     loadPhongShader();
     tessellateShapes();
-    _voxelGrids.getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeVectorField);
+    _voxelGrid.getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeVectorField);
     _forest = std::make_unique<Forest>(numTrees, forestWidth, forestHeight);
+    _forest->connectModulesToVoxels(&_voxelGrid);
     updateFromForest();
     _simulator.init();
 }
@@ -55,7 +56,7 @@ void BasicForestScene::loadPhongShader() {
 
 void BasicForestScene::render(SupportCanvas3D *context) {
 
-    _simulator.step(&_voxelGrids);
+    _simulator.step(&_voxelGrid);
 
     Camera *camera = context->getCamera();
     glClearColor(0.2, 0.2, 0.2, 0.3);
@@ -69,11 +70,11 @@ void BasicForestScene::render(SupportCanvas3D *context) {
     glBindTexture(GL_TEXTURE_2D, 0);
     _phongShader->unbind();
 
-    _voxelGrids.getVisualization()->setPV(camera->getProjectionMatrix() * camera->getViewMatrix());
-    _voxelGrids.getVisualization()->draw(context);
+    _voxelGrid.getVisualization()->setPV(camera->getProjectionMatrix() * camera->getViewMatrix());
+    _voxelGrid.getVisualization()->draw(context);
 
     //Trigger another render
-    _simulator.cleanupForNextStep(&_voxelGrids);
+    _simulator.cleanupForNextStep(&_voxelGrid);
     context->update();
 }
 
@@ -175,6 +176,6 @@ void BasicForestScene::setSceneUniforms(SupportCanvas3D *context) {
 }
 
 void BasicForestScene::settingsChanged() {
-     _voxelGrids.getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeVectorField);
-     _voxelGrids.getVisualization()->updateValuesFromSettings();
+     _voxelGrid.getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeVectorField);
+     _voxelGrid.getVisualization()->updateValuesFromSettings();
 }

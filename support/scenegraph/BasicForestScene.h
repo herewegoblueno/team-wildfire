@@ -7,7 +7,6 @@
 #include <memory>
 #include <vector>
 #include "support/shapes/Shape.h"
-#include "voxels/voxelgrid.h"
 #include "trees/forest.h"
 #include "support/shapes/Trunk.h"
 #include "support/shapes/Leaf.h"
@@ -50,7 +49,7 @@ private:
     void setSceneUniforms(SupportCanvas3D *context);
 
     std::unique_ptr<CS123::GL::CS123Shader> _phongShader;
-    VoxelGrid _voxelGrids;
+    VoxelGrid _voxelGrid;
     std::unique_ptr<Forest> _forest;
     std::unique_ptr<Trunk> _trunk;
     std::unique_ptr<Leaf> _leaf;
