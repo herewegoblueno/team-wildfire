@@ -73,13 +73,12 @@ void SupportCanvas3D::initializeGL() {
     m_oldRotN = settings.cameraRotN;
 
     initializeGlew();
-
     initializeOpenGLSettings();
 
     settingsChanged();
 
-    m_mainWindowParent->onSupportCanvasInitialized();
     initializeScenes();
+    m_mainWindowParent->onSupportCanvasInitialized();
     setSceneFromSettings();
 }
 
@@ -115,6 +114,7 @@ void SupportCanvas3D::initializeOpenGLSettings() {
 }
 
 void SupportCanvas3D::initializeScenes() {
+    //The forest scene will be initialized when its .xml file is read from onSupportCanvasInitialized
     m_basicFireScene = std::make_unique<BasicFireScene>();
 }
 
