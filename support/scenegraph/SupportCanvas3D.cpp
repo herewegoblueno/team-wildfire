@@ -115,7 +115,6 @@ void SupportCanvas3D::initializeOpenGLSettings() {
 }
 
 void SupportCanvas3D::initializeScenes() {
-    m_basicForestScene = std::make_unique<BasicForestScene>();
     m_basicFireScene = std::make_unique<BasicFireScene>();
 }
 
