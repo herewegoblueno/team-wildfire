@@ -75,12 +75,12 @@ void SupportCanvas3D::initializeGL() {
     initializeGlew();
 
     initializeOpenGLSettings();
-    initializeScenes();
-    setSceneFromSettings();
 
     settingsChanged();
 
     m_mainWindowParent->onSupportCanvasInitialized();
+    initializeScenes();
+    setSceneFromSettings();
 }
 
 void SupportCanvas3D::initializeGlew() {
