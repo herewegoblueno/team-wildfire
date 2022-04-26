@@ -106,23 +106,29 @@ void BasicForestScene::renderTrunksVisualizedModules() {
     for (PrimitiveBundle &bundle : _trunks) {
         _phongShader->setUniform("m",  bundle.model);
         int moduleID = bundle.moduleID;
+
         if (_moduleIDToMat.count(moduleID)) {
-            _phongShader->applyMaterial(_moduleIDToMat[moduleID]);
+            //We've alredy made a meterial for this module
+            if (moduleID == settings.selectedModuleId) _phongShader->applyMaterial(matForSelectedBranch);
+            else _phongShader->applyMaterial(_moduleIDToMat[moduleID]);
         } else {
+            //We have to fist make a material for this module
             CS123SceneMaterial mat = bundle.primitive.material;
-            if (settings.selectedModuleId == moduleID){
-                //Neon green
-                mat.cAmbient.r = 0.22;
-                mat.cAmbient.g = 1; //Since selected modules will be neon green
-                mat.cAmbient.b = 0.1;
-            }else{
-                mat.cAmbient.r = randomDarkColor();
-                mat.cAmbient.g = randomDarkColor() / 2; //Since selected modules will be neon green, want to differentiate more
-                mat.cAmbient.b = randomDarkColor();
+            mat.cAmbient.r = randomDarkColor();
+            mat.cAmbient.g = randomDarkColor() / 2; //Since selected modules will be neon green, want to differentiate more
+            mat.cAmbient.b = randomDarkColor();
+
+            //(we'll also take the opportunity to initialize the mat for selected modules if it hasn't been made already)
+            if (matForSelectedBranch.cAmbient == vec4(0,0,0,0)){
+                matForSelectedBranch = mat;
+                matForSelectedBranch.cAmbient.r = 0.22;
+                matForSelectedBranch.cAmbient.g = 1; //Since selected modules will be neon green
+                matForSelectedBranch.cAmbient.b = 0.1;
             }
 
             _moduleIDToMat[moduleID] = mat;
-            _phongShader->applyMaterial(mat);
+            if (moduleID == settings.selectedModuleId) _phongShader->applyMaterial(matForSelectedBranch);
+            else _phongShader->applyMaterial(mat);
         }
         _trunk->drawVAO();
     }
