@@ -32,7 +32,7 @@ public:
     Voxel(VoxelGrid *grid, int XIndex, int YIndex, int ZIndex, vec3 center);
     Voxel *getVoxelWithIndexOffset(vec3 offset);
 
-    //Making these fucntoins since these structs will be being passed through the simulator several times
+    //Making these functions since these structs will be being passed through the simulator several times
     //better to enforce that it's just the pointers being passed around
     VoxelPhysicalData *getCurrentState();
     VoxelPhysicalData *getLastFrameState();
@@ -43,7 +43,7 @@ public:
     const int XIndex;
     const int YIndex;
     const int ZIndex;
-    const vec3 centerInWorldSpace;
+    const dvec3 centerInWorldSpace;
 
     VoxelTemperatureGradientInfo getTemperatureGradientInfoFromPreviousFrame();
     double getAmbientTemperature();

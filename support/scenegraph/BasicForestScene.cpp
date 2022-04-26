@@ -24,8 +24,7 @@ BasicForestScene::BasicForestScene(MainWindow *mainWindow):
     loadPhongShader();
     tessellateShapes();
     _voxelGrid.getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeVectorField);
-    _forest = std::make_unique<Forest>(numTrees, forestWidth, forestHeight);
-    _forest->connectModulesToVoxels(&_voxelGrid);
+    _forest = std::make_unique<Forest>(&_voxelGrid, numTrees, forestWidth, forestHeight);
     updateFromForest();
     _simulator.init();
     _voxelGrid.getVisualization()->setForestReference(_forest.get());
@@ -106,24 +105,22 @@ void BasicForestScene::renderTrunksVisualizedModules() {
     for (PrimitiveBundle &bundle : _trunks) {
         _phongShader->setUniform("m",  bundle.model);
         int moduleID = bundle.moduleID;
+        CS123SceneMaterial mat = bundle.primitive.material;
         if (_moduleIDToMat.count(moduleID)) {
-            _phongShader->applyMaterial(_moduleIDToMat[moduleID]);
+            mat = _moduleIDToMat[moduleID];
         } else {
-            CS123SceneMaterial mat = bundle.primitive.material;
-            if (settings.selectedModuleId == moduleID){
-                //Neon green
-                mat.cAmbient.r = 0.22;
-                mat.cAmbient.g = 1; //Since selected modules will be neon green
-                mat.cAmbient.b = 0.1;
-            }else{
-                mat.cAmbient.r = randomDarkColor();
-                mat.cAmbient.g = randomDarkColor() / 2; //Since selected modules will be neon green, want to differentiate more
-                mat.cAmbient.b = randomDarkColor();
-            }
-
+            mat.cAmbient.r = randomDarkColor();
+            mat.cAmbient.g = randomDarkColor() / 2; //Since selected modules will be neon green, want to differentiate more
+            mat.cAmbient.b = randomDarkColor();
             _moduleIDToMat[moduleID] = mat;
-            _phongShader->applyMaterial(mat);
         }
+        if (settings.selectedModuleId == moduleID){
+            //Neon green
+            mat.cAmbient.r = 0.22;
+            mat.cAmbient.g = 1;
+            mat.cAmbient.b = 0.1;
+        }
+        _phongShader->applyMaterial(mat);
         _trunk->drawVAO();
     }
     _trunk->unbindVAO();

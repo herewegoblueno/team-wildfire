@@ -4,12 +4,16 @@
 
 using namespace glm;
 
-Forest::Forest(int numTrees, float forestWidth, float forestHeight) :
+Forest::Forest(VoxelGrid *grid, int numTrees, float forestWidth, float forestHeight) :
+    _grid(grid),
     _treeGenerator(nullptr)
 {
     initializeTrunkPrimitive();
     initializeLeafPrimitive();
     createTrees(numTrees, forestWidth, forestHeight);
+    initMassOfModules();
+    connectModulesToVoxels(); // depends on module mass
+    initMassOfVoxels();
 }
 
 Forest::~Forest() {
@@ -66,6 +70,7 @@ void Forest::addTreeToForest(const ModuleSet &modules, mat4 trans) {
             seen.insert(branch);
             branch->moduleID = module->ID;
             branch->model = trans * branch->model;
+            branch->invModel = inverse(branch->model);
             _branches.insert(branch);
             PrimitiveBundle branchPrimitive(*_trunk, branch->model, module->ID);
             _primitives.push_back(branchPrimitive);
@@ -79,12 +84,12 @@ void Forest::addTreeToForest(const ModuleSet &modules, mat4 trans) {
 }
 
 /** Map modules to voxels and vice versa */
-void Forest::connectModulesToVoxels(VoxelGrid *grid) {
-   int resolution = grid->getResolution();
-   double cellSideLength = grid->cellSideLength();
+void Forest::connectModulesToVoxels() {
+   int resolution = _grid->getResolution();
+   double cellSideLength = _grid->cellSideLength();
    for (Module *module: _modules) {
        vec3 centerPos = vec3(module->getCenter());
-       Voxel *center = grid->getVoxelClosestToPoint(centerPos);
+       Voxel *center = _grid->getVoxelClosestToPoint(centerPos);
        int xMin = std::max(0, center->XIndex - voxelSearchRadius);
        int xMax = std::min(resolution, center->XIndex + voxelSearchRadius);
        int yMin = std::max(0, center->YIndex - voxelSearchRadius);
@@ -94,40 +99,92 @@ void Forest::connectModulesToVoxels(VoxelGrid *grid) {
        for (int x = xMin; x < xMax; x++) {
            for (int y = yMin; y < yMax; y++) {
                for (int z = zMin; z < zMax; z++) {
-                   Voxel *voxel = grid->getVoxel(x, y, z);
+                   Voxel *voxel = _grid->getVoxel(x, y, z);
                    checkModuleVoxelOverlap(module, voxel, cellSideLength);
                }
            }
        }
    }
 
-   int total = 0;
+   int totalVoxels = 0;
    for (auto const& moduleVoxels : _moduleToVoxels) {
-       total += moduleVoxels.second.size();
+       int moduleID = moduleVoxels.first->ID;
+       int numVoxels = moduleVoxels.second.size();
+       totalVoxels += numVoxels;
+       //std::cout << numVoxels << std::endl;
+       if (numVoxels == 0) {
+           std::cerr << "Module " << moduleID << "has 0 voxels "<<  std::endl;
+       }
    }
-   std::cout << (float)total/(float)_modules.size() << " voxels per module" << std::endl;
+   std::cout << (float)totalVoxels/(float)_modules.size() << " voxels per module" << std::endl;
+
+   int totalModules = 0;
+   for (auto const& voxelModules : _voxelToModules) {
+       totalModules += voxelModules.second.size();
+   }
+   std::cout << (float)totalModules/(float)(std::pow(resolution,3)) << " modules per voxel" << std::endl;
 }
 
 /** See if a module and voxel overlap by checking each branch */
 void Forest::checkModuleVoxelOverlap(Module *module, Voxel *voxel,
                                      double cellSideLength) {
-    vec3 voxelCenter = voxel->centerInWorldSpace;
+    dvec3 voxelCenter = voxel->centerInWorldSpace;
     for (Branch *branch: module->_branches) {
         vec4 branchSpaceCenter = branch->invModel * vec4(voxelCenter, 1);
         float x = branchSpaceCenter.x;
         float y = branchSpaceCenter.y;
         float z = branchSpaceCenter.z;
-        double dist = std::sqrt(x*x + z*z); // lateral dist to branch center
-        // implicit branch boundary
-        double branchMaxDist = trunkInitRadius *
-                branchWidthDecay * (y / trunkInitLength);
+        // lateral dist to branch center
+        double dist = std::sqrt(x*x + z*z);
+        // implicit lateral branch boundary
+        double horizScale = 1.0 - (1.0 - branchWidthDecay) * (y + 1.0);
+        double branchMaxDist = 0.5 * horizScale;
         // approximate voxel as a sphere
-        if (dist - cellSideLength < branchMaxDist) {
+        if (dist - cellSideLength / 2.0 < branchMaxDist && y >= -0.5 && y <= 0.5) {
             _moduleToVoxels[module].insert(voxel);
             _voxelToModules[voxel].insert(module);
             return;
         }
     }
+}
+
+/** Init mass of each module based on its branches */
+void Forest::initMassOfModules() {
+    for (Module *module : _modules) {
+        module->updateMass();
+    }
+}
+
+/** Init mass of each voxel based on surrounding modules */
+void Forest::initMassOfVoxels() {
+    int res = _grid->getResolution();
+    double cellSideLength = _grid->cellSideLength();
+    for (int x = 0; x < res; x++) {
+        for (int y = 0; y < res; y++) {
+            for (int z = 0; z < res; z++) {
+                updateVoxelMass(_grid->getVoxel(x, y, z), cellSideLength);
+                auto mass = _grid->getVoxel(x, y, z)->getCurrentState()->mass;
+                if (mass > 0) {
+                    std::cout << "voxel with positive mass " << mass << std::endl;
+                }
+            }
+        }
+    }
+}
+
+/** Update mass of each voxel based on surrounding modules */
+void Forest::updateVoxelMass(Voxel *voxel, double cellSideLength) {
+    double voxelMass = 0;
+    dvec3 voxelCenter = voxel->centerInWorldSpace;
+    for (Module *module : _voxelToModules[voxel]) {
+        ModulePhysicalData *moduleState = module->getCurrentState();
+        dvec3 moduleCenter = module->getCenter();
+        // TODO: with current voxel size, weight is usually negative
+        // https://cs2240spring22.slack.com/archives/C03CDJZM90Q/p1650994477346319
+        double weight = 1.0 - length(voxelCenter - moduleCenter) / cellSideLength;
+        voxelMass += weight * moduleState->mass;
+    }
+    voxel->getCurrentState()->mass = voxelMass;
 }
 
 std::vector<PrimitiveBundle> Forest::getPrimitives() {

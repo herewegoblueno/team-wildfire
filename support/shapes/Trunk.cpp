@@ -30,7 +30,7 @@ std::vector<glm::vec3> Trunk::makeSideGrid() {
     grid.reserve(height * width);
     for (int row = 0; row < height; row++) {
         float y = 0.5f - static_cast<float>(row) / m_param1;
-        float horizScale = 1.f - m_taperAmt * (y + 0.5f) / 1.0f;
+        float horizScale = 1.f - m_taperAmt * (y + 0.5f);
         for (int col = 0; col < width; col++) {
             float theta = 2.0f * PI * static_cast<float>(col) / m_param2;
             float x = -0.5f * cos(theta) * horizScale;

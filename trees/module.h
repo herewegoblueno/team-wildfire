@@ -39,7 +39,13 @@ struct ModuleTree {
     {}
 };
 
-class Module{
+struct ModulePhysicalData {
+    double mass;        // total mass of branches, updated during combustion
+    double temperature; // surface temperature of module
+};
+
+class Module
+{
 public:
     Module();
     int ID; // lets us identify modules for visual debugging
@@ -52,18 +58,14 @@ public:
     bool _includesRoot;
 
     glm::dvec3 getCenter() const;
+    void updateMass();
+    ModulePhysicalData *getCurrentState();
 
 private:
-    // total mass of branches, updated during combustion
-    double _mass;
-    // surface temperature of module
-    double _temp;
-    void updateRadii();
-    void updateMass();
+    ModulePhysicalData _currentPhysicalData;
 
     double getBranchMass(Branch *branch) const;
     double getBranchVolume(Branch *branch) const;
-
 };
 
 #endif // MODULE_H

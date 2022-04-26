@@ -12,7 +12,7 @@ const int voxelSearchRadius = 25;
 class Forest
 {
 public:
-    Forest(int numTrees, float forestWidth, float forestHeight);
+    Forest(VoxelGrid *grid, int numTrees, float forestWidth, float forestHeight);
     ~Forest();
     void update();
     std::vector<PrimitiveBundle> getPrimitives();
@@ -27,6 +27,7 @@ private:
     void initializeTrunkPrimitive();
     void initializeLeafPrimitive();
 
+    VoxelGrid *_grid;
     BranchSet _branches;
     ModuleSet _modules;
     std::vector<PrimitiveBundle> _primitives;
@@ -35,7 +36,10 @@ private:
     std::unique_ptr<CS123ScenePrimitive> _leaf;
 
     void checkModuleVoxelOverlap(Module *module, Voxel *voxel, double cellSideLength);
-
+    void connectModulesToVoxels();
+    void initMassOfModules();
+    void initMassOfVoxels();
+    void updateVoxelMass(Voxel *voxel, double cellSideLength);
     std::map<Module *, VoxelSet> _moduleToVoxels;
     std::map<Voxel *, ModuleSet> _voxelToModules;
     std::unordered_map<int, Module *> _moduleIDs;

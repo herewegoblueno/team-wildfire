@@ -152,7 +152,7 @@ void VoxelGridLine::renderVoxel(Voxel *vox, bool renderingInEyeMode){
     float temperature = vox->getCurrentState()->temperature;
     //Doing this to sense explosions
     bool isValidTemperature = !isnan(temperature) && abs(temperature) < 2000;
-    vec3 pos = vox->centerInWorldSpace;
+    vec3 pos = vec3(vox->centerInWorldSpace);
 
     //We'd love to do this in the shader, but its better to do this here for performance
     if (isValidTemperature){
