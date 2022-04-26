@@ -2,23 +2,21 @@
 #include <math.h>
 
 
-float get_q_v(Voxel* v) {return v->getLastFrameState()->q_v;}
-float get_q_c(Voxel* v) {return v->getLastFrameState()->q_c;}
-float get_q_r(Voxel* v) {return v->getLastFrameState()->q_r;}
+
 void Simulator::stepVoxelWater(Voxel* v, int deltaTimeInMs)
 {
-    float q_v = v->getLastFrameState()->q_v;
-    float q_c = v->getLastFrameState()->q_c;
-    float q_r = v->getLastFrameState()->q_r;
-    glm::vec3 u = vec3(v->getCurrentState()->u); // at this point u is already calculated
-    float h = v->centerInWorldSpace.y; // need discussion
+    double q_v = v->getLastFrameState()->q_v;
+    double q_c = v->getLastFrameState()->q_c;
+    double q_r = v->getLastFrameState()->q_r;
+    glm::dvec3 u = v->getCurrentState()->u; // at this point u is already calculated
+    double h = v->centerInWorldSpace.y; // need discussion
 
     q_v = advect(q_v, u, v->getGradient(get_q_v), deltaTimeInMs);
     q_c = advect(q_c, u, v->getGradient(get_q_c), deltaTimeInMs);
     q_r = advect(q_r, u, v->getGradient(get_q_r), deltaTimeInMs);
     float q_vs = saturate(absolute_pres(h), absolute_temp(h));
 
-    float E_r = q_r*evaporation_rate*std::max(q_vs - q_v, 0.f);// evaporation of rain Fire Eq.22
+    float E_r = q_r*evaporation_rate*std::max(q_vs - q_v, 0.);// evaporation of rain Fire Eq.22
     float A_c = autoconverge_cloud*(q_c - 0.001); // below Stormscape Eq.24
     float K_c = raindrop_accelerate*q_c*q_r;  // below Stormscape Eq.24
     q_v = q_v + std::min(q_vs - q_v, q_c) + E_r;
@@ -41,28 +39,28 @@ void Simulator::stepVoxelWater(Voxel* v, int deltaTimeInMs)
 
 
 // Advection function based on *Stable Fluids* Jos Stam 1999
-float Simulator::advect(float field, glm::vec3 vel, glm::vec3 field_grad, float dt)
+double Simulator::advect(double field, glm::dvec3 vel, glm::dvec3 field_grad, double dt)
 {
     float df_dt = -glm::dot(vel, field_grad);
     return field + df_dt*dt;
 }
 
 // saturation ratio calculation of Eq.16 Stormscape
-float Simulator::saturate(float pressure, float temperature)
+double Simulator::saturate(double pressure, double temperature)
 {
     return 380.16/pressure*exp(17.67*temperature/(temperature+243.5));
 }
 
 
 // absolute temperature calculation based on Eq.27 Stormscape
-float Simulator::absolute_temp(float height)
+double Simulator::absolute_temp(double height)
 {
     height = height_scale*height;
     return sealevel_temperature - 0.0065*height;
 }
 
 // absolute pressure calculation based on Eq.28 Stormscape
-float Simulator::absolute_pres(float height)
+double Simulator::absolute_pres(double height)
 {
     height = height_scale*height;
     float tmp = 1 - 0.0065*height/sealevel_temperature;
@@ -70,14 +68,14 @@ float Simulator::absolute_pres(float height)
 }
 
  // Stormscape Eq.9
-float Simulator::mole_fraction(float ratio)
+double Simulator::mole_fraction(double ratio)
 {
     if (ratio < 0) ratio = 0; // fail safe
     return ratio / (1 + ratio);
 }
 
  // Stormscape Eq.7
-float Simulator::avg_mole_mass(float ratio)
+double Simulator::avg_mole_mass(double ratio)
 {
     float real_mass = 18.02*ratio + 28.96*(1-ratio);
 //    return real_mass*mass_scale;
@@ -85,12 +83,12 @@ float Simulator::avg_mole_mass(float ratio)
 }
 
 // Stormscape Eq.11
-float Simulator::isentropic_exponent(float ratio)
+double Simulator::isentropic_exponent(double ratio)
 {
     return ratio*1.33 + (1-ratio)*1.4;
 }
 
-float Simulator::heat_capacity(float gamma, float mass)
+double Simulator::heat_capacity(double gamma, double mass)
 {
     return gamma*8.3/(mass*(gamma-1));
 }

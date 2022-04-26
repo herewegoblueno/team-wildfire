@@ -91,40 +91,75 @@ double Voxel::getNeighbourTemperature(int xOffset, int yOffset, int zOffset){
 }
 
 
-vec3 Voxel::getGradient(float (*func)(Voxel *))
+dvec3 Voxel::getGradient(double (*func)(Voxel *))
 {
-    float avg_Top = 0, avg_MiddleY = 0, avg_Bottom = 0;
-    float avg_Right = 0, avg_MiddleX = 0, avg_Left = 0;
-    float avg_Forward = 0, avg_MiddleZ = 0, avg_Back = 0;
+    Voxel *vox = getVoxelWithIndexOffset(vec3(0,1,0));
+    double temperatureTop = vox == nullptr ? 0 : func(vox);
+    vox = getVoxelWithIndexOffset(vec3(0,-1,0));
+    double temperatureBottom = vox == nullptr ? 0 : func(vox);
+    vox = getVoxelWithIndexOffset(vec3(1,0,0));
+    double temperatureRight = vox == nullptr ? 0 : func(vox);
+    vox = getVoxelWithIndexOffset(vec3(-1,0,0));
+    double temperatureLeft = vox == nullptr ? 0 : func(vox);
+    vox = getVoxelWithIndexOffset(vec3(0,0,1));
+    double temperatureForward = vox == nullptr ? 0 : func(vox);
+    vox = getVoxelWithIndexOffset(vec3(0,0,-1));
+    double temperatureBack = vox == nullptr ? 0 : func(vox);
 
-    for (int x = 0; x < 3; x++){
-        for (int y = 0; y < 3; y++){
-            for (int z = 0; z < 3; z++){
-                vec3 offset(x - 1, y - 1, z - 1);
-                Voxel *vox = getVoxelWithIndexOffset(offset);
-                float value = vox == nullptr ? 0 : func(vox);
-                if (x == 0) avg_Left += value / 9.f;
-                if (x == 1) avg_MiddleX += value / 9.f;
-                if (x == 2) avg_Right += value / 9.f;
-
-                if (y == 0) avg_Bottom += value / 9.f;
-                if (y == 1) avg_MiddleY += value / 9.f;
-                if (y == 2) avg_Top += value / 9.f;
-
-                if (z == 0) avg_Back += value / 9.f;
-                if (z == 1) avg_MiddleZ += value / 9.f;
-                if (z == 2) avg_Forward += value / 9.f;
-            }
-        }
-    }
     float cellSize = grid->cellSideLength();
 
     //calculating the ∇T (gradient)
-    float yGradient = (avg_Top - avg_Bottom) / (cellSize * 2);
-    float xGradient = (avg_Right - avg_Left) / (cellSize * 2);
-    float zGradient = (avg_Forward - avg_Back) / (cellSize * 2);
-    vec3 gradient = vec3(xGradient, yGradient, zGradient);
+    double yGradient = (temperatureTop - temperatureBottom) / (cellSize * 2);
+    double xGradient = (temperatureRight - temperatureLeft) / (cellSize * 2);
+    double zGradient = (temperatureForward - temperatureBack) / (cellSize * 2);
+    dvec3 gradient = dvec3(xGradient, yGradient, zGradient);
     return gradient;
 }
 
 
+double Voxel::getLaplace(double (*func)(Voxel *))
+{
+    Voxel *vox = getVoxelWithIndexOffset(vec3(0,1,0));
+    double temperatureTop = vox == nullptr ? 0 : func(vox);
+    vox = getVoxelWithIndexOffset(vec3(0,-1,0));
+    double temperatureBottom = vox == nullptr ? 0 : func(vox);
+    vox = getVoxelWithIndexOffset(vec3(1,0,0));
+    double temperatureRight = vox == nullptr ? 0 : func(vox);
+    vox = getVoxelWithIndexOffset(vec3(-1,0,0));
+    double temperatureLeft = vox == nullptr ? 0 : func(vox);
+    vox = getVoxelWithIndexOffset(vec3(0,0,1));
+    double temperatureForward = vox == nullptr ? 0 : func(vox);
+    vox = getVoxelWithIndexOffset(vec3(0,0,-1));
+    double temperatureBack = vox == nullptr ? 0 : func(vox);
+    double temperatureMiddle = func(this);
+
+    float cellSize = grid->cellSideLength();
+
+    double rateOfChangeOfYGradient = (temperatureTop - temperatureMiddle) - (temperatureMiddle - temperatureBottom);
+    rateOfChangeOfYGradient /= pow(cellSize, 2) * 2;
+    double rateOfChangeOfZGradient = (temperatureForward - temperatureMiddle) - (temperatureMiddle - temperatureBack) ;
+    rateOfChangeOfZGradient /= pow(cellSize, 2) * 2;
+    double rateOfChangeOfXGradient =  (temperatureRight - temperatureMiddle) - (temperatureMiddle - temperatureLeft);
+    rateOfChangeOfXGradient /= pow(cellSize, 2) * 2;
+    double laplace = rateOfChangeOfYGradient + rateOfChangeOfZGradient + rateOfChangeOfXGradient;
+    return laplace;
+}
+
+
+dvec3 Voxel::getVerticity()
+{
+    dvec3 grad_ux = getGradient(get_q_ux);
+    dvec3 grad_uy = getGradient(get_q_uy);
+    dvec3 grad_uz = getGradient(get_q_uz);
+
+    return dvec3(grad_uz.y - grad_uy.z, grad_ux.z - grad_uz.x, grad_uy.x - grad_ux.y);
+}
+
+
+double get_q_ux(Voxel* v) {return v->getLastFrameState()->u.x;}
+double get_q_uy(Voxel* v) {return v->getLastFrameState()->u.y;}
+double get_q_uz(Voxel* v) {return v->getLastFrameState()->u.z;}
+
+double get_q_v(Voxel* v) {return v->getLastFrameState()->q_v;}
+double get_q_c(Voxel* v) {return v->getLastFrameState()->q_c;}
+double get_q_r(Voxel* v) {return v->getLastFrameState()->q_r;}

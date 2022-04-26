@@ -49,7 +49,9 @@ public:
     VoxelTemperatureGradientInfo getTemperatureGradientInfoFromPreviousFrame();
     double getAmbientTemperature();
 
-    vec3 getGradient(float (*func)(Voxel *));
+    dvec3 getGradient(double (*func)(Voxel *));
+    double getLaplace(double (*func)(Voxel *));
+    dvec3 getVerticity();
 
 private:
     //Set and changed over the course of simulation
@@ -59,5 +61,14 @@ private:
     double getNeighbourTemperature(int xOffset, int yOffset, int zOffset);
     double getAmbientTempAtIndices(int x, int y, int z);
 };
+
+
+double get_q_ux(Voxel* v);
+double get_q_uy(Voxel* v);
+double get_q_uz(Voxel* v);
+
+double get_q_v(Voxel* v);
+double get_q_c(Voxel* v);
+double get_q_r(Voxel* v);
 
 #endif // VOXEL_H
