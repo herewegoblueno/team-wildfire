@@ -33,7 +33,7 @@ public:
     virtual void settingsChanged() override;
 
 private:
-    void updateFromForest();
+    void updatePrimitivesFromForest();
 
     void renderTrunksVisualizedModules();
     void renderTrunks();

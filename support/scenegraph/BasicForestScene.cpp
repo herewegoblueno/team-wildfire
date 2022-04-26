@@ -25,7 +25,8 @@ BasicForestScene::BasicForestScene(MainWindow *mainWindow):
     tessellateShapes();
     _voxelGrid.getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeVectorField);
     _forest = std::make_unique<Forest>(&_voxelGrid, numTrees, forestWidth, forestHeight);
-    updateFromForest();
+    //The forest also initializes the mass of the voxels
+    updatePrimitivesFromForest();
     _simulator.init();
     _voxelGrid.getVisualization()->setForestReference(_forest.get());
     mainWindow->updateModuleSelectionOptions(_forest->getAllModuleIDs());
@@ -35,9 +36,10 @@ BasicForestScene::~BasicForestScene()
 {
 }
 
-void BasicForestScene::updateFromForest() {
-    primitives.clear();
-    _forest->update();
+void BasicForestScene::updatePrimitivesFromForest() {
+    _leaves.clear();
+    _trunks.clear();
+    _forest->recalculatePrimitives();
     std::vector<PrimitiveBundle> forestPrimitives = _forest->getPrimitives();
     PrimitiveType type;
     for (PrimitiveBundle &bundle : forestPrimitives) {
@@ -75,8 +77,8 @@ void BasicForestScene::render(SupportCanvas3D *context) {
     _voxelGrid.getVisualization()->setPV(camera->getProjectionMatrix() * camera->getViewMatrix());
     _voxelGrid.getVisualization()->draw(context);
 
-    //Trigger another render
     _simulator.cleanupForNextStep(&_voxelGrid);
+    //Trigger another render
     context->update();
 }
 

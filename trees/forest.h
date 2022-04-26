@@ -14,9 +14,14 @@ class Forest
 public:
     Forest(VoxelGrid *grid, int numTrees, float forestWidth, float forestHeight);
     ~Forest();
-    void update();
+    void recalculatePrimitives();
+    void initializeModuleVoxelMapping(VoxelGrid *voxelGrid);
     std::vector<PrimitiveBundle> getPrimitives();
-    void connectModulesToVoxels(VoxelGrid *voxelGrid);
+
+    void updateModuleVoxelMapping(VoxelGrid *voxelGrid);
+    void updateMassOfModules();
+    void updateMassOfVoxels();
+
     VoxelSet getVoxelsMappedToModule(Module *m);
     Module *getModuleFromId(int id);
     std::vector<int> getAllModuleIDs();
@@ -36,7 +41,7 @@ private:
     std::unique_ptr<CS123ScenePrimitive> _leaf;
 
     void checkModuleVoxelOverlap(Module *module, Voxel *voxel, double cellSideLength);
-    void connectModulesToVoxels();
+    void initializeModuleVoxelMapping();
     void initMassOfModules();
     void initMassOfVoxels();
     std::map<Module *, VoxelSet> _moduleToVoxels;

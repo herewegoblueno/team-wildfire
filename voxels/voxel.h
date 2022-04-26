@@ -11,6 +11,7 @@ using namespace glm;
 struct VoxelPhysicalData {
     double mass = 0;
     double temperature = 0;
+
     dvec3 tempGradientFromPrevState = dvec3(0,0,0); // ∇T (here just to make debugging easier if need be)
     double tempLaplaceFromPrevState = 0; // ∇^2T (here just to make debugging easier if need be)
 

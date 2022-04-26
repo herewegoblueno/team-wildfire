@@ -12,7 +12,7 @@ Forest::Forest(VoxelGrid *grid, int numTrees, float forestWidth, float forestHei
     initializeLeafPrimitive();
     createTrees(numTrees, forestWidth, forestHeight);
     initMassOfModules();
-    connectModulesToVoxels(); // depends on module mass
+    initializeModuleVoxelMapping(); // depends on module mass
     initMassOfVoxels();
 }
 
@@ -26,7 +26,7 @@ Forest::~Forest() {
 }
 
 /** Update primitives based on branches */
-void Forest::update() {
+void Forest::recalculatePrimitives() {
     _primitives.clear();
     for (Branch *branch : _branches) {
         PrimitiveBundle branchPrimitive(*_trunk, branch->model, branch->moduleID);
@@ -84,7 +84,7 @@ void Forest::addTreeToForest(const ModuleSet &modules, mat4 trans) {
 }
 
 /** Map modules to voxels and vice versa */
-void Forest::connectModulesToVoxels() {
+void Forest::initializeModuleVoxelMapping() {
    int resolution = _grid->getResolution();
    double cellSideLength = _grid->cellSideLength();
    for (Module *module: _modules) {
@@ -111,7 +111,7 @@ void Forest::connectModulesToVoxels() {
        int moduleID = moduleVoxels.first->ID;
        int numVoxels = moduleVoxels.second.size();
        totalVoxels += numVoxels;
-       //std::cout << numVoxels << std::endl;
+
        if (numVoxels == 0) {
            std::cerr << "Module " << moduleID << "has 0 voxels "<<  std::endl;
        }
@@ -165,9 +165,22 @@ void Forest::initMassOfVoxels() {
         double numVoxels = voxels.size();
         double massPerVoxel = module->getCurrentState()->mass / numVoxels;
         for (Voxel *voxel : voxels) {
+            voxel->getLastFrameState()->mass += massPerVoxel;
             voxel->getCurrentState()->mass += massPerVoxel;
         }
     }
+}
+
+void updateModuleVoxelMapping(VoxelGrid *voxelGrid){
+    //TODO
+}
+
+void updateMassOfModules(){
+    //TODO
+}
+
+void updateMassOfVoxels(){
+    //TODO
 }
 
 std::vector<PrimitiveBundle> Forest::getPrimitives() {
