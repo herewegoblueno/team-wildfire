@@ -26,6 +26,8 @@ public:
     Module *getModuleFromId(int id);
     std::vector<int> getAllModuleIDs();
 
+    void updateLastFrameDataOfModules();
+
 private:
     void createTrees(int numTrees, float forestWidth, float forestHeight);
     void addTreeToForest(const ModuleSet &modules, glm::mat4 trans);

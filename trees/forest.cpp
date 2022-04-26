@@ -153,12 +153,23 @@ bool Forest::checkModuleVoxelOverlap(Module *module, Voxel *voxel,
 /** Init mass of each module based on its branches */
 void Forest::initMassOfModules() {
     for (Module *module : _modules) {
-        module->updateMass();
+        module->initMass();
     }
 }
 
 void Forest::updateMassOfModules(){
-    // TODO
+    for (Module *module : _modules) {
+        module->updateMass();
+    }
+}
+
+/**
+ * Update the structs that contain the info from last frame with the current frame's data (in preparation for another simulation run)
+ */
+void Forest::updateLastFrameDataOfModules(){
+    for (Module *module : _modules) {
+        module->updateLastFrameData();
+    }
 }
 
 /**
@@ -182,7 +193,7 @@ void Forest::updateModuleVoxelMapping(VoxelGrid *voxelGrid){
 
     for (auto const& moduleToVoxels : _moduleToVoxels) {
         Module *module = moduleToVoxels.first;
-        VoxelSet voxels = moduleToVoxels.second; //TODO: does this edit in place?
+        VoxelSet voxels = moduleToVoxels.second;
         for (Voxel *voxel : voxels) {
             if (!checkModuleVoxelOverlap(module, voxel, cellSideLength)){
                 _moduleToVoxels[module].erase(voxel);

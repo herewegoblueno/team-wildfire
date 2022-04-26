@@ -10,6 +10,16 @@ Module::Module() :
     // TODO: init temperature to ambient temp
 }
 
+/** Init mass of module based on branch masses */
+void Module::initMass() {
+    _currentPhysicalData.mass = 0;
+    _lastFramePhysicalData.mass = 0;
+    for (Branch *branch : _branches) {
+        _currentPhysicalData.mass += getBranchMass(branch);
+        _lastFramePhysicalData.mass += getBranchMass(branch);
+    }
+}
+
 /** Update mass of module based on branch masses */
 void Module::updateMass() {
     _currentPhysicalData.mass = 0;
@@ -37,6 +47,10 @@ ModulePhysicalData *Module::getCurrentState() {
     return &_currentPhysicalData;
 }
 
+ModulePhysicalData *Module::getLastFrameState() {
+    return &_lastFramePhysicalData;
+}
+
 double Module::getBranchMass(Branch *branch) const {
     return getBranchVolume(branch) * woodDensity;
 }
@@ -46,4 +60,8 @@ double Module::getBranchVolume(Branch *branch) const {
     double r0 = branch->radius;
     double r1 = r0 * branchWidthDecay;
     return (M_PI / 3.0)* l * (r0*r0 + r0*r1 + r1*r1);
+}
+
+void Module::updateLastFrameData(){
+    _lastFramePhysicalData = _currentPhysicalData;
 }

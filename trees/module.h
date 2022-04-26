@@ -58,11 +58,16 @@ public:
     bool _includesRoot;
 
     glm::dvec3 getCenter() const;
+    void initMass();
     void updateMass();
     ModulePhysicalData *getCurrentState();
+    ModulePhysicalData *getLastFrameState();
+
+    void updateLastFrameData();
 
 private:
     ModulePhysicalData _currentPhysicalData;
+    ModulePhysicalData _lastFramePhysicalData;
 
     double getBranchMass(Branch *branch) const;
     double getBranchVolume(Branch *branch) const;

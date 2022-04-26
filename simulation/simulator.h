@@ -4,6 +4,7 @@
 #include <chrono>
 #include "voxels/voxelgrid.h"
 #include "physics.h"
+#include "trees/forest.h"
 
 using namespace std::chrono;
 
@@ -18,14 +19,14 @@ public:
 
     Simulator();
     void init();
-    void step(VoxelGrid *grid);
-    void cleanupForNextStep(VoxelGrid *grid);
+    void step(VoxelGrid *grid, Forest *forest = nullptr);
+    void cleanupForNextStep(VoxelGrid *grid, Forest *forest = nullptr);
 
 
 private:
     milliseconds timeLastFrame;
-    void stepThreadHandler(VoxelGrid *grid, int deltaTime, int resolution, int minX, int maxX);
-    void stepCleanupThreadHandler(VoxelGrid *grid, int resolution, int minX, int maxX);
+    void stepThreadHandler(VoxelGrid *grid, Forest *forest, int deltaTime, int resolution, int minX, int maxX);
+    void stepCleanupThreadHandler(VoxelGrid *grid, Forest *forest, int resolution, int minX, int maxX);
 
     void stepVoxelHeatTransfer(Voxel* v, int deltaTimeInMs);
     void stepVoxelWater(Voxel* v, int deltaTimeInMs);
