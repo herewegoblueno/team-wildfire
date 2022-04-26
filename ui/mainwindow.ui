@@ -583,6 +583,39 @@
                 <string>View only voxels touching this module</string>
                </property>
               </widget>
+              <widget class="QWidget" name="widget" native="true">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>90</y>
+                 <width>251</width>
+                 <height>42</height>
+                </rect>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,1">
+                <item>
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>Color Mode</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="comboBox">
+                  <item>
+                   <property name="text">
+                    <string>ID</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Temperature</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
              </widget>
             </widget>
            </item>

@@ -56,6 +56,7 @@ private:
     std::vector<PrimitiveBundle> _trunks;
     std::vector<PrimitiveBundle> _leaves;
     std::unordered_map<int, CS123SceneMaterial> _moduleIDToMat;
+    CS123SceneMaterial matForSelectedBranch ;
     Simulator _simulator;
 
     MainWindow *mainWindow;
