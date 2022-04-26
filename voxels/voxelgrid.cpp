@@ -64,3 +64,13 @@ Voxel *VoxelGrid::getVoxelClosestToPoint(vec3 point){
 double VoxelGrid::getVolumePerCell(){
     return cellVolume;
 }
+
+
+bool VoxelGrid::isGoodIndex(int i){
+    return i >= 0 && i < resolution;
+}
+
+int VoxelGrid::getClampedIndex(int i){
+    return clamp(i, 0, resolution - 1);
+}
+

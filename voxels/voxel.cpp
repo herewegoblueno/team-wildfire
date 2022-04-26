@@ -1,5 +1,7 @@
 #include "voxel.h"
 #include "glm/ext.hpp"
+#include "simulation/physics.h"
+
 #define GLM_ENABLE_EXPERIMENTAL
 
 
@@ -10,8 +12,8 @@ Voxel::Voxel(VoxelGrid *grid, int XIndex, int YIndex, int ZIndex, vec3 center) :
     ZIndex(ZIndex),
     centerInWorldSpace(center)
 {
-    lastFramePhysicalState.temperature = getAmbientTempAtIndices(XIndex, YIndex, ZIndex);
-    currentPhysicalState.temperature = getAmbientTempAtIndices(XIndex, YIndex, ZIndex);
+    lastFramePhysicalState.temperature = ambientTemperatureFunc(centerInWorldSpace);
+    currentPhysicalState.temperature = ambientTemperatureFunc(centerInWorldSpace);
 
     //for testing
     int targetIndex = ceil(grid->getResolution() / 2.f);
@@ -44,13 +46,16 @@ void Voxel::updateLastFrameData(){
 }
 
 
-double Voxel::getAmbientTempAtIndices(int, int y, int){
-    y = glm::clamp(y, 0, grid->getResolution() - 1);
-    return glm::clamp(3.5 - y * grid->cellSideLength() / 2, 0.0, 3.5 );
+double Voxel::getAmbientTemperature(){
+    return ambientTemperatureFunc(centerInWorldSpace);
 }
 
-double Voxel::getAmbientTemperature(){
-    return getAmbientTempAtIndices(XIndex, YIndex, ZIndex);
+double Voxel::getAmbientTempAtIndices(int x, int y, int z){
+    if (grid->isGoodIndex(x) && grid->isGoodIndex(y) && grid->isGoodIndex(z)){
+        return grid->getVoxel(x, y, z)->getAmbientTemperature();
+    }else{
+         return grid->getVoxel(grid->getClampedIndex(x), grid->getClampedIndex(y), grid->getClampedIndex(z))->getAmbientTemperature();
+    }
 }
 
 
@@ -108,7 +113,6 @@ dvec3 Voxel::getGradient(double (*func)(Voxel *))
 
     float cellSize = grid->cellSideLength();
 
-    //calculating the ∇T (gradient)
     double yGradient = (temperatureTop - temperatureBottom) / (cellSize * 2);
     double xGradient = (temperatureRight - temperatureLeft) / (cellSize * 2);
     double zGradient = (temperatureForward - temperatureBack) / (cellSize * 2);
@@ -154,7 +158,6 @@ dvec3 Voxel::getVerticity()
 
     return dvec3(grad_uz.y - grad_uy.z, grad_ux.z - grad_uz.x, grad_uy.x - grad_ux.y);
 }
-
 
 double get_q_ux(Voxel* v) {return v->getLastFrameState()->u.x;}
 double get_q_uy(Voxel* v) {return v->getLastFrameState()->u.y;}

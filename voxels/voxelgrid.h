@@ -26,6 +26,9 @@ public:
     double getVolumePerCell();
     double cellSideLength();
 
+    bool isGoodIndex(int i);
+    int getClampedIndex(int i);
+
 private:
     VoxelGridLine gridlines;
     int resolution;

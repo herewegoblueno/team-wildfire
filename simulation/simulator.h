@@ -14,8 +14,6 @@ class Simulator
 {
 public:
     static const int NUMBER_OF_SIMULATION_THREADS;
-    static const float RADIATIVE_COOLING_TERM;
-    static const float HEAT_DIFFUSION_INTENSITY_TERM;
 
     Simulator();
     void init();

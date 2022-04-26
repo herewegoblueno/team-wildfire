@@ -23,6 +23,7 @@ SOURCES += ui/mainwindow.cpp \
     fire/smoke.cpp \
     main.cpp \
     glew-1.10.0/src/glew.c \
+    simulation/physics.cpp \
     simulation/simulationheattransfer.cpp \
     simulation/simulationwaterphysics.cpp \
     simulation/simulationwindfield.cpp \

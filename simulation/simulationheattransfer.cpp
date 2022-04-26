@@ -1,9 +1,6 @@
 #include "simulator.h"
 #include <thread>
 
- const float Simulator::HEAT_DIFFUSION_INTENSITY_TERM = 0.02; //alpha
- const float Simulator::RADIATIVE_COOLING_TERM = 0.01; //gamma
-
 //eq 21 in Fire in Paradise paper
 //TODO: add in last 2 terms
 void Simulator::stepVoxelHeatTransfer(Voxel* v, int deltaTimeInMs){

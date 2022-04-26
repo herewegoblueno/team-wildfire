@@ -58,8 +58,9 @@ private:
     VoxelPhysicalData currentPhysicalState;
     VoxelPhysicalData lastFramePhysicalState;
 
-    double getNeighbourTemperature(int xOffset, int yOffset, int zOffset);
     double getAmbientTempAtIndices(int x, int y, int z);
+    double getNeighbourTemperature(int xOffset, int yOffset, int zOffset);
+
 };
 
 

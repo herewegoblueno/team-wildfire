@@ -3,8 +3,8 @@
 #include <vector>
 #include <unordered_set>
 #include "glm/glm.hpp"
+#include "simulation/physics.h"
 
-const float woodDensity = 1;
 const float branchWidthDecay = 0.7; // Amount to scale x, z size of each successive iteration
 
 class Module;
