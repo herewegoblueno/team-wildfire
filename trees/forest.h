@@ -40,7 +40,7 @@ private:
     std::unique_ptr<CS123ScenePrimitive> _trunk;
     std::unique_ptr<CS123ScenePrimitive> _leaf;
 
-    void checkModuleVoxelOverlap(Module *module, Voxel *voxel, double cellSideLength);
+    bool checkModuleVoxelOverlap(Module *module, Voxel *voxel, double cellSideLength);
     void initializeModuleVoxelMapping();
     void initMassOfModules();
     void initMassOfVoxels();

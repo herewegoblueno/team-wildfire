@@ -100,7 +100,10 @@ void Forest::initializeModuleVoxelMapping() {
            for (int y = yMin; y < yMax; y++) {
                for (int z = zMin; z < zMax; z++) {
                    Voxel *voxel = _grid->getVoxel(x, y, z);
-                   checkModuleVoxelOverlap(module, voxel, cellSideLength);
+                   if (checkModuleVoxelOverlap(module, voxel, cellSideLength)){
+                       _moduleToVoxels[module].insert(voxel);
+                       _voxelToModules[voxel].insert(module);
+                   }
                }
            }
        }
@@ -126,7 +129,7 @@ void Forest::initializeModuleVoxelMapping() {
 }
 
 /** See if a module and voxel overlap by checking each branch */
-void Forest::checkModuleVoxelOverlap(Module *module, Voxel *voxel,
+bool Forest::checkModuleVoxelOverlap(Module *module, Voxel *voxel,
                                      double cellSideLength) {
     dvec3 voxelCenter = voxel->centerInWorldSpace;
     for (Branch *branch: module->_branches) {
@@ -141,11 +144,10 @@ void Forest::checkModuleVoxelOverlap(Module *module, Voxel *voxel,
         double branchMaxDist = 0.5 * horizScale;
         // approximate voxel as a sphere
         if (dist - cellSideLength / 2.0 < branchMaxDist && y >= -0.5 && y <= 0.5) {
-            _moduleToVoxels[module].insert(voxel);
-            _voxelToModules[voxel].insert(module);
-            return;
+            return true;
         }
     }
+    return false;
 }
 
 /** Init mass of each module based on its branches */
@@ -153,6 +155,10 @@ void Forest::initMassOfModules() {
     for (Module *module : _modules) {
         module->updateMass();
     }
+}
+
+void Forest::updateMassOfModules(){
+    // TODO
 }
 
 /**
@@ -171,12 +177,19 @@ void Forest::initMassOfVoxels() {
     }
 }
 
-void updateModuleVoxelMapping(VoxelGrid *voxelGrid){
-    //TODO
-}
+void Forest::updateModuleVoxelMapping(VoxelGrid *voxelGrid){
+    double cellSideLength = _grid->cellSideLength();
 
-void updateMassOfModules(){
-    //TODO
+    for (auto const& moduleToVoxels : _moduleToVoxels) {
+        Module *module = moduleToVoxels.first;
+        VoxelSet voxels = moduleToVoxels.second; //TODO: does this edit in place?
+        for (Voxel *voxel : voxels) {
+            if (!checkModuleVoxelOverlap(module, voxel, cellSideLength)){
+                _moduleToVoxels[module].erase(voxel);
+                _voxelToModules[voxel].erase(module);
+            }
+        }
+    }
 }
 
 void updateMassOfVoxels(){
