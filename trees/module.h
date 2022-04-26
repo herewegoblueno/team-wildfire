@@ -5,13 +5,13 @@
 #include "glm/glm.hpp"
 
 const float woodDensity = 1;
-// Amount to scale x, z size of each successive iteration
-const float branchWidthDecay = 0.7;
+const float branchWidthDecay = 0.7; // Amount to scale x, z size of each successive iteration
 
 class Module;
-
 struct Branch;
 typedef std::unordered_set<Branch *> BranchSet;
+typedef std::unordered_set<Module *> ModuleSet;
+
 struct Branch {
     Branch *parent;
     BranchSet children;
@@ -22,6 +22,7 @@ struct Branch {
     std::vector<glm::mat4> leafModels; // gives leaves world-space position
     int moduleID; // lets us identify modules for visual debugging
 };
+
 struct BranchTree {
     Branch *root;
     BranchSet branches;
@@ -30,7 +31,6 @@ struct BranchTree {
     {}
 };
 
-typedef std::unordered_set<Module *> ModuleSet;
 struct ModuleTree {
     Module *root;
     ModuleSet modules;
@@ -39,10 +39,10 @@ struct ModuleTree {
     {}
 };
 
-class Module
-{
+class Module{
 public:
     Module();
+    int ID; // lets us identify modules for visual debugging
 
     Module *_parent;
     ModuleSet _children;

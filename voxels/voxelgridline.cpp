@@ -7,6 +7,8 @@
 #include "voxelgrid.h"
 #include "support/Settings.h"
 #include <math.h>
+#include "trees/forest.h"
+#include "trees/module.h"
 
 
 //Modified from https://stackoverflow.com/questions/14486291/how-to-draw-line-in-opengl
@@ -14,6 +16,8 @@ void VoxelGridLine::init(VoxelGrid *grid)
 {
     this->grid = grid;
     pv = mat4(1.0f);
+    forest = nullptr;
+
     updateValuesFromSettings();
 
     generateGridVertices(grid);
@@ -61,55 +65,25 @@ void VoxelGridLine::draw(SupportCanvas3D *) {
     int eyeVoxelZ = eyeVoxel->ZIndex;
 
     glBindVertexArray(VAO);
-    for (int x = eyeVoxelX - eyeRadiusInVoxels; x <= eyeVoxelX + eyeRadiusInVoxels; x++){
-        for (int y = eyeVoxelY - eyeRadiusInVoxels; y <= eyeVoxelY + eyeRadiusInVoxels; y++){
-            for (int z = eyeVoxelZ - eyeRadiusInVoxels; z <= eyeVoxelZ + eyeRadiusInVoxels; z++){
-                Voxel *vox = grid->getVoxel(x, y, z);
-                if (vox == nullptr) continue;
-                float temperature = vox->getCurrentState()->temperature;
-                //Doing this to sense explosions
-                bool isValidTemperature = !isnan(temperature) && abs(temperature) < 2000;
-                vec3 pos = vox->centerInWorldSpace;
 
-                //We'd love to do this in the shader, but its better to do this here for performance
-                if (isValidTemperature){
-                    if (temperature < temperatureThreshold) continue;
-                    if (temperature > temperatureMax) continue;
-                    if (glm::length(vec3(pos - eyeCenter)) > eyeRadius) continue;
-                }else{
-                    //Uncomment this if you want the simulation to pause the simulation
-                    //once you start getting bad values....
-                    //settings.simulatorTimescale = 0;
-                }
-
-                shader->setUniform("m", pos);
-
-                if (voxelsGridEnabled){
-                    //Drawing the cube of the voxel itself...
-                    //TODO: improve this, still too tightly coupled with temperature ranges
-                    if (voxelMode == TEMP_LAPLACE){
-                        shader->setUniform("prop", (float)vox->getCurrentState()->tempLaplaceFromPrevState);
-                    }else{
-                        shader->setUniform("selectedVoxel", !isValidTemperature);
-                        shader->setUniform("prop", temperature);
-                    }
-                    shader->setUniform("renderingVectorField", false);
-                    glDrawArrays(GL_LINES, 0, vertices.size() / 3 - 2);
-                }
-
-                if (vectorFieldEnabled){
-                    //Now using the last part of the VAO to render vector field
-                    if (vectorMode == UFIELD){
-                        shader->setUniform("u", vec3(vox->getCurrentState()->u));
-                    }else{
-                        shader->setUniform("u", vec3(vox->getCurrentState()->tempGradientFromPrevState));
-                    }
-                    shader->setUniform("renderingVectorField", true);
-                    glDrawArrays(GL_LINES,  (vertices.size() / 3) - 2, 2);
+    if (forest != nullptr && settings.visualizeOnlyVoxelsTouchingSelectedModule && settings.selectedModuleId != DEFAULT_MODULE_ID){
+        //Render the branches currently being touched by the current branch
+        Module *m = forest->getModuleFromId(settings.selectedModuleId);
+        if (m == nullptr) return;
+        VoxelSet mappedVoxels = forest->getVoxelsMappedToModule(m);
+        for (Voxel *v : mappedVoxels) renderVoxel(v, false);
+    }else{
+        //Render based off the sliding window...
+        for (int x = eyeVoxelX - eyeRadiusInVoxels; x <= eyeVoxelX + eyeRadiusInVoxels; x++){
+            for (int y = eyeVoxelY - eyeRadiusInVoxels; y <= eyeVoxelY + eyeRadiusInVoxels; y++){
+                for (int z = eyeVoxelZ - eyeRadiusInVoxels; z <= eyeVoxelZ + eyeRadiusInVoxels; z++){
+                    renderVoxel(grid->getVoxel(x, y, z), true);
                 }
             }
         }
     }
+
+
 
     glDisable(GL_BLEND);
 }
@@ -173,6 +147,51 @@ void VoxelGridLine::generateGridVertices(VoxelGrid *grid){
     vertices.insert(vertices.end(), { 0, 0, 0, 0, halfCellLength * 5, 0});
 }
 
+void VoxelGridLine::renderVoxel(Voxel *vox, bool renderingInEyeMode){
+    if (vox == nullptr) return;
+    float temperature = vox->getCurrentState()->temperature;
+    //Doing this to sense explosions
+    bool isValidTemperature = !isnan(temperature) && abs(temperature) < 2000;
+    vec3 pos = vox->centerInWorldSpace;
+
+    //We'd love to do this in the shader, but its better to do this here for performance
+    if (isValidTemperature){
+        if (temperature < temperatureThreshold) return;
+        if (temperature > temperatureMax) return;
+        if (renderingInEyeMode && glm::length(vec3(pos - eyeCenter)) > eyeRadius) return;
+    }else{
+        //Uncomment this if you want the simulation to pause the simulation
+        //once you start getting bad values....
+        //settings.simulatorTimescale = 0;
+    }
+
+    shader->setUniform("m", pos);
+
+    if (voxelsGridEnabled){
+        //Drawing the cube of the voxel itself...
+        //TODO: improve this, still too tightly coupled with temperature ranges
+        if (voxelMode == TEMP_LAPLACE){
+            shader->setUniform("prop", (float)vox->getCurrentState()->tempLaplaceFromPrevState);
+        }else{
+            shader->setUniform("selectedVoxel", !isValidTemperature);
+            shader->setUniform("prop", temperature);
+        }
+        shader->setUniform("renderingVectorField", false);
+        glDrawArrays(GL_LINES, 0, vertices.size() / 3 - 2);
+    }
+
+    if (vectorFieldEnabled){
+        //Now using the last part of the VAO to render vector field
+        if (vectorMode == UFIELD){
+            shader->setUniform("u", vec3(vox->getCurrentState()->u));
+        }else{
+            shader->setUniform("u", vec3(vox->getCurrentState()->tempGradientFromPrevState));
+        }
+        shader->setUniform("renderingVectorField", true);
+        glDrawArrays(GL_LINES,  (vertices.size() / 3) - 2, 2);
+    }
+}
+
 void VoxelGridLine::toggle(bool enableVoxels, bool enableWind){
     voxelsGridEnabled = enableVoxels;
     vectorFieldEnabled = enableWind;
@@ -193,6 +212,11 @@ float VoxelGridLine::getEyeRadius(){
 void VoxelGridLine::setEyeRadius(float r){
     eyeRadius = r;
 }
+
+void VoxelGridLine::setForestReference(Forest *forest){
+    this->forest = forest;
+}
+
 
 std::string VoxelGridLine::getVectorFieldModeExplanation(VectorFieldVisualizationModes mode){
     switch (mode){

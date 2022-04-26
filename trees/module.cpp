@@ -1,6 +1,7 @@
 #include "module.h"
 
 Module::Module() :
+    ID(rand() % 1000000),
     _includesRoot(false)
 {
 

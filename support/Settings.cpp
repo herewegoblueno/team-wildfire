@@ -47,6 +47,11 @@ void Settings::loadSettingsOrDefaults() {
     visualizeForestVoxelGridMinTemp = s.value("visualizeForestVoxelGridMinTemp", 0).toDouble();
     visualizeForestVoxelGridMaxTemp = s.value("visualizeForestVoxelGridMaxTemp", 3).toDouble();
 
+    //It's actually important not to save these two, since a valid module id depends on the currently available IDs, which changes
+    //With every run
+    visualizeOnlyVoxelsTouchingSelectedModule =  s.value("visualizeOnlyVoxelsTouchingSelectedModule", false).toBool();
+    selectedModuleId = s.value("selectedModuleId", DEFAULT_MODULE_ID).toInt();
+
     simulatorTimescale = s.value("simulatorTimescale", 1).toDouble();
 
     // Shape Tesselation Settings

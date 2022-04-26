@@ -305,7 +305,7 @@
            <item>
             <widget class="QToolBox" name="forestToolBox">
              <property name="currentIndex">
-              <number>0</number>
+              <number>1</number>
              </property>
              <widget class="QWidget" name="ForestVisualization">
               <property name="geometry">
@@ -530,7 +530,7 @@
                </property>
               </widget>
              </widget>
-             <widget class="QWidget" name="page_2">
+             <widget class="QWidget" name="ModuleAnalysisTab">
               <property name="geometry">
                <rect>
                 <x>0</x>
@@ -540,8 +540,49 @@
                </rect>
               </property>
               <attribute name="label">
-               <string>N/A</string>
+               <string>Module Analysis</string>
               </attribute>
+              <widget class="QWidget" name="CurrentModuleSelectionParent" native="true">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>10</y>
+                 <width>251</width>
+                 <height>42</height>
+                </rect>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,1">
+                <item>
+                 <widget class="QLabel" name="CurrentModuleLabel">
+                  <property name="text">
+                   <string>CurrentModule</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="ModuleSelectionDropDown">
+                  <item>
+                   <property name="text">
+                    <string>N/A</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QCheckBox" name="viewOnlyModuleVoxelCheckbox">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>60</y>
+                 <width>251</width>
+                 <height>22</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>View only voxels touching this module</string>
+               </property>
+              </widget>
              </widget>
             </widget>
            </item>

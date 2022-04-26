@@ -17,8 +17,9 @@ using namespace CS123::GL;
 
 #include <iostream>
 
-BasicForestScene::BasicForestScene():
-     _voxelGrid(8, vec3(0,0,0), 60)
+BasicForestScene::BasicForestScene(MainWindow *mainWindow):
+     _voxelGrid(8, vec3(0,0,0), 60),
+     mainWindow(mainWindow)
 {
     loadPhongShader();
     tessellateShapes();
@@ -27,6 +28,8 @@ BasicForestScene::BasicForestScene():
     _forest->connectModulesToVoxels(&_voxelGrid);
     updateFromForest();
     _simulator.init();
+    _voxelGrid.getVisualization()->setForestReference(_forest.get());
+    mainWindow->updateModuleSelectionOptions(_forest->getAllModuleIDs());
 }
 
 BasicForestScene::~BasicForestScene()
@@ -107,9 +110,17 @@ void BasicForestScene::renderTrunksVisualizedModules() {
             _phongShader->applyMaterial(_moduleIDToMat[moduleID]);
         } else {
             CS123SceneMaterial mat = bundle.primitive.material;
-            mat.cAmbient.r = randomFloat();
-            mat.cAmbient.g = randomFloat();
-            mat.cAmbient.b = randomFloat();
+            if (settings.selectedModuleId == moduleID){
+                //Neon green
+                mat.cAmbient.r = 0.22;
+                mat.cAmbient.g = 1; //Since selected modules will be neon green
+                mat.cAmbient.b = 0.1;
+            }else{
+                mat.cAmbient.r = randomDarkColor();
+                mat.cAmbient.g = randomDarkColor() / 2; //Since selected modules will be neon green, want to differentiate more
+                mat.cAmbient.b = randomDarkColor();
+            }
+
             _moduleIDToMat[moduleID] = mat;
             _phongShader->applyMaterial(mat);
         }

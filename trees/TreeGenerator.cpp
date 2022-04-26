@@ -1,6 +1,6 @@
 #include "TreeGenerator.h"
 #include "support/Settings.h"
-#include "Random.h"
+#include "utils/Random.h"
 #include "glm/gtx/transform.hpp"
 #include <stack>
 #include <iostream>

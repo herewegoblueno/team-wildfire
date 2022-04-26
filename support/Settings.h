@@ -30,6 +30,8 @@ enum CameraMode {
     CAMERAMODE_CAMTRANS
 };
 
+const int DEFAULT_MODULE_ID = 0;
+
 // You can access all app settings through the "settings" global variable.
 struct Settings
 {
@@ -57,6 +59,8 @@ struct Settings
     float visualizeForestVoxelGridEyeRadius;
     float visualizeForestVoxelGridMinTemp;
     float visualizeForestVoxelGridMaxTemp;
+    bool visualizeOnlyVoxelsTouchingSelectedModule;
+    int selectedModuleId;
 
     float simulatorTimescale;
 

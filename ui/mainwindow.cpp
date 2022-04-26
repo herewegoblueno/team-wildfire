@@ -93,7 +93,8 @@ void MainWindow::notifyFrameCompleted(){
     int currentTime = duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
     int timeDiff = currentTime - timeSinceStartedCounting;
     double averageFrameDuration = timeDiff / (double) numberOfFramesRecorded;
-    ui->fpscounter->setText("Avg. FPS: " + QString::number(1 / (double)averageFrameDuration));
+    //Diabling this for now since the large number of updates makes interating with other parts of the UI hard
+   // ui->fpscounter->setText("Avg. FPS: " + QString::number(1 / (double)averageFrameDuration));
 }
 
 void MainWindow::initializeFrameCounting(){
@@ -129,6 +130,12 @@ void MainWindow::openXmlFileForForestScene(QString file) {
         else {
              QMessageBox::critical(this, "Error", "We don't support non-xml stuff yettt");
         }
+    }
+}
+
+void MainWindow::updateModuleSelectionOptions(std::vector<int> moduleIDs){
+    for (int id : moduleIDs){
+        ui->ModuleSelectionDropDown->addItem(QString::number(id));
     }
 }
 
@@ -253,5 +260,24 @@ void MainWindow::on_TimescaleSlider_valueChanged(int value)
 void MainWindow::on_resetTimescaleButton_clicked()
 {
     ui->TimescaleSlider->setValue(10);
+}
+
+
+void MainWindow::on_ModuleSelectionDropDown_currentTextChanged(const QString &text)
+{
+    bool successfulConversion;
+    int id = text.toInt(&successfulConversion);
+
+    if(successfulConversion){
+        settings.selectedModuleId = id;
+        signalSettingsChanged();
+    }
+}
+
+
+void MainWindow::on_viewOnlyModuleVoxelCheckbox_stateChanged(int state)
+{
+    settings.visualizeOnlyVoxelsTouchingSelectedModule = state == Qt::CheckState::Checked;
+    signalSettingsChanged();
 }
 

@@ -126,7 +126,7 @@ HEADERS += ui/mainwindow.h \
     support/shapes/Trunk.h \
     trees/LSystem.h \
     trees/TreeGenerator.h \
-    trees/Random.h \
+    utils/Random.h \
     trees/forest.h \
     trees/module.h \
     trees/terrain.h \

@@ -26,7 +26,7 @@ namespace CS123 { namespace GL {
 
 class BasicForestScene : public OpenGLScene {
 public:
-    BasicForestScene();
+    BasicForestScene(MainWindow *mainWindow);
     virtual ~BasicForestScene();
 
     virtual void render(SupportCanvas3D *context) override;
@@ -57,6 +57,8 @@ private:
     std::vector<PrimitiveBundle> _leaves;
     std::unordered_map<int, CS123SceneMaterial> _moduleIDToMat;
     Simulator _simulator;
+
+    MainWindow *mainWindow;
 };
 
 

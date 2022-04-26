@@ -5,8 +5,7 @@
 using namespace glm;
 
 Forest::Forest(int numTrees, float forestWidth, float forestHeight) :
-    _treeGenerator(nullptr),
-    _moduleNum(0)
+    _treeGenerator(nullptr)
 {
     initializeTrunkPrimitive();
     initializeLeafPrimitive();
@@ -58,17 +57,17 @@ void Forest::createTrees(int numTrees, float forestWidth, float forestHeight) {
 void Forest::addTreeToForest(const ModuleSet &modules, mat4 trans) {
     std::unordered_set<Branch *> seen;
     for (Module *module : modules) {
+        _moduleIDs.insert({module->ID, module});
         _modules.insert(module);
-        _moduleNum++;
         for (Branch *branch : module->_branches) {
             if (seen.count(branch)) {
                 std::cerr << "ERROR: BRANCH IN MULTIPLE MODULES" << std::endl;
             }
             seen.insert(branch);
-            branch->moduleID = _moduleNum;
+            branch->moduleID = module->ID;
             branch->model = trans * branch->model;
             _branches.insert(branch);
-            PrimitiveBundle branchPrimitive(*_trunk, branch->model, _moduleNum);
+            PrimitiveBundle branchPrimitive(*_trunk, branch->model, module->ID);
             _primitives.push_back(branchPrimitive);
             for (mat4 &leafModel : branch->leafModels) {
                 leafModel = trans * leafModel;
@@ -164,6 +163,21 @@ void Forest::initializeLeafPrimitive() {
     material->cDiffuse.g = 0.5f;
     material->cDiffuse.b = 0.02f;
     // Create primitive object
-    _leaf = std::make_unique<CS123ScenePrimitive>(
-                PrimitiveType::PRIMITIVE_LEAF, *material);
+    _leaf = std::make_unique<CS123ScenePrimitive>(PrimitiveType::PRIMITIVE_LEAF, *material);
+}
+
+
+VoxelSet Forest::getVoxelsMappedToModule(Module *m){
+    return _moduleToVoxels[m];
+}
+
+Module *Forest::getModuleFromId(int id){
+    return _moduleIDs[id];
+}
+
+std::vector<int> Forest::getAllModuleIDs(){
+    std::vector<int> keys;
+    for(auto const& pair: _moduleIDs)
+        keys.push_back(pair.first);
+    return keys;
 }

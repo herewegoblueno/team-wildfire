@@ -8,6 +8,7 @@
 #include <memory>
 #include "support/scenegraph/SupportCanvas3D.h"
 
+
 using namespace glm;
 using namespace std;
 
@@ -15,6 +16,8 @@ enum VoxelVisualizationModes { TEMPERATURE, TEMP_LAPLACE };
 enum VectorFieldVisualizationModes { UFIELD, TEMP_GRADIENT };
 
 class VoxelGrid;
+class Voxel;
+class Forest;
 
 class VoxelGridLine
 {
@@ -32,12 +35,14 @@ public:
     void setEyeCenter(vec3 v);
     float getEyeRadius();
     void setEyeRadius(float r);
+    void setForestReference(Forest *forest);
 
     static std::string getVectorFieldModeExplanation(VectorFieldVisualizationModes mode);
     static std::string getVoxelFieldModeExplanation(VoxelVisualizationModes mode);
 
 private:
     void generateGridVertices(VoxelGrid *grid);
+    void renderVoxel(Voxel *v, bool renderingInEyeMode);
     unique_ptr<CS123::GL::CS123Shader> shader;
     unsigned int VBO, VAO;
     vector<float> vertices;
@@ -54,6 +59,7 @@ private:
     bool vectorFieldEnabled;
 
     VoxelGrid *grid;
+    Forest *forest;
 };
 
 #endif // VOXELGRIDLINE_H

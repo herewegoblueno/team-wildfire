@@ -3,6 +3,7 @@
 
 #include "TreeGenerator.h"
 #include "voxels/voxelgrid.h"
+#include "unordered_map"
 
 // Size of grid to search beyond center voxel when finding voxels
 // that overlap a module
@@ -16,6 +17,9 @@ public:
     void update();
     std::vector<PrimitiveBundle> getPrimitives();
     void connectModulesToVoxels(VoxelGrid *voxelGrid);
+    VoxelSet getVoxelsMappedToModule(Module *m);
+    Module *getModuleFromId(int id);
+    std::vector<int> getAllModuleIDs();
 
 private:
     void createTrees(int numTrees, float forestWidth, float forestHeight);
@@ -29,12 +33,12 @@ private:
     std::unique_ptr<TreeGenerator> _treeGenerator;
     std::unique_ptr<CS123ScenePrimitive> _trunk;
     std::unique_ptr<CS123ScenePrimitive> _leaf;
-    int _moduleNum;
 
-    void checkModuleVoxelOverlap(Module *module, Voxel *voxel,
-                                 double cellSideLength);
+    void checkModuleVoxelOverlap(Module *module, Voxel *voxel, double cellSideLength);
+
     std::map<Module *, VoxelSet> _moduleToVoxels;
     std::map<Voxel *, ModuleSet> _voxelToModules;
+    std::unordered_map<int, Module *> _moduleIDs;
 };
 
 #endif // FOREST_H
