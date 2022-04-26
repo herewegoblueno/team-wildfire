@@ -39,7 +39,6 @@ private:
     void connectModulesToVoxels();
     void initMassOfModules();
     void initMassOfVoxels();
-    void updateVoxelMass(Voxel *voxel, double cellSideLength);
     std::map<Module *, VoxelSet> _moduleToVoxels;
     std::map<Voxel *, ModuleSet> _voxelToModules;
     std::unordered_map<int, Module *> _moduleIDs;

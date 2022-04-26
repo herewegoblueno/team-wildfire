@@ -155,36 +155,19 @@ void Forest::initMassOfModules() {
     }
 }
 
-/** Init mass of each voxel based on surrounding modules */
+/**
+ * Evenly distribute mass of each module over all the voxels it overlaps
+ */
 void Forest::initMassOfVoxels() {
-    int res = _grid->getResolution();
-    double cellSideLength = _grid->cellSideLength();
-    for (int x = 0; x < res; x++) {
-        for (int y = 0; y < res; y++) {
-            for (int z = 0; z < res; z++) {
-                updateVoxelMass(_grid->getVoxel(x, y, z), cellSideLength);
-                auto mass = _grid->getVoxel(x, y, z)->getCurrentState()->mass;
-                if (mass > 0) {
-                    std::cout << "voxel with positive mass " << mass << std::endl;
-                }
-            }
+    for (auto const& moduleToVoxels : _moduleToVoxels) {
+        Module *module = moduleToVoxels.first;
+        VoxelSet voxels = moduleToVoxels.second;
+        double numVoxels = voxels.size();
+        double massPerVoxel = module->getCurrentState()->mass / numVoxels;
+        for (Voxel *voxel : voxels) {
+            voxel->getCurrentState()->mass += massPerVoxel;
         }
     }
-}
-
-/** Update mass of each voxel based on surrounding modules */
-void Forest::updateVoxelMass(Voxel *voxel, double cellSideLength) {
-    double voxelMass = 0;
-    dvec3 voxelCenter = voxel->centerInWorldSpace;
-    for (Module *module : _voxelToModules[voxel]) {
-        ModulePhysicalData *moduleState = module->getCurrentState();
-        dvec3 moduleCenter = module->getCenter();
-        // TODO: with current voxel size, weight is usually negative
-        // https://cs2240spring22.slack.com/archives/C03CDJZM90Q/p1650994477346319
-        double weight = 1.0 - length(voxelCenter - moduleCenter) / cellSideLength;
-        voxelMass += weight * moduleState->mass;
-    }
-    voxel->getCurrentState()->mass = voxelMass;
 }
 
 std::vector<PrimitiveBundle> Forest::getPrimitives() {
