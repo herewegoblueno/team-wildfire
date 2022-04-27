@@ -18,11 +18,9 @@ void main()
 
     color.a = 0.5;
 
-//    if(Temperature > 3) color.a = 1 - f*6;
-//    color = vec4(0.3, 0.3, 0.3, 0.5);
+    //if(Temperature > 3) color.a = 1 - f*6;
 
     if(f>-0.03*Temperature) discard;
     if(f>0.25) discard;
 
-//    color = vec4(1,1,1,1);
 }

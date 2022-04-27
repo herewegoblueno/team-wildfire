@@ -53,14 +53,12 @@ void Smoke::InitRender()
 
     QImage img(":/textures/fire.png");
     QImage gl_img = QGLWidget::convertToGLFormat(img);
-    m_texture = std::make_unique<Texture2D>(gl_img.bits(),
-                                            gl_img.width(),
-                                            gl_img.height());
+    m_texture = std::make_unique<Texture2D>(gl_img.bits(), gl_img.width(), gl_img.height());
 }
 
 Smoke::~Smoke()
 {
-//    glDeleteVertexArrays(1, &m_particlesVAO);
+
 }
 
 
@@ -72,12 +70,12 @@ void Smoke::update_particles()
         Particle &p = m_particles[i];
         if (p.Life > 0.9f)
         {	// particle is alive, thus update
-            // particle is alive, thus update
             VoxelPhysicalData* vox = m_grid->getVoxelClosestToPoint(p.Position)->getCurrentState();
 
-            glm::vec3 u = vec3(vox->u); // we don't have velocity field yet
+            glm::vec3 u = vec3(vox->u);
             u = glm::vec3(0, 0.1, 0);
             float ambient_T = vox->temperature;
+
             if(isnan(ambient_T)) ambient_T = 0;
 
             glm::vec3 b = -thermal_expansion*gravity*(p.Temp - ambient_T); // Buoyancy

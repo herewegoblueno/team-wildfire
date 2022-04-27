@@ -22,8 +22,6 @@ public:
 
     virtual void render(SupportCanvas3D *context) override;
     virtual void settingsChanged() override;
-    void onNewSceneLoaded();
-
     void constructShaders();
     std::vector<std::unique_ptr<CS123::GL::CS123Shader>> * getShaderPrograms();
 
@@ -32,13 +30,11 @@ private:
 
     void setShaderSceneUniforms(SupportCanvas3D *context);
     void setLights();
-    void drawPrimitiveWithShader(int shapeIndex, glm::mat4x4 modelMat, CS123SceneMaterial mat, SupportCanvas3D *c);
 
     std::vector<std::unique_ptr<CS123::GL::CS123Shader>> shader_bank;
     CS123::GL::CS123Shader *current_shader;
     VoxelGrid voxelGrids;
     Simulator simulator;
-
 };
 
 

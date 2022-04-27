@@ -17,14 +17,8 @@ void main()
     else if(Temperature>0.8) color = vec4(0.9, 0.1, 0.0, 1);
     else color = vec4(0.8, 0, 0, 1);
 
-    color = (texture(sprite, TexCoords)+0.2)*color;
-//    color = ParticleColor;
-//    color.a = (color.x+color.y+color.z)*ParticleColor.a;
-//    color.b = color.b + f*2;
-//    if(Temperature < 3) color.a = 1 - f*10;
-//    else color.a = 1;
-//    color.a = 1;
-    if(f>(0.1 + 0.5*Temperature/5)*(0.1 + 0.5*Temperature/5)) discard;
+    //For some reason this isn't working on Mac....
+    //color = (texture(sprite, TexCoords)+0.2)*color;
 
-//    color = vec4(1,1,1,1);
+    if(f>(0.1 + 0.5*Temperature/5)*(0.1 + 0.5*Temperature/5)) discard;
 }

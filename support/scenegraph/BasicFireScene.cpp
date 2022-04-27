@@ -21,22 +21,15 @@ BasicFireScene::BasicFireScene():
      voxelGrids(8, vec3(0,0,0), 60)
 {
     fires.clear();
-//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, -1, 0), 0.5, &voxelGrids) );
-//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, -1, 0), 0.6, &voxelGrids) );
-
-
-//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, -1, 2), 0.5, &voxelGrids) );
-//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, -1, 2), 0.6, &voxelGrids) );
-
-
-//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(-0.8, -0.5, 1.2), 0.5, &voxelGrids) );
     fires.push_back(  std::make_unique<Fire> (500, glm::vec3(-0.8, -0.5, 1.2), 0.6, &voxelGrids) );
 
-
+//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, -1, 0), 0.5, &voxelGrids) );
+//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, -1, 0), 0.6, &voxelGrids) );
+//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, -1, 2), 0.5, &voxelGrids) );
+//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, -1, 2), 0.6, &voxelGrids) );
+//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(-0.8, -0.5, 1.2), 0.5, &voxelGrids) );
 //    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(1.6, -0.3, -1.2), 0.5, &voxelGrids) );
 //    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(1.6, -0.3, -1.2), 0.6, &voxelGrids) );
-
-
 //    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(2, -0.5, 0.8), 0.5, &voxelGrids) );
 //    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(2, -0.5, 0.8), 0.6, &voxelGrids) );
 
@@ -50,18 +43,11 @@ BasicFireScene::~BasicFireScene()
 {
 }
 
-void BasicFireScene::onNewSceneLoaded(){
-   constructShaders();
-}
-
 void BasicFireScene::constructShaders() {
     shader_bank.clear();
-    std::string vertexSource = ResourceLoader::loadResourceFileToString(":/shaders/default.vert");
-    std::string fragmentSource = ResourceLoader::loadResourceFileToString(":/shaders/default.frag");
-    shader_bank.push_back(std::make_unique<CS123Shader>(vertexSource, fragmentSource));
 
-    vertexSource = ResourceLoader::loadResourceFileToString(":/shaders/particle.vert");
-    fragmentSource = ResourceLoader::loadResourceFileToString(":/shaders/fire.frag");
+    std::string vertexSource = ResourceLoader::loadResourceFileToString(":/shaders/particle.vert");
+    std::string fragmentSource = ResourceLoader::loadResourceFileToString(":/shaders/fire.frag");
     shader_bank.push_back(std::make_unique<CS123Shader>(vertexSource, fragmentSource));
 
     vertexSource = ResourceLoader::loadResourceFileToString(":/shaders/particle.vert");
@@ -89,9 +75,8 @@ void BasicFireScene::render(SupportCanvas3D *context) {
     current_shader->unbind();
 
     std::vector<std::unique_ptr<CS123Shader>> *shaders = getShaderPrograms();
-    CS123Shader* fire_shader = shaders->at(1).get();
-    CS123Shader* smoke_shader = shaders->at(2).get();
-
+    CS123Shader* fire_shader = shaders->at(0).get();
+    CS123Shader* smoke_shader = shaders->at(1).get();
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
@@ -125,23 +110,6 @@ void BasicFireScene::render(SupportCanvas3D *context) {
     //Trigger another render
     simulator.cleanupForNextStep(&voxelGrids);
     context->update();
-}
-
-void BasicFireScene::drawPrimitiveWithShader(int shapeIndex, glm::mat4x4 modelMat, CS123SceneMaterial mat, SupportCanvas3D *c)
-{
-    current_shader = shader_bank[shapeIndex].get();
-
-    //TODO: will have to minimize bindings and unbindings to optimize
-    //We'd want to draw all the things that use any given shader all at once
-    current_shader->bind();
-    setShaderSceneUniforms(c);
-    setLights();
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    current_shader->setUniform("m", modelMat);
-    current_shader->applyMaterial(mat);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-    current_shader->unbind();
 }
 
 void BasicFireScene::setShaderSceneUniforms(SupportCanvas3D *context) {
