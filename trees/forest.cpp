@@ -161,18 +161,30 @@ bool Forest::checkModuleVoxelOverlap(Module *module, Voxel *voxel,
         double ratio = module->getCurrentState()->radiusRatio;
         mat4 model = branch->model;
         double branchRadius = branch->radius;
+        double branchLength = branch->length;
         double cellRadius = cellSideLength / 2.0;
         dvec3 branchStart = dvec3(model * trunkObjectBottom);
         dvec3 branchEnd = dvec3(model * trunkObjectTop);
-        // TODO: this is still not quite satisfactory
-        dvec3 closestPoint = closestPointToLine(voxelCenter, branchStart,
-                                                 branchEnd, cellRadius);
-//        if (closestPoint == branchStart || closestPoint == branchEnd) {
-//            return false;
-//        }
-        double distUpBranch = length(closestPoint - branchStart) / branch->length;
+        // Ensure lengths are consistent
+        assert(abs(branchLength - length(branchEnd - branchStart)) < 0.0001);
+        // Check branch start / end boundary
+        dvec3 toVoxelCenter = voxelCenter - branchStart;
+        dvec3 branchDir = normalize(branchEnd - branchStart);
+        double scalarProj = dot(toVoxelCenter, branchDir);
+        if (scalarProj + cellRadius < 0.0) {
+            continue;
+        }
+        if (scalarProj - cellRadius > branchLength) {
+            continue;
+        }
+        // Check branch radius boundary
+        scalarProj = std::min(std::max(scalarProj, 0.0), branchLength);
+        dvec3 closestPoint = branchStart + branchDir * scalarProj;
+        double distUpBranch = scalarProj / branchLength;
+        assert(distUpBranch <= 1.0 + DBL_EPSILON);
         double horizScale = ratio - (1.0 - branchWidthDecay) * distUpBranch;
-        if (length(closestPoint - voxelCenter) < branchRadius * horizScale) {
+        assert(horizScale <= 1.0 + DBL_EPSILON);
+        if (length(closestPoint - voxelCenter) < branchRadius * horizScale + cellRadius) {
             return true;
         }
     }
