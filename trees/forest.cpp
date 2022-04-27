@@ -191,22 +191,6 @@ bool Forest::checkModuleVoxelOverlap(Module *module, Voxel *voxel,
     return false;
 }
 
-/**
- * Return how close a point is to the line segment defined by a, b.
- * If the projection of the point onto line is outside the bounds of a, b
- * (up to some precision), return -1. Adapted from GLM_GTX_closest_point.
- */
-dvec3 Forest::closestPointToLine(dvec3 point, dvec3 a, dvec3 b, double precision) {
-    double LineLength = distance(a, b);
-    dvec3 Vector = point - a;
-    dvec3 LineDirection = (b - a) / LineLength;
-    // Project Vector to LineDirection to get the distance of point from a
-    double Distance = dot(Vector, LineDirection);
-    if (Distance + precision <= 0.0) return a;
-    if (Distance - precision >= LineLength) return b;
-    return a + LineDirection * Distance;
-}
-
 /** Init mass of each module based on its branches */
 void Forest::initMassOfModules() {
     for (Module *module : _modules) {
