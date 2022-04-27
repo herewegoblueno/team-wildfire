@@ -15,7 +15,9 @@ TreeGenerator::TreeGenerator() :
     // We want our trunk to be thinner than the unit cylinder
     // and have its base at the origin
     glm::mat4 trunkTranslate = glm::translate(glm::vec3(0, 0.5, 0));
-    glm::mat4 trunkScale = glm::scale(glm::vec3(trunkInitRadius, 1.0f, trunkInitRadius));
+    float xzScale = (rootTrunkRadius / trunkObjectRadius) / std::sqrt(2.0);
+    float yScale = rootTrunkLength / trunkObjectLength;
+    glm::mat4 trunkScale = glm::scale(glm::vec3(xzScale, yScale, xzScale));
     _trunkPreTransform = trunkTranslate * trunkScale;
 }
 
@@ -91,7 +93,7 @@ void TreeGenerator::parseLSystem(std::string lSystemString) {
             Branch *branch = new Branch();
             _branches.insert(branch);
             if (currentParent == nullptr) {
-                branch->radius = trunkInitRadius;
+                branch->radius = rootTrunkRadius;
                 branch->parent = nullptr;
                 branch->model = _trunkPreTransform;
                 branch->invModel = glm::inverse(_trunkPreTransform);

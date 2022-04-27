@@ -7,9 +7,11 @@
 
 const float branchWidthDecay = 0.7; // Amount to scale x, z size of each successive iteration
 
-// Object space positions based off of Trunk.cpp
+// Object space values based off of Trunk.cpp
 const glm::vec4 trunkObjectBottom = glm::vec4(0, -0.5, 0, 1);
 const glm::vec4 trunkObjectTop = glm::vec4(0, 0.5, 0, 1);
+const double trunkObjectRadius = 0.5;
+const double trunkObjectLength = 1.0;
 
 class Module;
 struct Branch;

@@ -13,8 +13,9 @@ const float m_pi = 3.14159265359;
 const int numModuleIterations = 1;
 
 const int recursionDepth = 6;
-const double trunkInitLength = 1.0;
-const double trunkInitRadius = 0.5;
+// Adjustable params that affect the trunk pre-transformation
+const double rootTrunkLength = 1.0;
+const double rootTrunkRadius = 0.25;
 // Min/max branching levels for adding leaves
 const int minLeafRecursiveDepth = 2;
 const int maxLeafRecursiveDepth = 9;
