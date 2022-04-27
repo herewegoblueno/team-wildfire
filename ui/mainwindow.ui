@@ -616,6 +616,28 @@
                 </item>
                </layout>
               </widget>
+              <widget class="QLabel" name="ModuleColorExplanation">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>140</y>
+                 <width>211</width>
+                 <height>31</height>
+                </rect>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                 <italic>true</italic>
+                </font>
+               </property>
+               <property name="text">
+                <string>Neon Green = selected, bright red = our of bounds of voxel field</string>
+               </property>
+               <property name="wordWrap">
+                <bool>true</bool>
+               </property>
+              </widget>
              </widget>
             </widget>
            </item>

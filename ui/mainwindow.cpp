@@ -88,20 +88,25 @@ void MainWindow::signalSettingsChanged() {
     m_canvas3D->settingsChanged();
 }
 
-void MainWindow::notifyFrameCompleted(){
-    numberOfFramesRecorded ++;
-    int currentTime = duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
-    int timeDiff = currentTime - timeSinceStartedCounting;
-    double averageFrameDuration = timeDiff / (double) numberOfFramesRecorded;
-    //Diabling this for now since the large number of updates makes interating with other parts of the UI hard
-   // ui->fpscounter->setText("Avg. FPS: " + QString::number(1 / (double)averageFrameDuration));
-}
 
 void MainWindow::initializeFrameCounting(){
     numberOfFramesRecorded = 0;
-    timeSinceStartedCounting = duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
+    int currentTime = duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
+    timeWhenStartedCountingFPS = currentTime;
+    timeAtLastFPSCounterUpdate = currentTime;
 }
 
+void MainWindow::notifyFrameCompleted(){
+    numberOfFramesRecorded ++;
+    int currentTime = duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
+    int timeDiff = currentTime - timeWhenStartedCountingFPS;
+    double averageFrameDuration = timeDiff / (double) numberOfFramesRecorded;
+    //A large number of updates makes interating with other parts of the UI hard
+    if (currentTime - timeAtLastFPSCounterUpdate >= 1){
+        ui->fpscounter->setText("Avg. FPS: " + QString::number(1 / (double)averageFrameDuration));
+        timeAtLastFPSCounterUpdate = currentTime;
+    }
+}
 
 void MainWindow::openXmlFileForForestScene(QString file) {
     if (!file.isNull()) {

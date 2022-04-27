@@ -81,7 +81,8 @@ private:
 
     //For tracking fps
     int numberOfFramesRecorded;
-    int timeSinceStartedCounting;
+    int timeWhenStartedCountingFPS;
+    int timeAtLastFPSCounterUpdate;
 };
 
 #endif // MAINWINDOW_H

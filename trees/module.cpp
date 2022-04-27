@@ -69,6 +69,5 @@ double Module::getBranchVolume(Branch *branch) const {
 }
 
 void Module::updateLastFrameData(){
-    _currentPhysicalData.radiusRatio = clamp(abs(std::sin(duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() / 10000.0)) - 0.2, 0.0, 1.0);
     _lastFramePhysicalData = _currentPhysicalData;
 }
