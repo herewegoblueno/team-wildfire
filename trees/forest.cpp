@@ -182,7 +182,7 @@ bool Forest::checkModuleVoxelOverlap(Module *module, Voxel *voxel,
         dvec3 closestPoint = branchStart + branchDir * scalarProj;
         double distUpBranch = scalarProj / branchLength;
         assert(distUpBranch <= 1.0 + DBL_EPSILON);
-        double horizScale = ratio - (1.0 - branchWidthDecay) * distUpBranch;
+        double horizScale = (1 - (1.0 - branchWidthDecay)) * ratio * distUpBranch;
         assert(horizScale <= 1.0 + DBL_EPSILON);
         if (length(closestPoint - voxelCenter) < branchRadius * horizScale + cellRadius) {
             return true;
