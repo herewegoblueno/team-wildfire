@@ -88,7 +88,7 @@ void TreeGenerator::parseLSystem(std::string lSystemString) {
             break;
         case 'F':
             // Allocate new branch object
-            Branch *branch = new Branch;
+            Branch *branch = new Branch();
             _branches.insert(branch);
             if (currentParent == nullptr) {
                 branch->radius = trunkInitRadius;
@@ -144,7 +144,7 @@ void TreeGenerator::initializeLSystem() {
 ModuleTree TreeGenerator::branchTreeToModules(BranchTree branchTree) {
     ModuleSet treeModules;
     Branch *rootBranch = branchTree.root;
-    Module *rootModule = new Module;
+    Module *rootModule = new Module();
     rootModule->_includesRoot = true;
     rootModule->_branches.insert(rootBranch);
     treeModules.insert(rootModule);
@@ -192,7 +192,7 @@ ModuleSet TreeGenerator::splitIntoModules(Branch *rootBranch, Module *rootModule
  *  Don't include the root branch in the returned module.
  */
 Module *TreeGenerator::accumulateModuleFrom(Branch *root) {
-    Module *module = new Module;
+    Module *module = new Module();
     std::stack<Branch *> stack;
     stack.push(root);
     while (!stack.empty()) {

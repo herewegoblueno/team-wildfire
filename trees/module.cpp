@@ -61,12 +61,14 @@ double Module::getBranchMass(Branch *branch) const {
 
 double Module::getBranchVolume(Branch *branch) const {
     double l = branch->length;
-    double r0 = branch->radius * _lastFramePhysicalData.radiusRatio;
+    //This is called by getBranchMass, which is used for both mass initialization and updating, so it's better
+    //to use currentMass
+    double r0 = branch->radius * _currentPhysicalData.radiusRatio;
     double r1 = r0 * branchWidthDecay;
     return (M_PI / 3.0)* l * (r0*r0 + r0*r1 + r1*r1);
 }
 
 void Module::updateLastFrameData(){
-    _currentPhysicalData.radiusRatio = abs(std::sin(duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() / 30000.0));
+    _currentPhysicalData.radiusRatio = clamp(abs(std::sin(duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() / 10000.0)) - 0.2, 0.0, 1.0);
     _lastFramePhysicalData = _currentPhysicalData;
 }

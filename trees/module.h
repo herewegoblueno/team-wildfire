@@ -56,9 +56,9 @@ public:
     int ID; // lets us identify modules for visual debugging
     bool _warning; // if true, color red for visual debugging
 
-    Module *_parent;
+    Module *_parent = nullptr;
     ModuleSet _children;
-    Branch *_rootBranch;
+    Branch *_rootBranch = nullptr;
     BranchSet _branches;
     // whether root is a branch in the module or just a pointer
     bool _includesRoot;
