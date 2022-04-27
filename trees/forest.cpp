@@ -311,7 +311,7 @@ void Forest::deleteModuleAndChildren(Module *m){
 
     for (Branch *b : m->_branches) {
         _branches.erase(b);
-        delete b; //TODO: what to do with rootbranch and includesrootbranch?
+        delete b;
     }
 
     //Copying the original children, since deleteModuleAndChildren will edit _children of this module
