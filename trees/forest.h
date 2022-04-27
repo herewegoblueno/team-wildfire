@@ -26,6 +26,7 @@ public:
     std::vector<int> getAllModuleIDs();
 
     void updateLastFrameDataOfModules();
+    void deleteDeadModules();
 
 private:
     void createTrees(int numTrees, float forestWidth, float forestHeight);
@@ -48,6 +49,8 @@ private:
     std::map<Module *, VoxelSet> _moduleToVoxels;
     std::map<Voxel *, ModuleSet> _voxelToModules;
     std::unordered_map<int, Module *> _moduleIDs;
+
+    void deleteModuleAndChildren(Module *m);
 };
 
 #endif // FOREST_H

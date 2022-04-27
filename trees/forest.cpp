@@ -130,6 +130,22 @@ void Forest::initializeModuleVoxelMapping() {
    std::cout << (float)totalModules/(float)(std::pow(resolution,3)) << " modules per voxel" << std::endl;
 }
 
+//Since trees can only shrink over time, we can only ever lose voxels in the mappings...
+void Forest::updateModuleVoxelMapping(){
+    double cellSideLength = _grid->cellSideLength();
+
+    for (auto const& moduleToVoxels : _moduleToVoxels) {
+        Module *module = moduleToVoxels.first;
+        VoxelSet voxels = moduleToVoxels.second;
+        for (Voxel *voxel : voxels) {
+            if (!checkModuleVoxelOverlap(module, voxel, cellSideLength)){
+                _moduleToVoxels[module].erase(voxel);
+                _voxelToModules[voxel].erase(module);
+            }
+        }
+    }
+}
+
 /** See if a module and voxel overlap by checking each branch */
 bool Forest::checkModuleVoxelOverlap(Module *module, Voxel *voxel,
                                      double cellSideLength) {
@@ -193,25 +209,18 @@ void Forest::initMassOfVoxels() {
     }
 }
 
-//Since trees can only shrink over time, we can only ever lose voxels in the mappings...
-void Forest::updateModuleVoxelMapping(){
-    double cellSideLength = _grid->cellSideLength();
-
+void Forest::updateMassOfVoxels(){
     for (auto const& moduleToVoxels : _moduleToVoxels) {
         Module *module = moduleToVoxels.first;
         VoxelSet voxels = moduleToVoxels.second;
+        double numVoxels = voxels.size();
+        double massChangePerVoxel = (module->getLastFrameState()->mass - module->getCurrentState()->mass) / numVoxels;
         for (Voxel *voxel : voxels) {
-            if (!checkModuleVoxelOverlap(module, voxel, cellSideLength)){
-                _moduleToVoxels[module].erase(voxel);
-                _voxelToModules[voxel].erase(module);
-            }
+            voxel->getCurrentState()->mass -= massChangePerVoxel;
         }
     }
 }
 
-void updateMassOfVoxels(){
-    //TODO
-}
 
 std::vector<PrimitiveBundle> Forest::getPrimitives() {
     return _primitives;
@@ -263,4 +272,46 @@ std::vector<int> Forest::getAllModuleIDs(){
     for(auto const& pair: _moduleIDs)
         keys.push_back(pair.first);
     return keys;
+}
+
+void Forest::deleteModuleAndChildren(Module *m){
+    //First remove it from all the necessary maps
+    //TODO: there might be a tiny amount of mass left from that module in the associated voxels, maybe we should eventually clean that up
+    _moduleIDs.erase(m->ID);
+
+    VoxelSet associatedVoxels = getVoxelsMappedToModule(m);
+    for (Voxel *v : associatedVoxels) _voxelToModules[v].erase(m);
+    _moduleToVoxels.erase(m);
+
+    if (m->_parent != nullptr) m->_parent->_children.erase(m);
+
+    for (Branch *b : m->_branches) {
+        _branches.erase(b);
+        delete b;
+    }
+
+    //Copying the original children, since deleteModuleAndChildren will edit _children of this module
+    ModuleSet originalChildren = m->_children;
+    for (Module *child : originalChildren) {
+        deleteModuleAndChildren(child);
+    }
+
+    _modules.erase(m);
+    delete m; //i bid you adieu
+}
+
+
+void Forest::deleteDeadModules(){
+    //This is called before updateLastFrameDataOfModules, so we should use currentState
+    //Not useing a normal iterator since I'm not sure the order of appearance of parents and children
+    //so you don'y know where to reposition the interator once one call to deleteModuleAndChildren has completed
+    //Also, since unordered_maps seem to be able to rehash(https://stackoverflow.com/questions/18301302/is-forauto-i-unordered-map-guaranteed-to-have-the-same-order-every-time)
+    //it might not be safe for deleteModuleAndChildren to return the left-most iterator of all the deletes
+    for(Module *m : _modules)
+    {
+       if (m->getCurrentState()->mass <= 0){
+           deleteModuleAndChildren(m);
+           return deleteDeadModules();
+       }
+    }
 }

@@ -109,8 +109,6 @@ float Terrain::getHeightFromWorld(glm::vec3 pos){
     float nearRow = (pos.x * scale / m_numRows + 1.f) / 2.f * m_numRows;
     float nearCol = (pos.z * scale / m_numRows + 1.f) / 2.f * m_numRows;
 
-    // std::cout << ""
-
     int r1 = floor(nearRow);
     int r2 = ceil(nearRow);
     float rMix = nearRow - r1;
