@@ -29,7 +29,8 @@ Forest::~Forest() {
 void Forest::recalculatePrimitives() {
     _primitives.clear();
     for (Branch *branch : _branches) {
-        PrimitiveBundle branchPrimitive(*_trunk, branch->model, branch->moduleID);
+        Module *m = getModuleFromId(branch->moduleID);
+        PrimitiveBundle branchPrimitive(*_trunk, branch->model * glm::scale(glm::vec3(m->getCurrentState()->radiusRatio, 1.0f, m->getCurrentState()->radiusRatio)), branch->moduleID);
         _primitives.push_back(branchPrimitive);
         for (mat4 &leafModel : branch->leafModels) {
             PrimitiveBundle leafPrimitive(*_leaf, leafModel);
@@ -109,6 +110,7 @@ void Forest::initializeModuleVoxelMapping() {
        }
    }
 
+   //Rest of this is just for debugging output...
    int totalVoxels = 0;
    for (auto const& moduleVoxels : _moduleToVoxels) {
        int moduleID = moduleVoxels.first->ID;
@@ -140,7 +142,10 @@ bool Forest::checkModuleVoxelOverlap(Module *module, Voxel *voxel,
         // lateral dist to branch center
         double dist = std::sqrt(x*x + z*z);
         // implicit lateral branch boundary
-        double horizScale = 1.0 - (1.0 - branchWidthDecay) * (y + 1.0);
+        //This is called in updateModuleVoxelMapping, which is called before updateLastFrameDataOfModules in the
+        //simulation loop, so we should use getCurrentState
+        double ratio = module->getCurrentState()->radiusRatio;
+        double horizScale = (1.0 * ratio - (1.0 - branchWidthDecay) * (y + 1.0));
         double branchMaxDist = 0.5 * horizScale;
         // approximate voxel as a sphere
         if (dist - cellSideLength / 2.0 < branchMaxDist && y >= -0.5 && y <= 0.5) {
@@ -188,7 +193,8 @@ void Forest::initMassOfVoxels() {
     }
 }
 
-void Forest::updateModuleVoxelMapping(VoxelGrid *voxelGrid){
+//Since trees can only shrink over time, we can only ever lose voxels in the mappings...
+void Forest::updateModuleVoxelMapping(){
     double cellSideLength = _grid->cellSideLength();
 
     for (auto const& moduleToVoxels : _moduleToVoxels) {

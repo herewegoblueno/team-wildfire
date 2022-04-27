@@ -15,10 +15,9 @@ public:
     Forest(VoxelGrid *grid, int numTrees, float forestWidth, float forestHeight);
     ~Forest();
     void recalculatePrimitives();
-    void initializeModuleVoxelMapping(VoxelGrid *voxelGrid);
     std::vector<PrimitiveBundle> getPrimitives();
 
-    void updateModuleVoxelMapping(VoxelGrid *voxelGrid);
+    void updateModuleVoxelMapping();
     void updateMassOfModules();
     void updateMassOfVoxels();
 

@@ -1,6 +1,9 @@
 #include "module.h"
 #include <iostream>
 
+#include <chrono>
+using namespace std::chrono;
+
 using namespace glm;
 
 Module::Module() :
@@ -57,11 +60,12 @@ double Module::getBranchMass(Branch *branch) const {
 
 double Module::getBranchVolume(Branch *branch) const {
     double l = branch->length;
-    double r0 = branch->radius;
+    double r0 = branch->radius * _lastFramePhysicalData.radiusRatio;
     double r1 = r0 * branchWidthDecay;
     return (M_PI / 3.0)* l * (r0*r0 + r0*r1 + r1*r1);
 }
 
 void Module::updateLastFrameData(){
+    _currentPhysicalData.radiusRatio = abs(std::sin(duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() / 30000.0));
     _lastFramePhysicalData = _currentPhysicalData;
 }

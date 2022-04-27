@@ -27,6 +27,24 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
     for (int x = 0; x < gridResolution; x += jumpPerThread)
         threads.emplace_back(&Simulator::stepThreadHandler, this, grid, forest, deltaTime, gridResolution, x, x + jumpPerThread);
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
+
+    if (forest != nullptr){ //Forest is optional
+        //This should be the last step of the simulation
+        //We want the actual step to be based on last frame's mapping, but we want the scene's rendering
+        //(which starts after the step function) to be based on the resultant mapping after the step
+        //(so the users see the most up to date state)
+        forest->updateModuleVoxelMapping();
+    }
+}
+
+void Simulator::stepThreadHandler(VoxelGrid *grid ,Forest *, int deltaTime, int resolution, int minXInclusive, int maxXExclusive){
+    for (int x = minXInclusive; x < maxXExclusive; x++){
+        for (int y = 0; y < resolution; y++){
+            for (int z = 0; z < resolution; z++){
+                stepVoxelHeatTransfer(grid->getVoxel(x, y, z), deltaTime);
+            }
+        }
+    }
 }
 
 void Simulator::cleanupForNextStep(VoxelGrid *grid, Forest *forest){
@@ -45,16 +63,6 @@ void Simulator::cleanupForNextStep(VoxelGrid *grid, Forest *forest){
     }
 }
 
-
-void Simulator::stepThreadHandler(VoxelGrid *grid ,Forest *, int deltaTime, int resolution, int minXInclusive, int maxXExclusive){
-    for (int x = minXInclusive; x < maxXExclusive; x++){
-        for (int y = 0; y < resolution; y++){
-            for (int z = 0; z < resolution; z++){
-                stepVoxelHeatTransfer(grid->getVoxel(x, y, z), deltaTime);
-            }
-        }
-    }
-}
 
 void Simulator::stepCleanupThreadHandler(VoxelGrid *grid, Forest *, int resolution, int minXInclusive, int maxXExclusive){
     for (int x = minXInclusive; x < maxXExclusive; x++){

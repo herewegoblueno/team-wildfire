@@ -42,6 +42,7 @@ struct ModuleTree {
 struct ModulePhysicalData {
     double mass;        // total mass of branches, updated during combustion
     double temperature; // surface temperature of module
+    double radiusRatio = 1;
 };
 
 class Module

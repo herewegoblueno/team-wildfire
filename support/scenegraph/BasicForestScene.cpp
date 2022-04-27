@@ -78,6 +78,7 @@ void BasicForestScene::render(SupportCanvas3D *context) {
     _voxelGrid.getVisualization()->draw(context);
 
     _simulator.cleanupForNextStep(&_voxelGrid, _forest.get());
+    updatePrimitivesFromForest();
     //Trigger another render
     context->update();
 }
