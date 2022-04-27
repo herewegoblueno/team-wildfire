@@ -7,6 +7,10 @@
 
 const float branchWidthDecay = 0.7; // Amount to scale x, z size of each successive iteration
 
+// Object space positions based off of Trunk.cpp
+const glm::vec4 trunkObjectBottom = glm::vec4(0, -0.5, 0, 1);
+const glm::vec4 trunkObjectTop = glm::vec4(0, 0.5, 0, 1);
+
 class Module;
 struct Branch;
 typedef std::unordered_set<Branch *> BranchSet;
@@ -50,6 +54,7 @@ class Module
 public:
     Module();
     int ID; // lets us identify modules for visual debugging
+    bool _warning; // if true, color red for visual debugging
 
     Module *_parent;
     ModuleSet _children;

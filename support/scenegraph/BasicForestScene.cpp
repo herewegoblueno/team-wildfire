@@ -18,10 +18,11 @@ using namespace CS123::GL;
 #include <iostream>
 
 BasicForestScene::BasicForestScene(MainWindow *mainWindow):
-     _voxelGrid(8, vec3(0,0,0), 60),
+     _voxelGrid(forestWidth + 2, vec3(0,0,0), 60),
      mainWindow(mainWindow)
 {
     loadPhongShader();
+    initDebugMaterials();
     tessellateShapes();
     _voxelGrid.getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeVectorField);
     _forest = std::make_unique<Forest>(&_voxelGrid, numTrees, forestWidth, forestHeight);
@@ -102,36 +103,41 @@ void BasicForestScene::renderGeometry() {
     }
 }
 
+void BasicForestScene::initDebugMaterials() {
+    // Neon green
+    _selectedBranchMat.cAmbient.r = 0.22;
+    _selectedBranchMat.cAmbient.g = 1;
+    _selectedBranchMat.cAmbient.b = 0.1;
+    // Bright red
+    _warningBranchesMat.cAmbient.r = 1.0;
+    _warningBranchesMat.cAmbient.g = 0.1;
+    _warningBranchesMat.cAmbient.b = 0.1;
+}
+
 /** Color each branch based on the module it's in */
 void BasicForestScene::renderTrunksVisualizedModules() {
     _trunk->bindVAO();
     for (PrimitiveBundle &bundle : _trunks) {
         _phongShader->setUniform("m",  bundle.model);
         int moduleID = bundle.moduleID;
-
+        CS123SceneMaterial mat;
         if (_moduleIDToMat.count(moduleID)) {
             //We've already made a material for this module
-            if (moduleID == settings.selectedModuleId) _phongShader->applyMaterial(matForSelectedBranch);
-            else _phongShader->applyMaterial(_moduleIDToMat[moduleID]);
+            mat = _moduleIDToMat[moduleID];
         } else {
             //We have to first make a material for this module
-            CS123SceneMaterial mat = bundle.primitive.material;
+            mat = bundle.primitive.material;
             mat.cAmbient.r = randomDarkColor();
             mat.cAmbient.g = randomDarkColor() / 2; //Since selected modules will be neon green, want to differentiate more
             mat.cAmbient.b = randomDarkColor();
-
-            //(we'll also take the opportunity to initialize the mat for selected modules if it hasn't been made already)
-            if (matForSelectedBranch.cAmbient == vec4(0,0,0,0)){
-                matForSelectedBranch = mat;
-                matForSelectedBranch.cAmbient.r = 0.22;
-                matForSelectedBranch.cAmbient.g = 1; //Since selected modules will be neon green
-                matForSelectedBranch.cAmbient.b = 0.1;
-            }
-
             _moduleIDToMat[moduleID] = mat;
-            if (moduleID == settings.selectedModuleId) _phongShader->applyMaterial(matForSelectedBranch);
-            else _phongShader->applyMaterial(mat);
         }
+        if (moduleID == settings.selectedModuleId) {
+            mat = _selectedBranchMat;
+        } else if (bundle.warning) {
+            mat = _warningBranchesMat;
+        }
+        _phongShader->applyMaterial(mat);
         _trunk->drawVAO();
     }
     _trunk->unbindVAO();

@@ -8,6 +8,7 @@ using namespace glm;
 
 Module::Module() :
     ID(rand() % 1000000),
+    _warning(false),
     _includesRoot(false)
 {
     // TODO: init temperature to ambient temp
@@ -35,8 +36,8 @@ void Module::updateMass() {
 dvec3 Module::getCenter() const {
     dvec3 center(0);
     for (Branch *branch : _branches) {
-        dvec3 branchBase = dvec3(branch->model*vec4(0));
-        dvec3 branchEnd = dvec3(branch->model*vec4(0, 1, 0, 1));
+        dvec3 branchBase = dvec3(branch->model*trunkObjectBottom);
+        dvec3 branchEnd = dvec3(branch->model*trunkObjectTop);
         dvec3 branchDir = branchEnd - branchBase;
         dvec3 branchCenter = branchBase +
                 normalize(branchDir) * branch->length / 2.0;

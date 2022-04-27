@@ -43,6 +43,8 @@ private:
 
     bool checkModuleVoxelOverlap(Module *module, Voxel *voxel, double cellSideLength);
     void initializeModuleVoxelMapping();
+    dvec3 closestPointToLine(dvec3 point, dvec3 a, dvec3 b, double precision);
+    void connectModulesToVoxels();
     void initMassOfModules();
     void initMassOfVoxels();
     std::map<Module *, VoxelSet> _moduleToVoxels;

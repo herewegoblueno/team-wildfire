@@ -47,6 +47,7 @@ private:
     void setLights();
     void setGlobalData();
     void setSceneUniforms(SupportCanvas3D *context);
+    void initDebugMaterials();
 
     std::unique_ptr<CS123::GL::CS123Shader> _phongShader;
     VoxelGrid _voxelGrid;
@@ -56,7 +57,8 @@ private:
     std::vector<PrimitiveBundle> _trunks;
     std::vector<PrimitiveBundle> _leaves;
     std::unordered_map<int, CS123SceneMaterial> _moduleIDToMat;
-    CS123SceneMaterial matForSelectedBranch ;
+    CS123SceneMaterial _selectedBranchMat;
+    CS123SceneMaterial _warningBranchesMat;
     Simulator _simulator;
 
     MainWindow *mainWindow;

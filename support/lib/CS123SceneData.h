@@ -150,7 +150,8 @@ struct CS123ScenePrimitive {
 struct PrimitiveBundle {
    CS123ScenePrimitive primitive;
    glm::mat4 model;
-   int moduleID;             // Only applicable to trunks
+   int moduleID; // only applicable to trunks
+   bool warning = false; // render in red, useful for debugging
    PrimitiveBundle(CS123ScenePrimitive primitive, glm::mat4 model, int moduleID) :
        primitive(primitive),
        model(model),

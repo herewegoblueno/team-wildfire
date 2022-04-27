@@ -1,5 +1,6 @@
 #include "forest.h"
 #include "glm/gtx/transform.hpp"
+#include "glm/gtx/closest_point.hpp"
 #include <iostream>
 
 using namespace glm;
@@ -30,7 +31,12 @@ void Forest::recalculatePrimitives() {
     _primitives.clear();
     for (Branch *branch : _branches) {
         Module *m = getModuleFromId(branch->moduleID);
-        PrimitiveBundle branchPrimitive(*_trunk, branch->model * glm::scale(glm::vec3(m->getCurrentState()->radiusRatio, 1.0f, m->getCurrentState()->radiusRatio)), branch->moduleID);
+        mat4 model = branch->model * glm::scale(glm::vec3(m->getCurrentState()->radiusRatio,
+                                                          1.0f, m->getCurrentState()->radiusRatio));
+        PrimitiveBundle branchPrimitive(*_trunk, model, branch->moduleID);
+        if (m->_warning) {
+            branchPrimitive.warning = true;
+        }
         _primitives.push_back(branchPrimitive);
         for (mat4 &leafModel : branch->leafModels) {
             PrimitiveBundle leafPrimitive(*_leaf, leafModel);
@@ -62,7 +68,7 @@ void Forest::createTrees(int numTrees, float forestWidth, float forestHeight) {
 void Forest::addTreeToForest(const ModuleSet &modules, mat4 trans) {
     std::unordered_set<Branch *> seen;
     for (Module *module : modules) {
-        _moduleIDs.insert({module->ID, module});
+        _moduleIDs[module->ID] = module;
         _modules.insert(module);
         for (Branch *branch : module->_branches) {
             if (seen.count(branch)) {
@@ -112,13 +118,12 @@ void Forest::initializeModuleVoxelMapping() {
 
    //Rest of this is just for debugging output...
    int totalVoxels = 0;
-   for (auto const& moduleVoxels : _moduleToVoxels) {
-       int moduleID = moduleVoxels.first->ID;
-       int numVoxels = moduleVoxels.second.size();
+   for (Module *module : _modules) {
+       int numVoxels = _moduleToVoxels[module].size();
        totalVoxels += numVoxels;
-
        if (numVoxels == 0) {
-           std::cerr << "Module " << moduleID << "has 0 voxels "<<  std::endl;
+           std::cerr << "Module " << module->ID << " has 0 voxels "<<  std::endl;
+           module->_warning = true;
        }
    }
    std::cout << (float)totalVoxels/(float)_modules.size() << " voxels per module" << std::endl;
@@ -135,24 +140,43 @@ bool Forest::checkModuleVoxelOverlap(Module *module, Voxel *voxel,
                                      double cellSideLength) {
     dvec3 voxelCenter = voxel->centerInWorldSpace;
     for (Branch *branch: module->_branches) {
-        vec4 branchSpaceCenter = branch->invModel * vec4(voxelCenter, 1);
-        float x = branchSpaceCenter.x;
-        float y = branchSpaceCenter.y;
-        float z = branchSpaceCenter.z;
-        // lateral dist to branch center
-        double dist = std::sqrt(x*x + z*z);
-        // implicit lateral branch boundary
         //This is called in updateModuleVoxelMapping, which is called before updateLastFrameDataOfModules in the
         //simulation loop, so we should use getCurrentState
         double ratio = module->getCurrentState()->radiusRatio;
-        double horizScale = (1.0 * ratio - (1.0 - branchWidthDecay) * (y + 1.0));
-        double branchMaxDist = 0.5 * horizScale;
-        // approximate voxel as a sphere
-        if (dist - cellSideLength / 2.0 < branchMaxDist && y >= -0.5 && y <= 0.5) {
+        mat4 model = branch->model;
+        double branchRadius = branch->radius;
+        double cellRadius = cellSideLength / 2.0;
+        dvec3 branchStart = dvec3(model * trunkObjectBottom);
+        dvec3 branchEnd = dvec3(model * trunkObjectTop);
+        // TODO: this is still not quite satisfactory
+        dvec3 closestPoint = closestPointToLine(voxelCenter, branchStart,
+                                                 branchEnd, cellRadius);
+//        if (closestPoint == branchStart || closestPoint == branchEnd) {
+//            return false;
+//        }
+        double distUpBranch = length(closestPoint - branchStart) / branch->length;
+        double horizScale = ratio - (1.0 - branchWidthDecay) * distUpBranch;
+        if (length(closestPoint - voxelCenter) < branchRadius * horizScale) {
             return true;
         }
     }
     return false;
+}
+
+/**
+ * Return how close a point is to the line segment defined by a, b.
+ * If the projection of the point onto line is outside the bounds of a, b
+ * (up to some precision), return -1. Adapted from GLM_GTX_closest_point.
+ */
+dvec3 Forest::closestPointToLine(dvec3 point, dvec3 a, dvec3 b, double precision) {
+    double LineLength = distance(a, b);
+    dvec3 Vector = point - a;
+    dvec3 LineDirection = (b - a) / LineLength;
+    // Project Vector to LineDirection to get the distance of point from a
+    double Distance = dot(Vector, LineDirection);
+    if (Distance + precision <= 0.0) return a;
+    if (Distance - precision >= LineLength) return b;
+    return a + LineDirection * Distance;
 }
 
 /** Init mass of each module based on its branches */
