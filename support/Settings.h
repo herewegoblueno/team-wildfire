@@ -11,6 +11,7 @@
 #include <QObject>
 #include "support/lib/RGBA.h"
 #include "voxels/voxelgridline.h"
+#include "trees/module.h"
 
 // Enumeration values for the currently selected UI tab
 enum UITab {
@@ -52,6 +53,8 @@ struct Settings
     bool visualizeForestVoxelGrid;
     VoxelVisualizationModes voxelGridMode;
     VectorFieldVisualizationModes vectorGridMode;
+    ModuleVisualizationModes moduleVisualizationMode;
+
     bool visualizeVectorField;
     float visualizeForestVoxelGridEyeX;
     float visualizeForestVoxelGridEyeY;

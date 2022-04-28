@@ -13,6 +13,8 @@ const glm::vec4 trunkObjectTop = glm::vec4(0, 0.5, 0, 1);
 const double trunkObjectRadius = 0.5;
 const double trunkObjectLength = 1.0;
 
+enum ModuleVisualizationModes { ID, MODULE_TEMPERATURE };
+
 class Module;
 struct Branch;
 typedef std::unordered_set<Branch *> BranchSet;
@@ -47,6 +49,7 @@ struct ModuleTree {
 
 struct ModulePhysicalData {
     double mass;        // total mass of branches, updated during combustion
+    double area;        // total surface area of all the branches
     double temperature; // surface temperature of module
     double radiusRatio = 1;
 };
@@ -66,8 +69,8 @@ public:
     bool _includesRoot;
 
     glm::dvec3 getCenter() const;
-    void initMass();
-    void updateMass();
+    void initMassAndArea();
+    void updateMassAndArea();
     ModulePhysicalData *getCurrentState();
     ModulePhysicalData *getLastFrameState();
 
@@ -79,6 +82,7 @@ private:
 
     double getBranchMass(Branch *branch) const;
     double getBranchVolume(Branch *branch) const;
+    double getBranchLateralSurfaceArea(Branch *branch) const;
 };
 
 #endif // MODULE_H

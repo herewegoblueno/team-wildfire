@@ -35,11 +35,15 @@ void Settings::loadSettingsOrDefaults() {
     branchStochasticity = s.value("branchStochasticity", 0.5).toDouble();
 
     //Forest Visualization (some of these are not saved)
-    seeBranchModules = s.value("seeBranchModules", false).toBool();
     visualizeForestVoxelGrid = s.value("visualizeForestVoxelGrid", false).toBool();
     voxelGridMode = static_cast<VoxelVisualizationModes>(s.value("voxelGridMode", TEMPERATURE).toInt());
+
     visualizeVectorField = s.value("visualizeVectorField", false).toBool();
     vectorGridMode = static_cast<VectorFieldVisualizationModes>(s.value("vectorGridMode", UFIELD).toInt());
+
+    seeBranchModules = s.value("seeBranchModules", false).toBool();
+    moduleVisualizationMode = static_cast<ModuleVisualizationModes>(s.value("moduleVisualizationMode", ID).toInt());
+
     visualizeForestVoxelGridEyeX =  s.value("visualizeForestVoxelGridEyeX", 0).toDouble();
     visualizeForestVoxelGridEyeY =  s.value("visualizeForestVoxelGridEyeY", 0).toDouble();
     visualizeForestVoxelGridEyeZ =  s.value("visualizeForestVoxelGridEyeZ", 0).toDouble();
@@ -92,6 +96,7 @@ void Settings::saveSettings() {
     s.setValue("visualizeVectorField", visualizeVectorField);
     s.setValue("voxelGridMode", voxelGridMode);
     s.setValue("vectorGridMode", vectorGridMode);
+    s.setValue("moduleVisualizationMode", moduleVisualizationMode);
 
     s.setValue("simulatorTimescale", simulatorTimescale);
     s.setValue("visualizeForestVoxelGridMinTemp", visualizeForestVoxelGridMinTemp);

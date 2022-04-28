@@ -13,21 +13,29 @@ Module::Module() :
 {
 }
 
-/** Init mass of module based on branch masses */
-void Module::initMass() {
+/** Init mass and surface area of module based on branches  */
+void Module::initMassAndArea() {
     _currentPhysicalData.mass = 0;
     _lastFramePhysicalData.mass = 0;
+    _currentPhysicalData.area = 0;
+    _lastFramePhysicalData.area = 0;
     for (Branch *branch : _branches) {
-        _currentPhysicalData.mass += getBranchMass(branch);
-        _lastFramePhysicalData.mass += getBranchMass(branch);
+        double mass = getBranchMass(branch);
+        double area = getBranchLateralSurfaceArea(branch);
+        _currentPhysicalData.mass += mass;
+        _lastFramePhysicalData.mass += mass;
+        _currentPhysicalData.area += area;
+        _lastFramePhysicalData.area += area ;
     }
 }
 
-/** Update mass of module based on branch masses */
-void Module::updateMass() {
+/** Update mass and surface area of module based on branches */
+void Module::updateMassAndArea() {
     _currentPhysicalData.mass = 0;
+    _currentPhysicalData.area = 0;
     for (Branch *branch : _branches) {
         _currentPhysicalData.mass += getBranchMass(branch);
+        _currentPhysicalData.area += getBranchLateralSurfaceArea(branch) ;
     }
 }
 
@@ -58,10 +66,17 @@ double Module::getBranchMass(Branch *branch) const {
     return getBranchVolume(branch) * woodDensity;
 }
 
+//getBranchLateralSurfaceArea and getBranchVolume are called by initMassAndArea and updateMassAndArea,
+//functions used for both module initialization and updating, so it's better to use _currentPhysicalData
+double Module::getBranchLateralSurfaceArea(Branch *branch) const {
+    double l = branch->length;
+    double r0 = branch->radius * _currentPhysicalData.radiusRatio;
+    double r1 = r0 * branchWidthDecay;
+    return (M_PI) * (r0 + r1) * std::sqrt(pow(r0 - r1, 2) + pow(l, 2));
+}
+
 double Module::getBranchVolume(Branch *branch) const {
     double l = branch->length;
-    //This is called by getBranchMass, which is used for both mass initialization and updating, so it's better
-    //to use currentMass
     double r0 = branch->radius * _currentPhysicalData.radiusRatio;
     double r1 = r0 * branchWidthDecay;
     return (M_PI / 3.0)* l * (r0*r0 + r0*r1 + r1*r1);

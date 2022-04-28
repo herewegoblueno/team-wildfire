@@ -13,6 +13,7 @@
 #include "simulation/simulator.h"
 #include <unordered_map>
 
+
 const int gridBuffer = 3; // make grid slightly larger than forest
 const int numTrees = 20;
 const float forestHeight = 10;
@@ -40,17 +41,17 @@ private:
     void renderTrunks();
     void renderLeaves();
     void renderGeometry();
-    void loadPhongShader();
+    void loadShaders();
     void tessellateShapes();
 
     void defineLights();
     void defineGlobalData();
-    void setLights();
-    void setGlobalData();
-    void setSceneUniforms(SupportCanvas3D *context);
-    void initDebugMaterials();
+    void setLights(CS123::GL::CS123Shader *s);
+    void setGlobalData(CS123::GL::CS123Shader *s);
+    void setSceneUniforms(SupportCanvas3D *context, CS123::GL::CS123Shader *s);
 
     std::unique_ptr<CS123::GL::CS123Shader> _phongShader;
+    std::unique_ptr<CS123::GL::CS123Shader> _moduleVisShader;
     VoxelGrid _voxelGrid;
     std::unique_ptr<Forest> _forest;
     std::unique_ptr<Trunk> _trunk;
@@ -58,8 +59,6 @@ private:
     std::vector<PrimitiveBundle> _trunks;
     std::vector<PrimitiveBundle> _leaves;
     std::unordered_map<int, CS123SceneMaterial> _moduleIDToMat;
-    CS123SceneMaterial _selectedBranchMat;
-    CS123SceneMaterial _warningBranchesMat;
     Simulator _simulator;
 
     MainWindow *mainWindow;

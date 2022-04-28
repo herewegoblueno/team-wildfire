@@ -583,7 +583,7 @@
                 <string>View only voxels touching this module</string>
                </property>
               </widget>
-              <widget class="QWidget" name="widget" native="true">
+              <widget class="QWidget" name="ModuleVisModeParent" native="true">
                <property name="geometry">
                 <rect>
                  <x>10</x>
@@ -594,14 +594,14 @@
                </property>
                <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,1">
                 <item>
-                 <widget class="QLabel" name="label">
+                 <widget class="QLabel" name="ModuleVisModeParentLabel">
                   <property name="text">
                    <string>Color Mode</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QComboBox" name="comboBox">
+                 <widget class="QComboBox" name="ModuleVisModeParentOptions">
                   <item>
                    <property name="text">
                     <string>ID</string>

@@ -18,7 +18,7 @@ public:
     std::vector<PrimitiveBundle> getPrimitives();
 
     void updateModuleVoxelMapping();
-    void updateMassOfModules();
+    void updateMassAndAreaOfModules();
     void updateMassOfVoxels();
 
     VoxelSet getVoxelsMappedToModule(Module *m);
@@ -46,7 +46,7 @@ private:
     void initializeModuleVoxelMapping();
     void connectModulesToVoxels();
     void initTempOfModules();
-    void initMassOfModules();
+    void initMassAndAreaOfModules();
     void initMassOfVoxels();
     std::map<Module *, VoxelSet> _moduleToVoxels;
     std::map<Voxel *, ModuleSet> _voxelToModules;

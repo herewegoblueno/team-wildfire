@@ -6,7 +6,6 @@
 #include "support/Settings.h"
 #include "support/scenegraph/SupportCanvas3D.h"
 #include "support/lib/ResourceLoader.h"
-#include "support/gl/shaders/CS123Shader.h"
 
 #include "support/shapes/Trunk.h"
 #include "support/shapes/Leaf.h"
@@ -21,8 +20,7 @@ BasicForestScene::BasicForestScene(MainWindow *mainWindow):
      _voxelGrid(forestWidth + gridBuffer, vec3(0,0,0), 60),
      mainWindow(mainWindow)
 {
-    loadPhongShader();
-    initDebugMaterials();
+    loadShaders();
     tessellateShapes();
     _voxelGrid.getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeVectorField);
     _forest = std::make_unique<Forest>(&_voxelGrid, numTrees, forestWidth, forestHeight);
@@ -53,10 +51,13 @@ void BasicForestScene::updatePrimitivesFromForest() {
     }
 }
 
-void BasicForestScene::loadPhongShader() {
+void BasicForestScene::loadShaders() {
     std::string vertexSource = ResourceLoader::loadResourceFileToString(":/shaders/default.vert");
     std::string fragmentSource = ResourceLoader::loadResourceFileToString(":/shaders/default.frag");
     _phongShader = std::make_unique<CS123Shader>(vertexSource, fragmentSource);
+
+    fragmentSource = ResourceLoader::loadResourceFileToString(":/shaders/module.frag");
+    _moduleVisShader = std::make_unique<CS123Shader>(vertexSource, fragmentSource);
 }
 
 void BasicForestScene::render(SupportCanvas3D *context) {
@@ -67,13 +68,15 @@ void BasicForestScene::render(SupportCanvas3D *context) {
     glClearColor(0.2, 0.2, 0.2, 0.3);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    _phongShader->bind();
-    setGlobalData();
-    setSceneUniforms(context);
-    setLights();
+    CS123Shader *selectedShader = settings.seeBranchModules ? _moduleVisShader.get() : _phongShader.get();
+
+    selectedShader->bind();
+    setGlobalData(selectedShader);
+    setSceneUniforms(context, selectedShader);
+    setLights(selectedShader);
     renderGeometry();
     glBindTexture(GL_TEXTURE_2D, 0);
-    _phongShader->unbind();
+    selectedShader->unbind();
 
     _voxelGrid.getVisualization()->setPV(camera->getProjectionMatrix() * camera->getViewMatrix());
     _voxelGrid.getVisualization()->draw(context);
@@ -103,23 +106,23 @@ void BasicForestScene::renderGeometry() {
     }
 }
 
-void BasicForestScene::initDebugMaterials() {
-    // Neon green
-    _selectedBranchMat.cAmbient.r = 0.22;
-    _selectedBranchMat.cAmbient.g = 1;
-    _selectedBranchMat.cAmbient.b = 0.1;
-    // Bright red
-    _warningBranchesMat.cAmbient.r = 1.0;
-    _warningBranchesMat.cAmbient.g = 0.1;
-    _warningBranchesMat.cAmbient.b = 0.1;
-}
-
 /** Color each branch based on the module it's in */
 void BasicForestScene::renderTrunksVisualizedModules() {
     _trunk->bindVAO();
     for (PrimitiveBundle &bundle : _trunks) {
-        _phongShader->setUniform("m",  bundle.model);
         int moduleID = bundle.moduleID;
+
+        _moduleVisShader->setUniform("m",  bundle.model);
+        _moduleVisShader->setUniform("isSelected",  settings.selectedModuleId == moduleID);
+        _moduleVisShader->setUniform("warningFlag",  bundle.warning);
+        _moduleVisShader->setUniform("propType",  settings.moduleVisualizationMode);
+
+        if (settings.moduleVisualizationMode == MODULE_TEMPERATURE){
+            _moduleVisShader->setUniform("propMax",  settings.visualizeForestVoxelGridMaxTemp);
+            _moduleVisShader->setUniform("propMin",  settings.visualizeForestVoxelGridMinTemp);
+            _moduleVisShader->setUniform("prop",  (float)_forest->getModuleFromId(moduleID)->getCurrentState()->temperature);
+        }
+
         CS123SceneMaterial mat;
         if (_moduleIDToMat.count(moduleID)) {
             //We've already made a material for this module
@@ -132,12 +135,7 @@ void BasicForestScene::renderTrunksVisualizedModules() {
             mat.cAmbient.b = randomDarkColor();
             _moduleIDToMat[moduleID] = mat;
         }
-        if (moduleID == settings.selectedModuleId) {
-            mat = _selectedBranchMat;
-        } else if (bundle.warning) {
-            mat = _warningBranchesMat;
-        }
-        _phongShader->applyMaterial(mat);
+        _moduleVisShader->applyMaterial(mat);
         _trunk->drawVAO();
     }
     _trunk->unbindVAO();
@@ -179,25 +177,25 @@ void BasicForestScene::defineGlobalData() {
     globalData.ks = 1.0f;
 }
 
-void BasicForestScene::setLights()
+void BasicForestScene::setLights(CS123Shader *selectedShader)
 {
     int size = lightingInformation.size();
     for (int i = 0; i < size; i++){
-        _phongShader->setLight(lightingInformation[i]);
+        selectedShader->setLight(lightingInformation[i]);
     }
 }
 
-void BasicForestScene::setGlobalData(){
-    _phongShader->setUniform("ka", globalData.ka);
-    _phongShader->setUniform("kd", globalData.kd);
-    _phongShader->setUniform("ks", globalData.ks);
+void BasicForestScene::setGlobalData(CS123Shader *selectedShader){
+    selectedShader->setUniform("ka", globalData.ka);
+    selectedShader->setUniform("kd", globalData.kd);
+    selectedShader->setUniform("ks", globalData.ks);
 }
 
-void BasicForestScene::setSceneUniforms(SupportCanvas3D *context) {
+void BasicForestScene::setSceneUniforms(SupportCanvas3D *context, CS123Shader *selectedShader) {
     Camera *camera = context->getCamera();
-    _phongShader->setUniform("useLighting", settings.useLighting);
-    _phongShader->setUniform("p" , camera->getProjectionMatrix());
-    _phongShader->setUniform("v", camera->getViewMatrix());
+    selectedShader->setUniform("useLighting", settings.useLighting);
+    selectedShader->setUniform("p" , camera->getProjectionMatrix());
+    selectedShader->setUniform("v", camera->getViewMatrix());
 }
 
 void BasicForestScene::settingsChanged() {

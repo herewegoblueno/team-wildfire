@@ -11,6 +11,7 @@
 #include "support/lib/CS123XmlSceneParser.h"
 #include <chrono>
 #include "voxels/voxelgridline.h"
+#include "trees/module.h"
 
 using namespace std::chrono;
 
@@ -52,6 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->FieldVisOptionsDropbox->setCurrentIndex(settings.vectorGridMode);
     ui->VoxelVisOptionsDropbox->setCurrentIndex(settings.voxelGridMode);
+    ui->ModuleVisModeParentOptions->setCurrentIndex(settings.moduleVisualizationMode);
     ui->seeBranchModules->setChecked(settings.seeBranchModules);
 
     ui->TimescaleSlider->setRange(0, 20);
@@ -288,5 +290,12 @@ void MainWindow::on_viewOnlyModuleVoxelCheckbox_stateChanged(int state)
 void MainWindow::on_useOrbitingCamera_stateChanged(int state)
 {
     changeCameraSettings(state == Qt::CheckState::Checked);
+}
+
+
+void MainWindow::on_ModuleVisModeParentOptions_currentIndexChanged(int index)
+{
+    settings.moduleVisualizationMode = static_cast<ModuleVisualizationModes>(index);
+    signalSettingsChanged();
 }
 

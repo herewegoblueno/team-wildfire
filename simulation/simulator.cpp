@@ -24,7 +24,7 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
     int jumpPerThread = gridResolution / NUMBER_OF_SIMULATION_THREADS;
 
     if (forest != nullptr){ //Forest is optional
-        forest->updateMassOfModules();
+        forest->updateMassAndAreaOfModules();
         //<TODO: Temperature changes, burning, and Radii updates should be here>
         //<TODO: water content of modules should go here>
         forest->updateMassOfVoxels();

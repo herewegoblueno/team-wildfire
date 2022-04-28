@@ -12,7 +12,7 @@ Forest::Forest(VoxelGrid *grid, int numTrees, float forestWidth, float forestHei
     initializeTrunkPrimitive();
     initializeLeafPrimitive();
     createTrees(numTrees, forestWidth, forestHeight);
-    initMassOfModules();
+    initMassAndAreaOfModules();
     initializeModuleVoxelMapping(); // depends on module mass
     initMassOfVoxels(); // depends on voxel mapping
     initTempOfModules(); // depends on voxel mapping
@@ -200,19 +200,20 @@ void Forest::initTempOfModules() {
         }
         double numVoxels = static_cast<double>(voxels.size());
         module->getCurrentState()->temperature = totalTemp / numVoxels;
+        module->getLastFrameState()->temperature = totalTemp / numVoxels;
     }
 }
 
 /** Init mass of each module based on its branches */
-void Forest::initMassOfModules() {
+void Forest::initMassAndAreaOfModules() {
     for (Module *module : _modules) {
-        module->initMass();
+        module->initMassAndArea();
     }
 }
 
-void Forest::updateMassOfModules(){
+void Forest::updateMassAndAreaOfModules(){
     for (Module *module : _modules) {
-        module->updateMass();
+        module->updateMassAndArea();
     }
 }
 
