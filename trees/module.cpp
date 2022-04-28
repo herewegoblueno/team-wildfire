@@ -11,7 +11,6 @@ Module::Module() :
     _warning(false),
     _includesRoot(false)
 {
-    // TODO: init temperature to ambient temp
 }
 
 /** Init mass of module based on branch masses */

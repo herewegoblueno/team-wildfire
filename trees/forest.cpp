@@ -14,7 +14,8 @@ Forest::Forest(VoxelGrid *grid, int numTrees, float forestWidth, float forestHei
     createTrees(numTrees, forestWidth, forestHeight);
     initMassOfModules();
     initializeModuleVoxelMapping(); // depends on module mass
-    initMassOfVoxels();
+    initMassOfVoxels(); // depends on voxel mapping
+    initTempOfModules(); // depends on voxel mapping
 }
 
 Forest::~Forest() {
@@ -138,7 +139,6 @@ void Forest::initializeModuleVoxelMapping() {
 //Since trees can only shrink over time, we can only ever lose voxels in the mappings...
 void Forest::updateModuleVoxelMapping(){
     double cellSideLength = _grid->cellSideLength();
-
     for (auto const& moduleToVoxels : _moduleToVoxels) {
         Module *module = moduleToVoxels.first;
         VoxelSet voxels = moduleToVoxels.second;
@@ -189,6 +189,18 @@ bool Forest::checkModuleVoxelOverlap(Module *module, Voxel *voxel,
         }
     }
     return false;
+}
+/** Init temp of each module to average of surrounding voxel ambient temps */
+void Forest::initTempOfModules() {
+    for (Module *module : _modules) {
+        double totalTemp = 0;
+        VoxelSet voxels = _moduleToVoxels[module];
+        for (Voxel *vox : voxels) {
+            totalTemp += vox->getAmbientTemperature();
+        }
+        double numVoxels = static_cast<double>(voxels.size());
+        module->getCurrentState()->temperature = totalTemp / numVoxels;
+    }
 }
 
 /** Init mass of each module based on its branches */
@@ -323,8 +335,8 @@ void Forest::deleteModuleAndChildren(Module *m){
 
 void Forest::deleteDeadModules(){
     //This is called before updateLastFrameDataOfModules, so we should use currentState
-    //Not useing a normal iterator since I'm not sure the order of appearance of parents and children
-    //so you don'y know where to reposition the interator once one call to deleteModuleAndChildren has completed
+    //Not using a normal iterator since I'm not sure the order of appearance of parents and children
+    //so you don't know where to reposition the interator once one call to deleteModuleAndChildren has completed
     //Also, since unordered_maps seem to be able to rehash(https://stackoverflow.com/questions/18301302/is-forauto-i-unordered-map-guaranteed-to-have-the-same-order-every-time)
     //it might not be safe for deleteModuleAndChildren to return the left-most iterator of all the deletes
     for(Module *m : _modules)

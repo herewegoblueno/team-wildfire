@@ -45,6 +45,7 @@ private:
     bool checkModuleVoxelOverlap(Module *module, Voxel *voxel, double cellSideLength);
     void initializeModuleVoxelMapping();
     void connectModulesToVoxels();
+    void initTempOfModules();
     void initMassOfModules();
     void initMassOfVoxels();
     std::map<Module *, VoxelSet> _moduleToVoxels;
