@@ -18,7 +18,7 @@ using namespace CS123::GL;
 #include <iostream>
 
 BasicForestScene::BasicForestScene(MainWindow *mainWindow):
-     _voxelGrid(forestWidth + 2, vec3(0,0,0), 60),
+     _voxelGrid(forestWidth + gridBuffer, vec3(0,0,0), 60),
      mainWindow(mainWindow)
 {
     loadPhongShader();

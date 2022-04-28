@@ -13,6 +13,7 @@
 #include "simulation/simulator.h"
 #include <unordered_map>
 
+const int gridBuffer = 3; // make grid slightly larger than forest
 const int numTrees = 20;
 const float forestHeight = 10;
 const float forestWidth = 10;
