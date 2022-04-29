@@ -29,14 +29,35 @@ void Module::initMassAndArea() {
     }
 }
 
-/** Update mass and surface area of module based on branches */
-void Module::updateMassAndArea() {
+/** Update mass and surface area of module based on branches (will only change due to burning) */
+void Module::updateMassAndAreaViaBurning(double deltaTimeInMs) {
     _currentPhysicalData.mass = 0;
     _currentPhysicalData.area = 0;
+    _currentPhysicalData.radiusRatio = _lastFramePhysicalData.radiusRatio;
+    double massLoss = getMassLossDueToBurning(deltaTimeInMs);
+    updateRadiiToReflectMassLoss(massLoss);
     for (Branch *branch : _branches) {
         _currentPhysicalData.mass += getBranchMass(branch);
         _currentPhysicalData.area += getBranchLateralSurfaceArea(branch) ;
     }
+}
+
+double Module::getMassLossDueToBurning(double deltaTimeInMs){
+   return getReactionRateFromPreviousFrame() * deltaTimeInMs / 1000.0;
+}
+
+//Using something similar to raymarching: reduce the radii bit my bit till you get a good mass below target
+void Module::updateRadiiToReflectMassLoss(double massLoss){
+    if (massLoss == 0 || _lastFramePhysicalData.radiusRatio <= 0) return;
+    double targetMass = std::max(0.0, _lastFramePhysicalData.mass - massLoss);
+    double testMass;
+    do {
+        testMass = 0;
+        _currentPhysicalData.radiusRatio -= 0.01;
+        if (_currentPhysicalData.radiusRatio < 0) _currentPhysicalData.radiusRatio = 0;
+        for (Branch *branch : _branches) testMass += getBranchMass(branch);
+    }
+    while (testMass > targetMass);
 }
 
 /** Return center of mass of module */
@@ -68,6 +89,7 @@ double Module::getBranchMass(Branch *branch) const {
 
 //getBranchLateralSurfaceArea and getBranchVolume are called by initMassAndArea and updateMassAndArea,
 //functions used for both module initialization and updating, so it's better to use _currentPhysicalData
+//Also important since we use it in updateRadiiToReflectMassLoss
 double Module::getBranchLateralSurfaceArea(Branch *branch) const {
     double l = branch->length;
     double r0 = branch->radius * _currentPhysicalData.radiusRatio;

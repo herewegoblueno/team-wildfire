@@ -70,7 +70,7 @@ public:
 
     glm::dvec3 getCenter() const;
     void initMassAndArea();
-    void updateMassAndArea();
+    void updateMassAndAreaViaBurning(double deltaTimeInMs);
     ModulePhysicalData *getCurrentState();
     ModulePhysicalData *getLastFrameState();
 
@@ -88,6 +88,8 @@ private:
 
     double getReactionRateFromPreviousFrame();
     double sigmoidFunc(double x);
+    double getMassLossDueToBurning(double deltaTimeInMs);
+    void updateRadiiToReflectMassLoss(double massLoss);
 };
 
 #endif // MODULE_H

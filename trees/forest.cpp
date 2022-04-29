@@ -152,8 +152,7 @@ void Forest::updateModuleVoxelMapping(){
 }
 
 /** See if a module and voxel overlap by checking each branch */
-bool Forest::checkModuleVoxelOverlap(Module *module, Voxel *voxel,
-                                     double cellSideLength) {
+bool Forest::checkModuleVoxelOverlap(Module *module, Voxel *voxel, double cellSideLength) {
     dvec3 voxelCenter = voxel->centerInWorldSpace;
     for (Branch *branch: module->_branches) {
         //This is called in updateModuleVoxelMapping, which is called before updateLastFrameDataOfModules in the
@@ -190,6 +189,7 @@ bool Forest::checkModuleVoxelOverlap(Module *module, Voxel *voxel,
     }
     return false;
 }
+
 /** Init temp of each module to average of surrounding voxel ambient temps */
 void Forest::initTempOfModules() {
     for (Module *module : _modules) {
@@ -231,9 +231,9 @@ void Forest::initMassAndAreaOfModules() {
     }
 }
 
-void Forest::updateMassAndAreaOfModules(){
+void Forest::updateMassAndAreaOfModulesViaBurning(double deltaTimeInMs){
     for (Module *module : _modules) {
-        module->updateMassAndArea();
+        module->updateMassAndAreaViaBurning(deltaTimeInMs);
     }
 }
 

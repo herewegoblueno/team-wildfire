@@ -18,7 +18,7 @@ public:
     std::vector<PrimitiveBundle> getPrimitives();
 
     void updateModuleVoxelMapping();
-    void updateMassAndAreaOfModules();
+    void updateMassAndAreaOfModulesViaBurning(double deltaTimeInMs);
     void updateMassOfVoxels();
     void artificiallyUpdateTemperatureOfModule(int moduleID, double delta);
     void artificiallyUpdateVoxelTemperatureAroundModule(int moduleID, double delta);

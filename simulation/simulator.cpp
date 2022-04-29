@@ -24,7 +24,8 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
     int jumpPerThread = gridResolution / NUMBER_OF_SIMULATION_THREADS;
 
     if (forest != nullptr){ //Forest is optional
-        forest->updateMassAndAreaOfModules();
+        forest->updateMassAndAreaOfModulesViaBurning(deltaTime);
+        //TODO: refactorabit
         for (Module *m : forest->getModules()) {
             VoxelSet surroundingAir = forest->getVoxelsMappedToModule(m);
             stepModuleHeatTransfer(m, surroundingAir, deltaTime);
