@@ -28,6 +28,8 @@ const double module_air_diffusion = 0.04; // b
 // combustion
 const double reaction_rate_t0 = 2.0; // TODO: make these physically accurate
 const double reaction_rate_t1 = 3.5;
+const double max_wind_combustion_boost = 1.5; // n_max
+const double speed_for_max_wind_boost = 1.0; // u_ref
 
 double ambientTemperatureFunc(glm::dvec3 point);
 

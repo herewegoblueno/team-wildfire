@@ -133,27 +133,35 @@ double Module::getTemperatureLaplaceFromPreviousFrame() {
 }
 
 /** Reaction rate based on module temperature */
-double Module::getReactionRateFromPreviousFrame() {
+double Module::getReactionRateFromPreviousFrame(double windSpeed) {
     double moduleTemp = getLastFrameState()->temperature;
     if (moduleTemp < reaction_rate_t0) return 0.0;
     if (moduleTemp > reaction_rate_t1) return 1.0;
-    double x = (moduleTemp - reaction_rate_t0) / (reaction_rate_t1 - reaction_rate_t0);
-    return sigmoidFunc(x);
+    double tempRatio = (moduleTemp - reaction_rate_t0) / (reaction_rate_t1 - reaction_rate_t0);
+    double rate = sigmoidFunc(tempRatio);
+    windSpeed = std::min(windSpeed, speed_for_max_wind_boost);
+    double windBoost = (max_wind_combustion_boost - 1.0)
+            * sigmoidFunc(windSpeed / speed_for_max_wind_boost) + 1.0;
+    return windBoost * rate;
 }
 
-/** Sigmoid-like function for interpolation in reaction rate calculations */
+/**
+ * Sigmoid-like function for interpolation between 0 and 1
+ * in reaction rate calculations
+ */
 double Module::sigmoidFunc(double x) {
     return 3*std::pow(x, 2) - 2*std::pow(x, 3);
 }
 
 /**
  * Mass loss rate (dM/dt) based on Eq. 1 of Fire in Paradise paper
- * TODO (optional): add char insulation and pyrolyzing front area terms
+ * TODO (optional): add char insulation
  */
-double Module::getMassLossRateFromPreviousFrame() {
-    double reactionRate = getReactionRateFromPreviousFrame();
+double Module::getMassLossRateFromPreviousFrame(double windSpeed) {
+    double reactionRate = getReactionRateFromPreviousFrame(windSpeed);
     double moduleTemp = getLastFrameState()->temperature;
-    return -reactionRate * moduleTemp;
+    double surfaceArea = getLastFrameState()->area;
+    return -reactionRate * moduleTemp * surfaceArea;
 }
 
 void Module::updateLastFrameData(){

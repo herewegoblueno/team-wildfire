@@ -74,7 +74,7 @@ public:
     ModulePhysicalData *getCurrentState();
     ModulePhysicalData *getLastFrameState();
 
-    double getMassLossRateFromPreviousFrame();
+    double getMassLossRateFromPreviousFrame(double windSpeed);
     double getTemperatureLaplaceFromPreviousFrame();
     void updateLastFrameData();
 
@@ -86,7 +86,7 @@ private:
     double getBranchVolume(Branch *branch) const;
     double getBranchLateralSurfaceArea(Branch *branch) const;
 
-    double getReactionRateFromPreviousFrame();
+    double getReactionRateFromPreviousFrame(double windSpeed);
     double sigmoidFunc(double x);
 };
 
