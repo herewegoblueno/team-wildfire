@@ -2,7 +2,7 @@
 #define PHYSICS_H
 #include "glm/ext.hpp"
 
-//These are all the relavant tunable physics variables for the simulatoin
+//These are all the relevant tunable physics variables for the simulation
 
 // general
 const float sealevel_temperature = 280;
@@ -30,10 +30,12 @@ const double reaction_rate_t0 = 2.0; // TODO: make these physically accurate
 const double reaction_rate_t1 = 3.5;
 const double max_wind_combustion_boost = 1.5; // n_max
 const double speed_for_max_wind_boost = 1.0; // u_ref
+const double reation_rate_multiplier = 1.5; //Not in paper, added by us
 
+//Voxels
 double ambientTemperatureFunc(glm::dvec3 point);
 
-// forest
-const float woodDensity = 200;
+// trees
+const float woodDensity = 40;
 
 #endif // PHYSICS_H

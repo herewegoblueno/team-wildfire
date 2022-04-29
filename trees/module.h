@@ -88,9 +88,9 @@ private:
 
     double getReactionRateFromPreviousFrame(double windSpeed);
     double sigmoidFunc(double x);
-    double getMassLossDueToBurning(double deltaTimeInMs, VoxelSet &voxels);
+    double getMassChangeDueToBurning(double deltaTimeInMs, VoxelSet &voxels);
     void updateRadiiToReflectMassLoss(double massLoss);
-    double getMassLossRateFromPreviousFrame(double windSpeed);
+    double getMassChangeRateFromPreviousFrame(double windSpeed);
 };
 
 #endif // MODULE_H

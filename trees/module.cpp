@@ -34,24 +34,26 @@ void Module::updateMassAndAreaViaBurning(double deltaTimeInMs, VoxelSet &voxels)
     _currentPhysicalData.mass = 0;
     _currentPhysicalData.area = 0;
     _currentPhysicalData.radiusRatio = _lastFramePhysicalData.radiusRatio;
-    double massLoss = getMassLossDueToBurning(deltaTimeInMs, voxels);
-    updateRadiiToReflectMassLoss(massLoss);
+    double massChange = getMassChangeDueToBurning(deltaTimeInMs, voxels);
+    updateRadiiToReflectMassLoss(massChange);
     for (Branch *branch : _branches) {
         _currentPhysicalData.mass += getBranchMass(branch);
         _currentPhysicalData.area += getBranchLateralSurfaceArea(branch) ;
     }
 }
 
-double Module::getMassLossDueToBurning(double deltaTimeInMs, VoxelSet &voxels){
+double Module::getMassChangeDueToBurning(double deltaTimeInMs, VoxelSet &voxels){
    double windSpeed = 0;
    for (Voxel *v : voxels) windSpeed += length(v->getLastFrameState()->u);
-   return getReactionRateFromPreviousFrame(windSpeed) * deltaTimeInMs / 1000.0;
+   double dMdt = getMassChangeRateFromPreviousFrame(windSpeed);
+   return dMdt * deltaTimeInMs / 1000.0;
 }
 
 //Using something similar to raymarching: reduce the radii bit my bit till you get a good mass below target
-void Module::updateRadiiToReflectMassLoss(double massLoss){
-    if (massLoss == 0 || _lastFramePhysicalData.radiusRatio <= 0) return;
-    double targetMass = std::max(0.0, _lastFramePhysicalData.mass - massLoss);
+void Module::updateRadiiToReflectMassLoss(double massChange){
+    //Assumes actual mass change can only negative
+    if (massChange >= 0 || _lastFramePhysicalData.radiusRatio <= 0) return;
+    double targetMass = std::max(0.0, _lastFramePhysicalData.mass + massChange);
     double testMass;
     do {
         testMass = 0;
@@ -183,10 +185,10 @@ double Module::sigmoidFunc(double x) {
  * Mass loss rate (dM/dt) based on Eq. 1 of Fire in Paradise paper
  * TODO (optional): add char insulation
  */
-double Module::getMassLossRateFromPreviousFrame(double windSpeed) {
+double Module::getMassChangeRateFromPreviousFrame(double windSpeed) {
     double reactionRate = getReactionRateFromPreviousFrame(windSpeed);
     double surfaceArea = getLastFrameState()->area;
-    return -reactionRate * surfaceArea;
+    return -reactionRate * reation_rate_multiplier * surfaceArea;
 }
 
 void Module::updateLastFrameData(){
