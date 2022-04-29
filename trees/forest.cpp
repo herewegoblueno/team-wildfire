@@ -204,6 +204,26 @@ void Forest::initTempOfModules() {
     }
 }
 
+
+void Forest::artificiallyUpdateTemperatureOfModule(int moduleID, double delta){
+    if (_moduleIDs.find(moduleID) != _moduleIDs.end()) {
+        Module *m = _moduleIDs[moduleID];
+        m->getCurrentState()->temperature += delta;
+        m->getLastFrameState()->temperature += delta;
+    }
+}
+
+void Forest::artificiallyUpdateVoxelTemperatureAroundModule(int moduleID, double delta){
+    if (_moduleIDs.find(moduleID) != _moduleIDs.end()) {
+        VoxelSet voxs = _moduleToVoxels[_moduleIDs[moduleID]];
+        for (Voxel *v : voxs){
+            v->getCurrentState()->temperature += delta;
+            v->getLastFrameState()->temperature += delta;
+        }
+    }
+}
+
+
 /** Init mass of each module based on its branches */
 void Forest::initMassAndAreaOfModules() {
     for (Module *module : _modules) {

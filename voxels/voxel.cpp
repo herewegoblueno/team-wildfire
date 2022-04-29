@@ -82,7 +82,6 @@ double Voxel::getNeighbourTemperature(int xOffset, int yOffset, int zOffset){
     double zGradient = (temperatureForward - temperatureBack) / (cellSize * 2);
     dvec3 gradient = dvec3(xGradient, yGradient, zGradient);
 
-
     //calculating the ∇^2T (laplace)
     double rateOfChangeOfYGradient = (temperatureTop - temperatureMiddle) - (temperatureMiddle - temperatureBottom);
     rateOfChangeOfYGradient /= pow(cellSize, 2) * 2;

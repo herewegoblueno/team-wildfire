@@ -202,3 +202,7 @@ void BasicForestScene::settingsChanged() {
      _voxelGrid.getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeVectorField);
      _voxelGrid.getVisualization()->updateValuesFromSettings();
 }
+
+Forest * BasicForestScene::getForest(){
+    return _forest.get();
+}

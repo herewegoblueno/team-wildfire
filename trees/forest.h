@@ -20,6 +20,8 @@ public:
     void updateModuleVoxelMapping();
     void updateMassAndAreaOfModules();
     void updateMassOfVoxels();
+    void artificiallyUpdateTemperatureOfModule(int moduleID, double delta);
+    void artificiallyUpdateVoxelTemperatureAroundModule(int moduleID, double delta);
 
     VoxelSet getVoxelsMappedToModule(Module *m);
     Module *getModuleFromId(int id);

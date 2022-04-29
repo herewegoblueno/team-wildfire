@@ -12,6 +12,7 @@
 #include <chrono>
 #include "voxels/voxelgridline.h"
 #include "trees/module.h"
+#include "support/scenegraph/BasicForestScene.h"
 
 using namespace std::chrono;
 
@@ -52,12 +53,20 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->visualizationTemperatureRangeSlider->setValues(settings.visualizeForestVoxelGridMinTemp * 10, settings.visualizeForestVoxelGridMaxTemp * 10);
 
     ui->FieldVisOptionsDropbox->setCurrentIndex(settings.vectorGridMode);
+    auto explanation = VoxelGridLine::getVectorFieldModeExplanation(static_cast<VectorFieldVisualizationModes>(settings.vectorGridMode));
+    ui->VectorFieldExplanation->setText(QString::fromStdString(explanation));
+
     ui->VoxelVisOptionsDropbox->setCurrentIndex(settings.voxelGridMode);
+    explanation = VoxelGridLine::getVoxelFieldModeExplanation(static_cast<VoxelVisualizationModes>(settings.voxelGridMode));
+    ui->VoxelModeExplanation->setText(QString::fromStdString(explanation));
+
     ui->ModuleVisModeParentOptions->setCurrentIndex(settings.moduleVisualizationMode);
     ui->seeBranchModules->setChecked(settings.seeBranchModules);
 
+    ui->PausedWarning->hide();
     ui->TimescaleSlider->setRange(0, 20);
     ui->TimescaleSlider->setValue(settings.simulatorTimescale * 10);
+
 
     #ifdef QT_DEBUG
       ui->DebugBuildWarning->show();
@@ -110,6 +119,7 @@ void MainWindow::notifyFrameCompleted(){
     }
 }
 
+//We don't actually use any primitves from the .xml, but it does set some lighing and camera settings
 void MainWindow::openXmlFileForForestScene(QString file) {
     if (!file.isNull()) {
         if (file.endsWith(".xml")) {
@@ -259,6 +269,8 @@ void MainWindow::on_TimescaleSlider_valueChanged(int value)
 {
     settings.simulatorTimescale = value / 10.f;
     ui->timescaleValue->setText(QString::number(value / 10.f));
+    if (value == 0) ui->PausedWarning->show();
+    else ui->PausedWarning->hide();
 }
 
 
@@ -297,5 +309,39 @@ void MainWindow::on_ModuleVisModeParentOptions_currentIndexChanged(int index)
 {
     settings.moduleVisualizationMode = static_cast<ModuleVisualizationModes>(index);
     signalSettingsChanged();
+}
+
+
+void MainWindow::on_ChangeModuleTempIncrease_clicked()
+{
+    if (settings.selectedModuleId == DEFAULT_MODULE_ID) return;
+    m_canvas3D->getForestScene()->getForest()->artificiallyUpdateTemperatureOfModule(settings.selectedModuleId, 5);
+}
+
+
+void MainWindow::on_ChangeModuleTempDecrease_clicked()
+{
+    if (settings.selectedModuleId == DEFAULT_MODULE_ID) return;
+    m_canvas3D->getForestScene()->getForest()->artificiallyUpdateTemperatureOfModule(settings.selectedModuleId, -5);
+}
+
+
+void MainWindow::on_ChangeModuleAirTempIncrease_clicked()
+{
+    if (settings.selectedModuleId == DEFAULT_MODULE_ID) return;
+    m_canvas3D->getForestScene()->getForest()->artificiallyUpdateVoxelTemperatureAroundModule(settings.selectedModuleId, 5);
+}
+
+
+void MainWindow::on_ChangeModuleAirTempDecrease_clicked()
+{
+    if (settings.selectedModuleId == DEFAULT_MODULE_ID) return;
+    m_canvas3D->getForestScene()->getForest()->artificiallyUpdateVoxelTemperatureAroundModule(settings.selectedModuleId, -5);
+}
+
+
+void MainWindow::on_pauseTimescaleButton_clicked()
+{
+   ui->TimescaleSlider->setValue(0);
 }
 

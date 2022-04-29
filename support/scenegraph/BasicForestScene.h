@@ -34,6 +34,8 @@ public:
     virtual void render(SupportCanvas3D *context) override;
     virtual void settingsChanged() override;
 
+    Forest *getForest();
+
 private:
     void updatePrimitivesFromForest();
 
