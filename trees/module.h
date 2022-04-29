@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include "glm/glm.hpp"
 #include "simulation/physics.h"
+#include "voxels/voxelgrid.h"
 
 const float branchWidthDecay = 0.7; // Amount to scale x, z size of each successive iteration
 
@@ -70,11 +71,10 @@ public:
 
     glm::dvec3 getCenter() const;
     void initMassAndArea();
-    void updateMassAndAreaViaBurning(double deltaTimeInMs);
+    void updateMassAndAreaViaBurning(double deltaTimeInMs, VoxelSet &voxels);
     ModulePhysicalData *getCurrentState();
     ModulePhysicalData *getLastFrameState();
 
-    double getMassLossRateFromPreviousFrame(double windSpeed);
     double getTemperatureLaplaceFromPreviousFrame();
     void updateLastFrameData();
 
@@ -88,8 +88,9 @@ private:
 
     double getReactionRateFromPreviousFrame(double windSpeed);
     double sigmoidFunc(double x);
-    double getMassLossDueToBurning(double deltaTimeInMs);
+    double getMassLossDueToBurning(double deltaTimeInMs, VoxelSet &voxels);
     void updateRadiiToReflectMassLoss(double massLoss);
+    double getMassLossRateFromPreviousFrame(double windSpeed);
 };
 
 #endif // MODULE_H

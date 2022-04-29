@@ -34,6 +34,6 @@ const double speed_for_max_wind_boost = 1.0; // u_ref
 double ambientTemperatureFunc(glm::dvec3 point);
 
 // forest
-const float woodDensity = 1;
+const float woodDensity = 200;
 
 #endif // PHYSICS_H

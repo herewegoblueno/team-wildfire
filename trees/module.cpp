@@ -30,11 +30,11 @@ void Module::initMassAndArea() {
 }
 
 /** Update mass and surface area of module based on branches (will only change due to burning) */
-void Module::updateMassAndAreaViaBurning(double deltaTimeInMs) {
+void Module::updateMassAndAreaViaBurning(double deltaTimeInMs, VoxelSet &voxels) {
     _currentPhysicalData.mass = 0;
     _currentPhysicalData.area = 0;
     _currentPhysicalData.radiusRatio = _lastFramePhysicalData.radiusRatio;
-    double massLoss = getMassLossDueToBurning(deltaTimeInMs);
+    double massLoss = getMassLossDueToBurning(deltaTimeInMs, voxels);
     updateRadiiToReflectMassLoss(massLoss);
     for (Branch *branch : _branches) {
         _currentPhysicalData.mass += getBranchMass(branch);
@@ -42,8 +42,10 @@ void Module::updateMassAndAreaViaBurning(double deltaTimeInMs) {
     }
 }
 
-double Module::getMassLossDueToBurning(double deltaTimeInMs){
-   return getReactionRateFromPreviousFrame() * deltaTimeInMs / 1000.0;
+double Module::getMassLossDueToBurning(double deltaTimeInMs, VoxelSet &voxels){
+   double windSpeed = 0;
+   for (Voxel *v : voxels) windSpeed += length(v->getLastFrameState()->u);
+   return getReactionRateFromPreviousFrame(windSpeed) * deltaTimeInMs / 1000.0;
 }
 
 //Using something similar to raymarching: reduce the radii bit my bit till you get a good mass below target
@@ -53,7 +55,7 @@ void Module::updateRadiiToReflectMassLoss(double massLoss){
     double testMass;
     do {
         testMass = 0;
-        _currentPhysicalData.radiusRatio -= 0.01;
+        _currentPhysicalData.radiusRatio -= 0.0001;
         if (_currentPhysicalData.radiusRatio < 0) _currentPhysicalData.radiusRatio = 0;
         for (Branch *branch : _branches) testMass += getBranchMass(branch);
     }
@@ -161,6 +163,8 @@ double Module::getReactionRateFromPreviousFrame(double windSpeed) {
     if (moduleTemp > reaction_rate_t1) return 1.0;
     double tempRatio = (moduleTemp - reaction_rate_t0) / (reaction_rate_t1 - reaction_rate_t0);
     double rate = sigmoidFunc(tempRatio);
+
+    //TODO: double check this
     windSpeed = std::min(windSpeed, speed_for_max_wind_boost);
     double windBoost = (max_wind_combustion_boost - 1.0)
             * sigmoidFunc(windSpeed / speed_for_max_wind_boost) + 1.0;
@@ -181,9 +185,8 @@ double Module::sigmoidFunc(double x) {
  */
 double Module::getMassLossRateFromPreviousFrame(double windSpeed) {
     double reactionRate = getReactionRateFromPreviousFrame(windSpeed);
-    double moduleTemp = getLastFrameState()->temperature;
     double surfaceArea = getLastFrameState()->area;
-    return -reactionRate * moduleTemp * surfaceArea;
+    return -reactionRate * surfaceArea;
 }
 
 void Module::updateLastFrameData(){

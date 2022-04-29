@@ -233,7 +233,7 @@ void Forest::initMassAndAreaOfModules() {
 
 void Forest::updateMassAndAreaOfModulesViaBurning(double deltaTimeInMs){
     for (Module *module : _modules) {
-        module->updateMassAndAreaViaBurning(deltaTimeInMs);
+        module->updateMassAndAreaViaBurning(deltaTimeInMs, _moduleToVoxels[module]);
     }
 }
 
