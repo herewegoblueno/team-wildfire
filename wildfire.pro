@@ -3,7 +3,6 @@ TARGET = wildfire
 TEMPLATE = app
 
 QMAKE_CXXFLAGS += -std=c++14
-QMAKE_CXXFLAGS += -I "../eigen-master"
 CONFIG += c++14
 
 unix:!macx {
@@ -172,3 +171,9 @@ RESOURCES += \
 
 DISTFILES += \
     xmlScenes/basicScene.xml
+
+# For Eigen, see readme for more details
+HOME_DIR = $$(HOME)
+QMAKE_CXXFLAGS = -I "$${HOME_DIR}/eigen-git-mirror"
+INCLUDEPATH += "$${HOME_DIR}/eigen-git-mirror"
+DEPENDPATH += "$${HOME_DIR}/eigen-git-mirror"
