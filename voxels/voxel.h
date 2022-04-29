@@ -68,6 +68,10 @@ double get_q_ux(Voxel* v);
 double get_q_uy(Voxel* v);
 double get_q_uz(Voxel* v);
 
+double get_ux(Voxel* v);
+double get_uy(Voxel* v);
+double get_uz(Voxel* v);
+
 double get_q_v(Voxel* v);
 double get_q_c(Voxel* v);
 double get_q_r(Voxel* v);

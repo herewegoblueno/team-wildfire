@@ -163,6 +163,10 @@ double get_q_ux(Voxel* v) {return v->getLastFrameState()->u.x;}
 double get_q_uy(Voxel* v) {return v->getLastFrameState()->u.y;}
 double get_q_uz(Voxel* v) {return v->getLastFrameState()->u.z;}
 
+double get_ux(Voxel* v) {return v->getCurrentState()->u.x;}
+double get_uy(Voxel* v) {return v->getCurrentState()->u.y;}
+double get_uz(Voxel* v) {return v->getCurrentState()->u.z;}
+
 double get_q_v(Voxel* v) {return v->getLastFrameState()->q_v;}
 double get_q_c(Voxel* v) {return v->getLastFrameState()->q_c;}
 double get_q_r(Voxel* v) {return v->getLastFrameState()->q_r;}

@@ -43,7 +43,7 @@ private:
 
     // wind related equation
     static glm::dvec3 verticity_confinement(glm::dvec3 u, Voxel* v, double time);
-    static glm::dvec3 pressure_projection(glm::dvec3 u, Voxel* v, double time);
+    static void pressure_projection(VoxelGrid *grid, double time, int resolution);
 
 };
 

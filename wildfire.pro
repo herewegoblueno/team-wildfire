@@ -3,6 +3,7 @@ TARGET = wildfire
 TEMPLATE = app
 
 QMAKE_CXXFLAGS += -std=c++14
+QMAKE_CXXFLAGS += -I "../eigen-master"
 CONFIG += c++14
 
 unix:!macx {
@@ -141,7 +142,7 @@ HEADERS += ui/mainwindow.h \
     voxels/voxelgridline.h
 
 FORMS += ui/mainwindow.ui
-INCLUDEPATH += glm ui glew-1.10.0/include
+INCLUDEPATH += glm ui glew-1.10.0/include ../eigen-master
 DEPENDPATH += glm ui glew-1.10.0/include
 
 DEFINES += _USE_MATH_DEFINES
