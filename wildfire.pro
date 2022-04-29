@@ -173,7 +173,14 @@ DISTFILES += \
     xmlScenes/basicScene.xml
 
 # For Eigen, see readme for more details
-HOME_DIR = $$(HOME)
+macx {
+    HOME_DIR = $$(HOME)
+}
+
+win32 {
+    HOME_DIR = $$(HOMEPATH)
+}
+
 QMAKE_CXXFLAGS = -I "$${HOME_DIR}/eigen-git-mirror"
 INCLUDEPATH += "$${HOME_DIR}/eigen-git-mirror"
 DEPENDPATH += "$${HOME_DIR}/eigen-git-mirror"
