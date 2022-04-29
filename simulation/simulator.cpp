@@ -25,6 +25,10 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
 
     if (forest != nullptr){ //Forest is optional
         forest->updateMassAndAreaOfModules();
+        for (Module *m : forest->getModules()) {
+            VoxelSet surroundingAir = forest->getVoxelsMappedToModule(m);
+            stepModuleHeatTransfer(m, surroundingAir, deltaTime);
+        }
         //<TODO: Temperature changes, burning, and Radii updates should be here>
         //<TODO: water content of modules should go here>
         forest->updateMassOfVoxels();

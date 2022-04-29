@@ -82,6 +82,56 @@ double Module::getBranchVolume(Branch *branch) const {
     return (M_PI / 3.0)* l * (r0*r0 + r0*r1 + r1*r1);
 }
 
+/**
+ * Compute Laplace based on temperature gradients between this<->parent and this<->children.
+ * If this module is missing children or parent, we use this module's temperature as a
+ * replacement value, essentially padding the module tree with another equi-temperature module.
+ */
+double Module::getTemperatureLaplaceFromPreviousFrame() {
+    double thisTemp = getLastFrameState()->temperature;
+    dvec3 thisCenter = getCenter();
+    // averages over all children
+    double distToChildren;
+    double childrenTemp;
+    if (_children.size() > 0) {
+        dvec3 childrenCenter = dvec3(0.0);
+        childrenTemp = 0.0;
+        for (Module *child : _children) {
+            childrenTemp += child->getLastFrameState()->temperature;
+            childrenCenter += child->getCenter();
+        }
+        double childrenSize = static_cast<double>(_children.size());
+        childrenTemp = childrenTemp / childrenSize;
+        childrenCenter = childrenCenter / childrenSize;
+        distToChildren = length(childrenCenter - thisCenter);
+    } else {
+        childrenTemp = thisTemp;
+        distToChildren = 0;
+    }
+
+    double parentTemp;
+    double distToParent;
+    if (_parent != nullptr) {
+        parentTemp = _parent->getLastFrameState()->temperature;
+        distToParent = length(thisCenter - _parent->getCenter());
+    } else {
+        parentTemp = thisTemp;
+        distToParent = 0;
+    }
+
+    // if missing parent or children, approximate total distance
+    // by using the non-missing value twice
+    if (!distToParent) {
+        distToParent = distToChildren;
+    } else if (!distToChildren) {
+        distToChildren = distToParent;
+    }
+
+    double childrenDeriv = (childrenTemp - thisTemp) / distToChildren;
+    double parentDeriv = (thisTemp - parentTemp) / distToParent;
+    return (childrenDeriv - parentDeriv) / (distToChildren + distToParent);
+}
+
 void Module::updateLastFrameData(){
     _lastFramePhysicalData = _currentPhysicalData;
 }

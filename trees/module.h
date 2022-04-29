@@ -74,6 +74,7 @@ public:
     ModulePhysicalData *getCurrentState();
     ModulePhysicalData *getLastFrameState();
 
+    double getTemperatureLaplaceFromPreviousFrame();
     void updateLastFrameData();
 
 private:

@@ -26,6 +26,7 @@ public:
     VoxelSet getVoxelsMappedToModule(Module *m);
     Module *getModuleFromId(int id);
     std::vector<int> getAllModuleIDs();
+    ModuleSet getModules();
 
     void updateLastFrameDataOfModules();
     void deleteDeadModules();

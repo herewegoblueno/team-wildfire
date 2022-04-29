@@ -22,6 +22,8 @@ const float gravity_acceleration = 9.8;
 // heat transfer
 const double HEAT_DIFFUSION_INTENSITY_TERM = 0.02; //alpha
 const double RADIATIVE_COOLING_TERM = 0.01; //gamma
+const double adjacent_module_diffusion = 0.04; // alpha_M
+const double module_air_diffusion = 0.04; // b
 
 double ambientTemperatureFunc(glm::dvec3 point);
 

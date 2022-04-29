@@ -30,6 +30,7 @@ private:
     void stepVoxelWater(Voxel* v, int deltaTimeInMs);
     void stepVoxelWind(Voxel* v, int deltaTimeInMs);
 
+    void stepModuleHeatTransfer(Module *m, VoxelSet surroundingAir, int deltaTimeInMs);
 
     // water particle related equation
     static double advect(double field, glm::dvec3 vel, glm::dvec3 field_grad, double dt);
