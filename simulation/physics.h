@@ -25,6 +25,10 @@ const double RADIATIVE_COOLING_TERM = 0.01; //gamma
 const double adjacent_module_diffusion = 0.04; // alpha_M
 const double module_air_diffusion = 0.04; // b
 
+// combustion
+const double reaction_rate_t0 = 2.0; // TODO: make these physically accurate
+const double reaction_rate_t1 = 3.5;
+
 double ambientTemperatureFunc(glm::dvec3 point);
 
 // forest

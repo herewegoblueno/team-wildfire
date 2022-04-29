@@ -132,6 +132,30 @@ double Module::getTemperatureLaplaceFromPreviousFrame() {
     return (childrenDeriv - parentDeriv) / (distToChildren + distToParent);
 }
 
+/** Reaction rate based on module temperature */
+double Module::getReactionRateFromPreviousFrame() {
+    double moduleTemp = getLastFrameState()->temperature;
+    if (moduleTemp < reaction_rate_t0) return 0.0;
+    if (moduleTemp > reaction_rate_t1) return 1.0;
+    double x = (moduleTemp - reaction_rate_t0) / (reaction_rate_t1 - reaction_rate_t0);
+    return sigmoidFunc(x);
+}
+
+/** Sigmoid-like function for interpolation in reaction rate calculations */
+double Module::sigmoidFunc(double x) {
+    return 3*std::pow(x, 2) - 2*std::pow(x, 3);
+}
+
+/**
+ * Mass loss rate (dM/dt) based on Eq. 1 of Fire in Paradise paper
+ * TODO (optional): add char insulation and pyrolyzing front area terms
+ */
+double Module::getMassLossRateFromPreviousFrame() {
+    double reactionRate = getReactionRateFromPreviousFrame();
+    double moduleTemp = getLastFrameState()->temperature;
+    return -reactionRate * moduleTemp;
+}
+
 void Module::updateLastFrameData(){
     _lastFramePhysicalData = _currentPhysicalData;
 }
