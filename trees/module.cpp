@@ -98,7 +98,7 @@ double Module::getBranchLateralSurfaceArea(Branch *branch) const {
     double l = branch->length;
     double r0 = branch->radius * _currentPhysicalData.radiusRatio;
     double r1 = r0 * branchWidthDecay;
-    return (M_PI) * (r0 + r1) * std::sqrt(pow(r0 - r1, 2) + pow(l, 2));
+    return (M_PI) * (r0 + r1) * std::sqrt(std::pow(r0 - r1, 2) + std::pow(l, 2));
 }
 
 double Module::getBranchVolume(Branch *branch) const {

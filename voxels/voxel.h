@@ -18,9 +18,9 @@ struct VoxelPhysicalData {
     dvec3 u = dvec3(0,0,0);  // velocity field
 
     // water coefs
-    float q_v = 0; // water vapor
-    float q_c = 0; // condensed water
-    float q_r = 0; // rain (ignore for now)
+    double q_v = 0.8; // water vapor
+    double q_c = 0.2; // condensed water
+    double q_r = 0; // rain (ignore for now)
 };
 
 struct VoxelTemperatureGradientInfo {

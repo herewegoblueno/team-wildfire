@@ -41,7 +41,7 @@ Fire::Fire(int density, glm::vec3 center, float size, VoxelGrid* grid):
         float vec_x = (rand() % 100 - 50)/ 150.0f * (1-vec_y);
         float vec_z = (rand() % 100 - 50)/ 150.0f * (1-vec_y);
         m_particles.push_back(Particle());
-        m_poss.push_back(glm::vec3(random_x, random_y, random_z));
+        m_poss.push_back(glm::vec3(random_x, random_y*0.2, random_z));
         m_vels.push_back(glm::vec3(vec_x, vec_y*0.3, vec_z));
     }
     //set respawn rate based on given density
@@ -115,12 +115,12 @@ void Fire::update_particles()
             float te = p.Temp;
 
             glm::vec3 u = vec3(vox->u);
-            float c_dis = glm::distance(p.Position, m_center)+0.001f;
-            u = glm::normalize(p.Position + glm::vec3(0,1,0) - m_center)*std::min(0.05f+0.2f/c_dis, 0.1f);
+//            float c_dis = glm::distance(p.Position, m_center)+0.001f;
+//            u = glm::normalize(p.Position + glm::vec3(0,1,0) - m_center)*std::min(0.05f+0.2f/c_dis, 0.1f);
 
-            glm::vec3 b = -thermal_expansion*gravity*(p.Temp - ambient_T); // Buoyancy
+            glm::vec3 b = thermal_expansion*glm::vec3(0, gravity_acceleration, 0)*(p.Temp - ambient_T); // Buoyancy
 
-            p.Position += (b+u) * fire_frame_rate;
+            p.Position += u * fire_frame_rate;
 
             if(isnan(p.Position.x))
             {
@@ -129,11 +129,11 @@ void Fire::update_particles()
                 cout << "crash loop";
             }
 
-            glm::vec3 adjust_vec = p.Position - m_center;
-            adjust_vec.y = adjust_vec.y*0.5;
-            float adjust_len = glm::length(adjust_vec);
-            float neighbor_temp = 5 + 10*std::exp(-0.5*adjust_len*adjust_len/0.005);
-            p.Temp = alpha_temp*p.Temp + beta_temp*(neighbor_temp + ambient_T);
+//            glm::vec3 adjust_vec = p.Position - m_center;
+//            adjust_vec.y = adjust_vec.y*0.5;
+//            float adjust_len = glm::length(adjust_vec);
+//            float neighbor_temp = 5 + 10*std::exp(-0.5*adjust_len*adjust_len/0.005);
+            p.Temp = alpha_temp*p.Temp + beta_temp*(ambient_T);
 
             if(p.Life < fire_frame_rate*1.5 || p.Temp < 10)
             {

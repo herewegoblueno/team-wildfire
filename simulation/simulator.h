@@ -5,6 +5,7 @@
 #include "voxels/voxelgrid.h"
 #include "physics.h"
 #include "trees/forest.h"
+#include <Eigen/Sparse>
 
 using namespace std::chrono;
 
@@ -18,6 +19,7 @@ public:
     Simulator();
     void init();
     void step(VoxelGrid *grid, Forest *forest = nullptr);
+    void linear_step(VoxelGrid *grid, Forest *forest = nullptr);
     void cleanupForNextStep(VoxelGrid *grid, Forest *forest = nullptr);
 
 
@@ -27,13 +29,13 @@ private:
     void stepCleanupThreadHandler(VoxelGrid *grid, Forest *forest, int resolution, int minX, int maxX);
 
     void stepVoxelHeatTransfer(Voxel* v, int deltaTimeInMs);
-    void stepVoxelWater(Voxel* v, int deltaTimeInMs);
-    void stepVoxelWind(Voxel* v, int deltaTimeInMs);
+    void stepVoxelWater(Voxel* v, double deltaTimeInMs);
+    void stepVoxelWind(Voxel* v, double deltaTimeInMs);
 
     void stepModuleHeatTransfer(Module *m, VoxelSet surroundingAir, int deltaTimeInMs);
 
     // water particle related equation
-    static double advect(double field, glm::dvec3 vel, glm::dvec3 field_grad, double dt);
+    static double advect(double (*func)(Voxel *), glm::dvec3 vel, double dt, Voxel* v);
     static double saturate(double pressure, double temperature);
     static double absolute_temp(double height);
     static double absolute_pres(double height);
@@ -44,7 +46,9 @@ private:
 
     // wind related equation
     static glm::dvec3 verticity_confinement(glm::dvec3 u, Voxel* v, double time);
-    static void pressure_projection(VoxelGrid *grid, double time, int resolution);
+    static void pressure_projection_LLT(VoxelGrid *grid, double time);
+    static void pressure_projection_PCG(VoxelGrid *grid, double time);
+    static void pressure_projection_Jacobi(VoxelGrid *grid, double time);
 
 };
 

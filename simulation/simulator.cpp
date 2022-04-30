@@ -50,6 +50,39 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
     }
 }
 
+
+void Simulator::linear_step(VoxelGrid *grid, Forest *forest)
+{
+    milliseconds currentTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+    double deltaTime = (currentTime - timeLastFrame).count();
+    if (deltaTime > 100) deltaTime = 100;
+    deltaTime *= 0.01;
+    timeLastFrame = currentTime;
+    if (deltaTime == 0) return; //Don't bother doing anything
+
+    int gridResolution = grid->getResolution();
+
+    for (int x = 0; x < gridResolution; x++){
+        for (int y = 0; y < gridResolution; y++){
+            for (int z = 0; z < gridResolution; z++){
+                stepVoxelHeatTransfer(grid->getVoxel(x, y, z), deltaTime);
+                stepVoxelWind(grid->getVoxel(x, y, z), deltaTime);
+            }
+        }
+    }
+
+    pressure_projection_Jacobi(grid, deltaTime);
+
+    for (int x = 0; x < gridResolution; x++){
+        for (int y = 0; y < gridResolution; y++){
+            for (int z = 0; z < gridResolution; z++){
+                stepVoxelWater(grid->getVoxel(x, y, z), deltaTime);
+            }
+        }
+    }
+
+}
+
 void Simulator::stepThreadHandler(VoxelGrid *grid ,Forest *, int deltaTime, int resolution, int minXInclusive, int maxXExclusive){
     for (int x = minXInclusive; x < maxXExclusive; x++){
         for (int y = 0; y < resolution; y++){

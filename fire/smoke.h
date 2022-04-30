@@ -7,7 +7,7 @@
 
 #include "GL/glew.h"
 #include <glm.hpp>
-
+#include "../simulation/physics.h"
 #include "particle.h"
 
 namespace CS123 { namespace GL {
