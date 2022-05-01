@@ -3,10 +3,12 @@
 DESTDIR = ../bin
 CUDA_OBJECTS_DIR = ./
 
-OTHER_FILES += \
-    $$PWD/jacobi.cu
+#OTHER_FILES += \
+#    $$PWD/jacobi.cu \
+#    $$PWD/base_op.cu
 CUDA_SOURCES += \
-    $$PWD/jacobi.cu
+    $$PWD/jacobi.cu \
+    $$PWD/base_op.cu
 
 # MSVCRT link option (static or dynamic, it must be the same with your Qt SDK link option)
 MSVCRT_LINK_FLAG_DEBUG   = "/MDd"
@@ -78,4 +80,5 @@ win32 {
     }
 
 }
+
 

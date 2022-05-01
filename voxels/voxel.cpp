@@ -120,6 +120,30 @@ dvec3 Voxel::getGradient(double (*func)(Voxel *))
     return gradient;
 }
 
+dvec3 Voxel::getVelGradient()
+{
+    Voxel *vox = getVoxelWithIndexOffset(vec3(0,1,0));
+    double temperatureTop = vox == nullptr ? 0 : get_uy(vox);
+    vox = getVoxelWithIndexOffset(vec3(0,-1,0));
+    double temperatureBottom = vox == nullptr ? 0 : get_uy(vox);
+    vox = getVoxelWithIndexOffset(vec3(1,0,0));
+    double temperatureRight = vox == nullptr ? 0 : get_ux(vox);
+    vox = getVoxelWithIndexOffset(vec3(-1,0,0));
+    double temperatureLeft = vox == nullptr ? 0 : get_ux(vox);
+    vox = getVoxelWithIndexOffset(vec3(0,0,1));
+    double temperatureForward = vox == nullptr ? 0 : get_uz(vox);
+    vox = getVoxelWithIndexOffset(vec3(0,0,-1));
+    double temperatureBack = vox == nullptr ? 0 : get_uz(vox);
+
+    float cellSize = grid->cellSideLength();
+
+    double yGradient = (temperatureTop - temperatureBottom) / (cellSize * 2);
+    double xGradient = (temperatureRight - temperatureLeft) / (cellSize * 2);
+    double zGradient = (temperatureForward - temperatureBack) / (cellSize * 2);
+    dvec3 gradient = dvec3(xGradient, yGradient, zGradient);
+    return gradient;
+}
+
 
 double Voxel::getLaplace(double (*func)(Voxel *))
 {

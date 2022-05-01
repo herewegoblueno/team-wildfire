@@ -49,6 +49,7 @@ public:
     double getAmbientTemperature();
 
     dvec3 getGradient(double (*func)(Voxel *));
+    dvec3 getVelGradient();
     double getLaplace(double (*func)(Voxel *));
     dvec3 getVerticity();
 

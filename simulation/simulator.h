@@ -25,16 +25,19 @@ public:
 private:
     milliseconds timeLastFrame;
     void stepThreadHandler(VoxelGrid *grid, Forest *forest, int deltaTime, int resolution, int minX, int maxX);
+    void stepThreadHandlerWind(VoxelGrid *grid, Forest *forest, int deltaTime, int resolution, int minX, int maxX, double* mat_A, double* dvg);
+    void stepThreadHandlerWater(VoxelGrid *grid, Forest *forest, int deltaTime, int resolution, int minX, int maxX);
     void stepCleanupThreadHandler(VoxelGrid *grid, Forest *forest, int resolution, int minX, int maxX);
 
     void stepVoxelHeatTransfer(Voxel* v, int deltaTimeInMs);
-    void stepVoxelWater(Voxel* v, int deltaTimeInMs);
-    void stepVoxelWind(Voxel* v, int deltaTimeInMs);
+    void stepVoxelWater(Voxel* v, double deltaTimeInMs);
+    void stepVoxelWind(Voxel* v, double deltaTimeInMs);
 
     void stepModuleHeatTransfer(Module *m, VoxelSet surroundingAir, int deltaTimeInMs);
 
     // water particle related equation
-    static double advect(double field, glm::dvec3 vel, glm::dvec3 field_grad, double dt);
+    static double advect(double (*func)(Voxel *), glm::dvec3 vel, double dt, Voxel* v);
+    static dvec3  advect_vel(glm::dvec3 vel, double dt, Voxel* v);
     static double saturate(double pressure, double temperature);
     static double absolute_temp(double height);
     static double absolute_pres(double height);
@@ -48,7 +51,7 @@ private:
     static void pressure_projection_LLT(VoxelGrid *grid, double time);
     static void pressure_projection_PCG(VoxelGrid *grid, double time);
     static void pressure_projection_Jacobi(VoxelGrid *grid, double time);
-    static void pressure_projection_Jacobi_cuda(VoxelGrid *grid, double time);
+    static void pressure_projection_Jacobi_cuda(double* A_mat, double* dvg, int N, int Ni, int iter);
 //    void jacobi_cuda();
 
 };
