@@ -1,8 +1,8 @@
-#include "BasicFireScene.h"
 #include "GL/glew.h"
 #include <QGLWidget>
 #include "support/camera/Camera.h"
 
+#include "BasicFireScene.h"
 #include "support/Settings.h"
 #include "support/scenegraph/SupportCanvas3D.h"
 #include "support/lib/ResourceLoader.h"
@@ -12,10 +12,11 @@
 #include "support/shapes/Leaf.h"
 
 #include <chrono>
+#include <iostream>
+
 using namespace std::chrono;
 using namespace CS123::GL;
 
-#include <iostream>
 
 BasicFireScene::BasicFireScene():
      voxelGrids(8, vec3(0,0,0), 60)
@@ -61,7 +62,7 @@ std::vector<std::unique_ptr<CS123Shader>> *BasicFireScene::getShaderPrograms(){
 }
 
 void BasicFireScene::render(SupportCanvas3D *context) {
-    simulator.step(&voxelGrids);
+    simulator.linear_step(&voxelGrids);
 
     glClearColor(0.2, 0.2, 0.2, 0.3);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -119,13 +120,6 @@ void BasicFireScene::setShaderSceneUniforms(SupportCanvas3D *context) {
     current_shader->setUniform("v", camera->getViewMatrix());
 }
 
-void BasicFireScene::setLights()
-{
-    int size = lightingInformation.size();
-    for (int i = 0; i < size; i++){
-        current_shader->setLight(lightingInformation[i]);
-    }
-}
 
 void BasicFireScene::settingsChanged() {
 

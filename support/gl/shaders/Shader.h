@@ -28,6 +28,7 @@ public:
     Shader& operator=(Shader &&that);
 
 
+
     void setUniform(const std::string &name, float f);
     void setUniform(const std::string &name, const glm::vec2 &vec2);
     void setUniform(const std::string &name, const glm::vec3 &vec3);

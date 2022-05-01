@@ -7,14 +7,17 @@
 #include "support/scenegraph/SupportCanvas3D.h"
 #include "support/lib/ResourceLoader.h"
 
+
+#include "support/gl/shaders/CS123Shader.h"
 #include "support/shapes/Trunk.h"
 #include "support/shapes/Leaf.h"
 
 #include <chrono>
+#include <iostream>
 using namespace std::chrono;
 using namespace CS123::GL;
 
-#include <iostream>
+
 
 BasicForestScene::BasicForestScene(MainWindow *mainWindow):
      _voxelGrid(forestWidth + gridBuffer, vec3(0,0,0), 60),

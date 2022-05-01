@@ -13,6 +13,7 @@
 #include "voxels/voxelgridline.h"
 #include "trees/module.h"
 #include "support/scenegraph/BasicForestScene.h"
+#include "support/scenegraph/BasicFireScene.h"
 
 using namespace std::chrono;
 

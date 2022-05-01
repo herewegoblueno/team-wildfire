@@ -1,13 +1,15 @@
-#include "CS123Shader.h"
-
 #include "support/lib/CS123SceneData.h"
 #include "support/Settings.h"
-
 
 #include "support/gl/GLDebug.h"
 #include <sstream>
 
-namespace CS123 { namespace GL {
+#include "CS123Shader.h"
+
+
+
+
+using namespace CS123::GL;
 
 
 CS123Shader::CS123Shader(const std::string &vertexSource, const std::string &fragmentSource) :
@@ -20,9 +22,10 @@ CS123Shader::CS123Shader(const std::string &vertexSource, const std::string &geo
 {
 }
 
-glm::vec3 toGLMVec3(const CS123SceneColor &c) {
+glm::vec3 toGLMVec3(const glm::vec4 &c) {
     return glm::vec3(c.r, c.g, c.b);
 }
+
 
 void CS123Shader::applyMaterial(const CS123SceneMaterial &material) {
     setUniform("ambient_color", toGLMVec3(material.cAmbient));
@@ -30,6 +33,7 @@ void CS123Shader::applyMaterial(const CS123SceneMaterial &material) {
     setUniform("specular_color", toGLMVec3(material.cSpecular));
     setUniform("shininess", material.shininess);
 }
+
 
 void CS123Shader::setLight(const CS123SceneLightData &light) {
     bool ignoreLight = false;
@@ -65,4 +69,7 @@ void CS123Shader::setLight(const CS123SceneLightData &light) {
 //    setUniformArrayByIndex("lightAttenuations", light.function, light.id);
 }
 
-}}
+
+
+
+

@@ -1,6 +1,7 @@
 #include "voxel.h"
 #include "glm/ext.hpp"
 #include "simulation/physics.h"
+#include "voxelgrid.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 

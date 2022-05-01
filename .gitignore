@@ -17,3 +17,6 @@ Makefile*
 ui_*
 *.user
 
+.qtc_clangd
+Debug
+Release

@@ -20,12 +20,5 @@ struct Particle {
 };
 
 
-const float alpha_temp = 0.98;
-const float beta_temp = 0.02;
-const float burn_coef = 0.1;
-
-const float thermal_expansion = 0.005;
-const glm::vec3 gravity(0,-1,0);
-
 
 #endif

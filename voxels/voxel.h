@@ -1,7 +1,6 @@
 #ifndef VOXEL_H
 #define VOXEL_H
 
-#include "voxelgrid.h"
 #include <glm.hpp>
 
 class VoxelGrid;

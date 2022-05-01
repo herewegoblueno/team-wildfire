@@ -18,6 +18,7 @@ public:
     Simulator();
     void init();
     void step(VoxelGrid *grid, Forest *forest = nullptr);
+    void linear_step(VoxelGrid *grid, Forest *forest = nullptr);
     void cleanupForNextStep(VoxelGrid *grid, Forest *forest = nullptr);
 
 
@@ -44,7 +45,11 @@ private:
 
     // wind related equation
     static glm::dvec3 verticity_confinement(glm::dvec3 u, Voxel* v, double time);
-    static void pressure_projection(VoxelGrid *grid, double time, int resolution);
+    static void pressure_projection_LLT(VoxelGrid *grid, double time);
+    static void pressure_projection_PCG(VoxelGrid *grid, double time);
+    static void pressure_projection_Jacobi(VoxelGrid *grid, double time);
+    static void pressure_projection_Jacobi_cuda(VoxelGrid *grid, double time);
+//    void jacobi_cuda();
 
 };
 

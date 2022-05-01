@@ -7,14 +7,15 @@
 #include "support/gl/datatype/VBO.h"
 #include "support/gl/datatype/VBOAttribMarker.h"
 #include "support/gl/shaders/ShaderAttribLocations.h"
+#include "support/gl/shaders/CS123Shader.h"
 
 
 #include "support/lib/ResourceLoader.h"
-#include "support/gl/shaders/CS123Shader.h"
 #include <glm/gtx/transform.hpp>
 
 #include "fire/fire.h"
 #include "voxels/voxelgrid.h"
+#include "simulation/physics.h"
 
 #include <iostream>
 #include <QImage>
@@ -107,7 +108,7 @@ void Fire::update_particles()
             VoxelPhysicalData* vox = voxel->getCurrentState();
             float ambient_T = vox->temperature;
 
-            if(isnan(ambient_T)) ambient_T = 0;
+            if(std::isnan(ambient_T)) ambient_T = 0;
 
             float x = p.Position.x;
             float y = p.Position.y;
@@ -118,11 +119,11 @@ void Fire::update_particles()
             float c_dis = glm::distance(p.Position, m_center)+0.001f;
             u = glm::normalize(p.Position + glm::vec3(0,1,0) - m_center)*std::min(0.05f+0.2f/c_dis, 0.1f);
 
-            glm::vec3 b = -thermal_expansion*gravity*(p.Temp - ambient_T); // Buoyancy
+            glm::vec3 b = -glm::vec3(0, gravity_acceleration*thermal_expansion, 0)*(p.Temp - ambient_T); // Buoyancy
 
             p.Position += (b+u) * fire_frame_rate;
 
-            if(isnan(p.Position.x))
+            if(std::isnan(p.Position.x))
             {
                 cout << x << " " << y << " " << z << " " << te<< endl << flush;
                 cout << (b+u).x << " " << (b+u).y << " " << (b+u).z << endl << flush;

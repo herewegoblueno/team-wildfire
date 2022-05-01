@@ -12,6 +12,7 @@ class CS123Shader : public Shader {
 public:
     CS123Shader(const std::string &vertexSource, const std::string &fragmentSource);
     CS123Shader(const std::string &vertexSource, const std::string &geometrySource, const std::string &fragmentSource);
+    ~CS123Shader() {}
 
     void applyMaterial(const CS123SceneMaterial &material);
     void setLight(const CS123SceneLightData &light);

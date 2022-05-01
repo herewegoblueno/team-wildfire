@@ -1,5 +1,7 @@
 #include "simulator.h"
 #include <thread>
+#include <chrono>
+#include <iostream>
 #include "support/Settings.h"
 
 const int Simulator::NUMBER_OF_SIMULATION_THREADS = 4;
@@ -47,6 +49,52 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
         //(so the users see the most up to date state)
         forest->updateModuleVoxelMapping();
     }
+}
+
+
+void Simulator::linear_step(VoxelGrid *grid, Forest *forest)
+{
+    milliseconds currentTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+    double deltaTime = (currentTime - timeLastFrame).count();
+    if (deltaTime > 100) deltaTime = 100;
+    deltaTime *= 0.01;
+    timeLastFrame = currentTime;
+    if (deltaTime == 0) return; //Don't bother doing anything
+
+    int gridResolution = grid->getResolution();
+    auto t = std::chrono::high_resolution_clock::now();
+    for (int x = 0; x < gridResolution; x++){
+        for (int y = 0; y < gridResolution; y++){
+            for (int z = 0; z < gridResolution; z++){
+                stepVoxelHeatTransfer(grid->getVoxel(x, y, z), deltaTime);
+            }
+        }
+    }
+    auto Heattime = (double) std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - t).count() / 1000000;
+    t = std::chrono::high_resolution_clock::now();
+    for (int x = 0; x < gridResolution; x++){
+        for (int y = 0; y < gridResolution; y++){
+            for (int z = 0; z < gridResolution; z++){
+                stepVoxelWind(grid->getVoxel(x, y, z), deltaTime);
+            }
+        }
+    }
+    pressure_projection_Jacobi_cuda(grid, deltaTime);
+    auto Windtime = (double) std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - t).count() / 1000000;
+
+    t = std::chrono::high_resolution_clock::now();
+    for (int x = 0; x < gridResolution; x++){
+        for (int y = 0; y < gridResolution; y++){
+            for (int z = 0; z < gridResolution; z++){
+                stepVoxelWater(grid->getVoxel(x, y, z), deltaTime);
+            }
+        }
+    }
+    auto Watertime = (double) std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - t).count() / 1000000;
+    std::cout << "1: " << Heattime << " milliseconds\n" << std::flush;
+    std::cout << "2: " << Windtime << " milliseconds\n" << std::flush;
+    std::cout << "3: " << Watertime << " milliseconds\n" << std::flush;
+
 }
 
 void Simulator::stepThreadHandler(VoxelGrid *grid ,Forest *, int deltaTime, int resolution, int minXInclusive, int maxXExclusive){
