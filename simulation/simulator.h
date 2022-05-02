@@ -31,7 +31,7 @@ private:
                                 double* pressure);
     void stepCleanupThreadHandler(VoxelGrid *grid, Forest *forest, int resolution, int minX, int maxX);
 
-    void stepVoxelHeatTransfer(Voxel* v, int deltaTimeInMs);
+    void stepVoxelHeatTransfer(Voxel* v, double deltaTimeInMs);
     void stepVoxelWater(Voxel* v, double deltaTimeInMs);
     void stepVoxelWind(Voxel* v, double deltaTimeInMs);
 
@@ -50,8 +50,6 @@ private:
 
     // wind related equation
     static glm::dvec3 vorticity_confinement(glm::dvec3 u, Voxel* v, double time);
-    static void pressure_projection_PCG(VoxelGrid *grid, double time);
-    static void pressure_projection_Jacobi(VoxelGrid *grid, double time);
     static void pressure_projection_Jacobi_cuda(double* diag, double* rhs, int* id_xyz, int N, int Ni, int iter);
 //    void jacobi_cuda();
 

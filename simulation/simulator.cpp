@@ -59,7 +59,8 @@ void Simulator::linear_step(VoxelGrid *grid, Forest *forest)
     milliseconds currentTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
     double deltaTime = (currentTime - timeLastFrame).count();
     if (deltaTime > 100) deltaTime = 100;
-    deltaTime *= settings.simulatorTimescale*0.001;
+//    deltaTime *= settings.simulatorTimescale*0.001;
+    deltaTime = 0.001;
     timeLastFrame = currentTime;
     if (deltaTime == 0) return; //Don't bother doing anything
 
@@ -105,7 +106,7 @@ void Simulator::stepThreadHandlerWind(VoxelGrid *grid, Forest *forest, double de
                                       int minXInclusive, int maxXExclusive, double* diag_A, double* rhs, int* id_xyz)
 {
     double cell_size = grid->cellSideLength();
-    double density_term = deltaTime/air_density/cell_size/cell_size;
+    double density_term = deltaTime/0.02/cell_size/cell_size;
     int index, face_num = resolution*resolution;
 //    int cell_num = face_num*resolution;
     for (int x = minXInclusive; x < maxXExclusive; x++){
@@ -120,12 +121,12 @@ void Simulator::stepThreadHandlerWind(VoxelGrid *grid, Forest *forest, double de
                 glm::dvec3 gradient = grid->getVoxel(x,y,z)->getVelGradient();
                 double this_rhs = (gradient.x + gradient.y + gradient.z)/density_term;
 
-//                if(x>resolution-2) diag --;
-//                if(x<1) diag --;
+                if(x>resolution-2) diag --;
+                if(x<1) diag --;
 //                if(y>resolution-2) diag --;
                 if(y<1) diag --;
-//                if(z>resolution-2) diag --;
-//                if(z<1) diag --;
+                if(z>resolution-2) diag --;
+                if(z<1) diag --;
 
                 diag_A[index] = diag;
                 int* i_xyz = id_xyz+index*3;
@@ -165,7 +166,7 @@ void Simulator::stepThreadHandlerWater(VoxelGrid *grid ,Forest *, double deltaTi
                 vox->getCurrentState()->u -= deltaP*(double)deltaTime;
                 if(glm::length(vox->getCurrentState()->u)>100)
                 {
-                    std::cout << "error";
+                    std::cout << "[velocity magnitude error]";
                 }
 //                stepVoxelWater(vox, deltaTime);
             }

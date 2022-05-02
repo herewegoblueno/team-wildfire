@@ -128,13 +128,13 @@ dvec3 Voxel::getVelGradient()
     vox = getVoxelWithIndexOffset(vec3(0,-1,0));
     double temperatureBottom = vox == nullptr ? 0 : get_uy(vox);
     vox = getVoxelWithIndexOffset(vec3(1,0,0));
-    double temperatureRight = vox == nullptr ? getCurrentState()->u.x : get_ux(vox);
+    double temperatureRight = vox == nullptr ? 0 : get_ux(vox);
     vox = getVoxelWithIndexOffset(vec3(-1,0,0));
-    double temperatureLeft = vox == nullptr ? getCurrentState()->u.x : get_ux(vox);
+    double temperatureLeft = vox == nullptr ? 0 : get_ux(vox);
     vox = getVoxelWithIndexOffset(vec3(0,0,1));
-    double temperatureForward = vox == nullptr ? getCurrentState()->u.z : get_uz(vox);
+    double temperatureForward = vox == nullptr ? 0 : get_uz(vox);
     vox = getVoxelWithIndexOffset(vec3(0,0,-1));
-    double temperatureBack = vox == nullptr ? getCurrentState()->u.z : get_uz(vox);
+    double temperatureBack = vox == nullptr ? 0 : get_uz(vox);
 
     float cellSize = grid->cellSideLength();
 

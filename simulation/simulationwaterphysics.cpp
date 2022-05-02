@@ -38,7 +38,7 @@ void Simulator::stepVoxelWater(Voxel* v, double deltaTimeInMs)
     v->getCurrentState()->q_r = q_r;
     if(std::isnan(evp_temp))
     {
-        std::cout << "error";
+        std::cout << "[evaporation temperature error]";
     }
     v->getCurrentState()->temperature += evp_temp;
 }
@@ -57,6 +57,7 @@ glm::dvec3 Simulator::advect_vel(glm::dvec3 vel, double dt, Voxel* v)
 {
     glm::dvec3 pos = v->centerInWorldSpace - vel*dt;
     Voxel* v_trace = v->grid->getVoxelClosestToPoint(glm::vec3(pos[0], pos[1], pos[2]));
+//    VoxelPhysicalData
     if(v_trace==nullptr) return glm::dvec3(0,0,0);
     return v_trace->getLastFrameState()->u;
 }

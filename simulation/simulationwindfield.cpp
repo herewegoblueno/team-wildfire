@@ -29,7 +29,7 @@ void Simulator::stepVoxelWind(Voxel* v, double deltaTimeInMs)
 
     if(std::isnan(u.x))
     {
-        std::cout << "error";
+        std::cout << "[velocity nan error]";
     }
     v->getCurrentState()->u = u;
 }
@@ -40,99 +40,16 @@ dvec3 Simulator::vorticity_confinement(glm::dvec3 u, Voxel* v, double time)
     dvec3 vorticity = v->getVorticity() + 0.000001;
     dvec3 d_vorticity = v->getGradient(get_vorticity_len) + 0.000001;
     d_vorticity = glm::normalize(d_vorticity);
-    dvec3 f_omega = vorticity_epsilon*v->grid->cellSideLength()*glm::cross(d_vorticity, vorticity);
+    dvec3 f_omega = 3*vorticity_epsilon*v->grid->cellSideLength()*glm::cross(d_vorticity, vorticity);
     return u + f_omega*time;
 }
 
-void Simulator::pressure_projection_PCG(VoxelGrid *grid, double time)
-{
-//    int cell_num = A.
-}
+
 
 void Simulator::pressure_projection_Jacobi_cuda(double* diag, double* rhs, int* id_xyz, int N, int Ni, int iter)
 {
     jacobiGPU(diag, rhs, id_xyz, N, Ni, iter);
 }
-
-void Simulator::pressure_projection_Jacobi(VoxelGrid *grid, double time)
-{
-    int resolution = grid->getResolution();
-    int cell_num = resolution*resolution*resolution;
-    int face_num = resolution*resolution;
-    double cell_size = grid->cellSideLength();
-    double density_term = time/air_density/cell_size/cell_size;
-
-    Eigen::SparseMatrix<double> A(cell_num, cell_num);
-    Eigen::SparseMatrix<double> LU(cell_num, cell_num);
-    Eigen::VectorXd d = Eigen::VectorXd(cell_num,1);
-    for(int i=0; i<resolution;i++)
-    {
-        for(int j=0; j<resolution;j++)
-        {
-            for(int k=0; k<resolution;k++)
-            {
-                int index = i*face_num+j*resolution+k;
-                A.insert(index, index) = 6;
-
-                if(i<resolution-1) LU.insert(index, index+face_num) = -1;
-                else A.coeffRef(index, index) --;
-                if(i>0) LU.insert(index, index-face_num) = -1;
-                else A.coeffRef(index, index) --;
-                if(j<resolution-1) LU.insert(index, index+resolution) = -1;
-                else A.coeffRef(index, index) --;
-                if(j>0) LU.insert(index, index-resolution) = -1;
-                else A.coeffRef(index, index) --;
-                if(k<resolution-1) LU.insert(index, index+1) = -1;
-                else A.coeffRef(index, index) --;
-                if(k>0) LU.insert(index, index-1) = -1;
-                else A.coeffRef(index, index) --;
-
-                A.coeffRef(index, index) = 1./A.coeffRef(index, index); // already inverse
-
-                glm::dvec3 gradientX = grid->getVoxel(i,j,k)->getGradient(get_ux);
-                glm::dvec3 gradientY = grid->getVoxel(i,j,k)->getGradient(get_uy);
-                glm::dvec3 gradientZ = grid->getVoxel(i,j,k)->getGradient(get_uz);
-                d[index] = (gradientX.x + gradientY.y + gradientZ.z)/density_term;
-            }
-        }
-    }
-
-    Eigen::VectorXd p = Eigen::VectorXd(cell_num,1);
-    p.setZero();
-
-    for(int iter=0;iter<3;iter++)
-        p = A*(LU*p + d);
-
-    for(int i=0; i<resolution;i++)
-    {
-        for(int j=0; j<resolution;j++)
-        {
-            for(int k=0; k<resolution;k++)
-            {
-                glm::dvec3 deltaP(0,0,0);
-                int index = i*face_num+j*resolution+k;
-                if(i<resolution-1) deltaP.x += p[index+face_num];
-                else deltaP.x += p[index];
-                if(i>0) deltaP.x -= p[index-face_num];
-                else deltaP.x -= p[index];
-                if(j<resolution-1) deltaP.y += p[index+resolution];
-                else deltaP.y += p[index];
-                if(j>0) deltaP.y -= p[index-resolution];
-                else deltaP.y -= p[index];
-                if(k<resolution-1) deltaP.z += p[index+1];
-                else deltaP.z += p[index];
-                if(k>0) deltaP.z -= p[index-1];
-                else deltaP.z -= p[index];
-                grid->getVoxel(i,j,k)->getCurrentState()->u -= deltaP*time;
-            }
-        }
-    }
-}
-
-
-
-
-
 
 
 

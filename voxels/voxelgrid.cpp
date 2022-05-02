@@ -68,10 +68,6 @@ VoxelPhysicalData VoxelGrid::getStateInterpolatePoint(vec3 point){
     int yIndex = static_cast<int>(clamp(floor(distancesToPoint.y / voxelSize), 0.f, float(resolution - 1)));
     int zIndex = static_cast<int>(clamp(floor(distancesToPoint.z / voxelSize), 0.f, float(resolution - 1)));
 
-    if(point.x<minXYZ.x || point.y<minXYZ.y || point.z<minXYZ.z ||
-       point.x>minXYZ.x+axisSize || point.y>minXYZ.y+axisSize || point.z>minXYZ.z+axisSize   )
-        return *getVoxel(xIndex, yIndex, zIndex)->getCurrentState();
-
     VoxelPhysicalData output;
     Voxel* p000 = getVoxel(xIndex, yIndex, zIndex);
     Voxel* p001 = getVoxel(xIndex, yIndex, zIndex+1);
@@ -81,6 +77,9 @@ VoxelPhysicalData VoxelGrid::getStateInterpolatePoint(vec3 point){
     Voxel* p101 = getVoxel(xIndex+1, yIndex, zIndex+1);
     Voxel* p110 = getVoxel(xIndex+1, yIndex+1, zIndex);
     Voxel* p111 = getVoxel(xIndex+1, yIndex+1, zIndex+1);
+    if(p000==nullptr || p001==nullptr || p010==nullptr || p011==nullptr ||
+       p100==nullptr || p101==nullptr || p110==nullptr || p111==nullptr)
+        return *getVoxel(xIndex, yIndex, zIndex)->getCurrentState();
 
     double xd = (point.x - p000->centerInWorldSpace.x)/voxelSize;
     double yd = (point.y - p000->centerInWorldSpace.y)/voxelSize;

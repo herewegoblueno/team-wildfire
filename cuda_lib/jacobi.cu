@@ -34,19 +34,12 @@ __global__ void jacobi(double* x_next, double* A, double* x_now, double* b, int*
         int id_y = xyz[idx*3+1];
         int id_z = xyz[idx*3+2];
 
-        // for water boundary assume boundary pressure is always the same
-        if(id_x > 0)   x_next[idx] += x_now[idx - Res*Res];
-        else x_next[idx] += x_now[idx];
-        if(id_x < Res-1) x_next[idx] += x_now[idx + Res*Res];
-        else x_next[idx] += x_now[idx];
-        if(id_z > 0)   x_next[idx] += x_now[idx - 1];
-        else x_next[idx] += x_now[idx];
-        if(id_z < Res-1) x_next[idx] += x_now[idx + 1];
-        else x_next[idx] += x_now[idx];
-
-        // bottom wall, top air
-        if(id_y > 0)   x_next[idx] += x_now[idx - Res];
-        if(id_y < Res-1) x_next[idx] += x_now[idx + Res];
+        if(id_y > 0)   sigma -= x_now[idx - Res];
+        if(id_y < Res-1) sigma -= x_now[idx + Res];
+        if(id_x > 0)   sigma -= x_now[idx - Res*Res];
+        if(id_x < Res-1) sigma -= x_now[idx + Res*Res];
+        if(id_z > 0)   sigma -= x_now[idx - 1];
+        if(id_z < Res-1) sigma -= x_now[idx + 1];
 
         x_next[idx] = (b[idx] - sigma) / (A[idx]+0.000001);
 //        printf(" (%d: %d, %d, %d) ", idx, id_x, id_y, id_z);

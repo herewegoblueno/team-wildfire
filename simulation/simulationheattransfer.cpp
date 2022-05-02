@@ -4,7 +4,7 @@
 
 //eq 21 in Fire in Paradise paper
 //TODO: add in last 2 terms
-void Simulator::stepVoxelHeatTransfer(Voxel* v, int deltaTimeInMs){
+void Simulator::stepVoxelHeatTransfer(Voxel* v, double deltaTimeInMs){
 
     VoxelTemperatureGradientInfo tempGradientInfo = v->getTemperatureGradientInfoFromPreviousFrame();
     v->getCurrentState()->tempGradientFromPrevState = tempGradientInfo.gradient;
@@ -18,7 +18,7 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, int deltaTimeInMs){
     v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt * deltaTimeInMs / 1000.0;
     if(std::abs(v->getCurrentState()->temperature) > 100)
     {
-        std::cout << "error";
+        std::cout << "[temperature nan error]";
     }
 }
 

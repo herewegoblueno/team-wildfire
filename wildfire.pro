@@ -165,6 +165,7 @@ QMAKE_CXXFLAGS_WARN_ON -= -Waddress -Warray-bounds -Wc++0x-compat -Wchar-subscri
                           -Wsequence-point -Wsign-compare -Wstrict-overflow=1 -Wswitch \
                           -Wtrigraphs -Wuninitialized -Wunused-label -Wunused-variable \
                           -Wvolatile-register-var -Wno-extra
+QMAKE_CXXFLAGS += -Wno-enum-compare
 }
 
 

@@ -19,22 +19,16 @@ using namespace CS123::GL;
 
 
 BasicFireScene::BasicFireScene():
-     voxelGrids(8, vec3(0,0,0), 52)
+     voxelGrids(8, vec3(0,0,0), 40)
 {
     fires.clear();
-    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(-0.8, -0.5, 1.2), 0.6, &voxelGrids) );
+//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, 0, 0), 0.6, &voxelGrids) );
+    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, 0, 1), 5, &voxelGrids) );
+    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, 0, -1), 5, &voxelGrids) );
+    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(-1, -1, 0), 5, &voxelGrids) );
+    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(1, -1, 0), 5, &voxelGrids) );
 
-//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, -1, 0), 0.5, &voxelGrids) );
-//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, -1, 0), 0.6, &voxelGrids) );
-//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, -1, 2), 0.5, &voxelGrids) );
-//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(0, -1, 2), 0.6, &voxelGrids) );
-//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(-0.8, -0.5, 1.2), 0.5, &voxelGrids) );
-//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(1.6, -0.3, -1.2), 0.5, &voxelGrids) );
-//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(1.6, -0.3, -1.2), 0.6, &voxelGrids) );
-//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(2, -0.5, 0.8), 0.5, &voxelGrids) );
-//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(2, -0.5, 0.8), 0.6, &voxelGrids) );
-
-    voxelGrids.getVisualization()->toggle(false, true);
+    voxelGrids.getVisualization()->toggle(true, false);
 
     simulator.init();
     constructShaders();
@@ -62,6 +56,7 @@ std::vector<std::unique_ptr<CS123Shader>> *BasicFireScene::getShaderPrograms(){
 }
 
 void BasicFireScene::render(SupportCanvas3D *context) {
+    voxelGrids.getVisualization()->updateValuesFromSettings();
     simulator.linear_step(&voxelGrids);
 
     glClearColor(0.2, 0.2, 0.2, 0.3);

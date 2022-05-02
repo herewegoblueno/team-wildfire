@@ -20,7 +20,7 @@ using namespace CS123::GL;
 
 
 BasicForestScene::BasicForestScene(MainWindow *mainWindow):
-     _voxelGrid(forestWidth + gridBuffer, vec3(0,0,0), 36),
+     _voxelGrid(forestWidth + gridBuffer, vec3(0,0,0), 28),
      mainWindow(mainWindow)
 {
     loadShaders();
@@ -64,7 +64,6 @@ void BasicForestScene::loadShaders() {
 }
 
 void BasicForestScene::render(SupportCanvas3D *context) {
-    _voxelGrid.getVoxel(18, 18, 18)->getCurrentState()->temperature = 20;
     _simulator.linear_step(&_voxelGrid, _forest.get());
 
     Camera *camera = context->getCamera();
