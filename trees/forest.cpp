@@ -316,6 +316,10 @@ VoxelSet Forest::getVoxelsMappedToModule(Module *m){
     return _moduleToVoxels[m];
 }
 
+ModuleSet Forest::getModulesMappedToVoxel(Voxel *v){
+    return _voxelToModules[v];
+}
+
 Module *Forest::getModuleFromId(int id){
     return _moduleIDs[id];
 }

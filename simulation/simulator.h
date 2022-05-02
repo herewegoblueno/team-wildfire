@@ -28,7 +28,7 @@ private:
     void stepThreadHandler(VoxelGrid *grid, Forest *forest, int deltaTime, int resolution, int minX, int maxX);
     void stepCleanupThreadHandler(VoxelGrid *grid, Forest *forest, int resolution, int minX, int maxX);
 
-    void stepVoxelHeatTransfer(Voxel* v, int deltaTimeInMs);
+    void stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int deltaTimeInMs);
     void stepVoxelWater(Voxel* v, double deltaTimeInMs);
     void stepVoxelWind(Voxel* v, double deltaTimeInMs);
 

@@ -75,6 +75,7 @@ public:
     ModulePhysicalData *getCurrentState();
     ModulePhysicalData *getLastFrameState();
 
+    double getMassChangeRateFromPreviousFrame(double windSpeed);
     double getTemperatureLaplaceFromPreviousFrame();
     void updateLastFrameData();
 
@@ -90,7 +91,6 @@ private:
     double sigmoidFunc(double x);
     double getMassChangeDueToBurning(double deltaTimeInMs, VoxelSet &voxels);
     void updateRadiiToReflectMassLoss(double massLoss);
-    double getMassChangeRateFromPreviousFrame(double windSpeed);
 };
 
 #endif // MODULE_H
