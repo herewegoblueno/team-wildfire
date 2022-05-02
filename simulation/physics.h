@@ -41,7 +41,6 @@ const double reation_rate_multiplier = 1.0; //Not in paper, added by us
 double ambientTemperatureFunc(glm::dvec3 point);
 
 // trees
-
 const double woodDensity = 40;
 
 // fire particle
@@ -49,5 +48,19 @@ const double alpha_temp = 0.98;
 const double beta_temp = 0.02;
 const double burn_coef = 0.1;
 const double thermal_expansion = 0.5;
+
+
+//For temperature conversions
+const double maxReasonableCelcuis = 200;
+const double minReasonableCelcuis = 20;
+const double celciusdiff = maxReasonableCelcuis - minReasonableCelcuis;
+
+const double maxSimulationTemp = 20;
+const double minSimulationTemp = 2;
+const double simDiff = maxSimulationTemp - minSimulationTemp;
+
+double worldTempToSimulationTemp(double worldTemp);
+double simTempToWorldTemp(double simTemp);
+
 
 #endif // PHYSICS_H
