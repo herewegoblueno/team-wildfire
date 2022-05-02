@@ -53,6 +53,8 @@ struct ModulePhysicalData {
     double area;        // total surface area of all the branches
     double temperature; // surface temperature of module
     double radiusRatio = 1;
+
+    double massChangeRateFromLastFrame = 0;
 };
 
 class Module

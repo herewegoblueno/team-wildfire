@@ -15,9 +15,11 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
     dTdt -= glm::dot(tempGradientInfo.gradient, v->getLastFrameState()->u);
 
     double dMdt = 0.0;
-    double windSpeed = length(v->getLastFrameState()->u);
     for (Module *m : nearbyModules) {
-        dMdt += m->getMassChangeRateFromPreviousFrame(windSpeed);
+        dMdt += m->getCurrentState()->massChangeRateFromLastFrame;
+    }
+    if (isnan(dMdt)){
+
     }
     dTdt -= module_to_air_diffusion * dMdt;
     v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt * deltaTimeInMs / 1000.0;
