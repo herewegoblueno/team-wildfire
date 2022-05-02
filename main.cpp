@@ -1,7 +1,10 @@
 #include <QApplication>
 #include "mainwindow.h"
-extern "C" void get_deviceinfo();
 
+
+#ifdef CUDA_FLUID
+extern "C" void get_deviceinfo();
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -10,7 +13,9 @@ int main(int argc, char *argv[])
     bool startFullscreen = false;
     w.show();
 
+    #ifdef CUDA_FLUID
     get_deviceinfo();
+    #endif
 
     if (startFullscreen) {
         // We cannot use w.showFullscreen() here because on Linux that creates the

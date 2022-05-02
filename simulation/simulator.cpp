@@ -90,7 +90,7 @@ void Simulator::linear_step(VoxelGrid *grid, Forest *forest)
     free(rhs);
 }
 
-void Simulator::stepThreadHandler(VoxelGrid *grid ,Forest *, int deltaTime, int resolution, int minXInclusive, int maxXExclusive){
+void Simulator::stepThreadHandler(VoxelGrid *grid ,Forest * forest, int deltaTime, int resolution, int minXInclusive, int maxXExclusive){
     for (int x = minXInclusive; x < maxXExclusive; x++){
         for (int y = 0; y < resolution; y++){
             for (int z = 0; z < resolution; z++){
@@ -114,7 +114,9 @@ void Simulator::stepThreadHandlerWind(VoxelGrid *grid, Forest *forest, double de
         index = x*face_num;
         for (int y = 0; y < resolution; y++){
             for (int z = 0; z < resolution; z++){
-                stepVoxelHeatTransfer(grid->getVoxel(x, y, z), deltaTime*1000);
+                Voxel *v = grid->getVoxel(x, y, z);
+                ModuleSet nearbyModules = forest == nullptr ? ModuleSet() : forest->getModulesMappedToVoxel(v);
+                stepVoxelHeatTransfer(v, nearbyModules, deltaTime);
                 stepVoxelWind(grid->getVoxel(x, y, z), deltaTime);
 
                 double diag = 6;
@@ -167,11 +169,8 @@ void Simulator::stepThreadHandlerWater(VoxelGrid *grid ,Forest *, double deltaTi
                 else deltaP.z -= pressure[index];
                 Voxel* vox = grid->getVoxel(x,y,z);
                 vox->getCurrentState()->u -= deltaP*(double)deltaTime/cell_size/air_density;
-                if(glm::length(vox->getCurrentState()->u)>100)
-                {
-                    std::cout << "[large vel after pressure]";
-                }
-//                stepVoxelWater(vox, deltaTime);
+
+                stepVoxelWater(vox, deltaTime);
             }
         }
     }
