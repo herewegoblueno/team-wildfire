@@ -10,6 +10,7 @@
 #include "trees/forest.h"
 #include "trees/module.h"
 
+const int pointsReservedForVectorRendering = 4;
 
 //Modified from https://stackoverflow.com/questions/14486291/how-to-draw-line-in-opengl
 void VoxelGridLine::init(VoxelGrid *grid)
@@ -144,7 +145,13 @@ void VoxelGridLine::generateGridVertices(VoxelGrid *grid){
     }
 
     //Add two more points that we'll use for drawing vector fields
-    vertices.insert(vertices.end(), { 0, 0, 0, 0, halfCellLength * 5, 0});
+    float scale = 1.3;
+    vertices.insert(vertices.end(), {
+                        0, 0, 0,
+                        0, scale * halfCellLength, 0,
+                        0, scale * halfCellLength, 0,
+                        -0.3f * halfCellLength, 0.6f * scale * halfCellLength, 0,
+                    });
 }
 
 void VoxelGridLine::renderVoxel(Voxel *vox, bool renderingInEyeMode){
@@ -177,7 +184,7 @@ void VoxelGridLine::renderVoxel(Voxel *vox, bool renderingInEyeMode){
             shader->setUniform("prop", temperature);
         }
         shader->setUniform("renderingVectorField", false);
-        glDrawArrays(GL_LINES, 0, vertices.size() / 3 - 2);
+        glDrawArrays(GL_LINES, 0, vertices.size() / 3 - pointsReservedForVectorRendering);
     }
 
     if (vectorFieldEnabled){
@@ -188,7 +195,7 @@ void VoxelGridLine::renderVoxel(Voxel *vox, bool renderingInEyeMode){
             shader->setUniform("u", vec3(vox->getCurrentState()->tempGradientFromPrevState));
         }
         shader->setUniform("renderingVectorField", true);
-        glDrawArrays(GL_LINES,  (vertices.size() / 3) - 2, 2);
+        glDrawArrays(GL_LINES,  (vertices.size() / 3) - pointsReservedForVectorRendering, pointsReservedForVectorRendering);
     }
 }
 

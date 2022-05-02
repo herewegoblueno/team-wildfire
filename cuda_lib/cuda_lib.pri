@@ -18,7 +18,7 @@ MSVCRT_LINK_FLAG_RELEASE = "/MD"
 
 win32 {
     CONFIG += console
-#    DEFINES += USE_CUDA
+    DEFINES += CUDA_FLUID
 
     # CUDA settings
     CUDA_DIR = "D:/DL Tools/NVIDIA Corporation/NVIDIA GPU Computing Toolkit/CUDA/v11.1"

@@ -13,9 +13,9 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, double deltaTimeInMs){
     double dTdt = HEAT_DIFFUSION_INTENSITY_TERM * tempGradientInfo.laplace;
     double differenceFromAmbience = v->getLastFrameState()->temperature - v->getAmbientTemperature();
     dTdt -= RADIATIVE_COOLING_TERM * pow(differenceFromAmbience, 4) * ((differenceFromAmbience > 0) ? 1 : -1);
-//    dTdt -= glm::dot(tempGradientInfo.gradient, v->getLastFrameState()->u);
+    dTdt -= glm::dot(tempGradientInfo.gradient, v->getLastFrameState()->u);
 
-    v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt * deltaTimeInMs / 1000.0;
+    v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt * deltaTimeInMs / 100.0;
     if(std::abs(v->getCurrentState()->temperature) > 100)
     {
         std::cout << "[temperature nan error]";

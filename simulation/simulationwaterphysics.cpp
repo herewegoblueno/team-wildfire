@@ -53,14 +53,6 @@ double Simulator::advect(double (*func)(Voxel *), glm::dvec3 vel, double dt, Vox
     return func(v_trace);
 }
 
-glm::dvec3 Simulator::advect_vel(glm::dvec3 vel, double dt, Voxel* v)
-{
-    glm::dvec3 pos = v->centerInWorldSpace - vel*dt;
-    Voxel* v_trace = v->grid->getVoxelClosestToPoint(glm::vec3(pos[0], pos[1], pos[2]));
-//    VoxelPhysicalData
-    if(v_trace==nullptr) return glm::dvec3(0,0,0);
-    return v_trace->getLastFrameState()->u;
-}
 
 // saturation ratio calculation of Eq.16 Stormscape
 double Simulator::saturate(double pressure, double temperature)

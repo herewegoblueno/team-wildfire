@@ -36,7 +36,7 @@ Fire::Fire(int density, glm::vec3 center, float size, VoxelGrid* grid):
     for (unsigned int i = 0; i < density; ++i)
     {
         float random_x = dist(generator) / 10.0f;
-        float random_y = dist(generator) / 10.0f;
+        float random_y = dist(generator) / 40.0f;
         float random_z = dist(generator) / 10.0f;
         float vec_y = (rand() % 100 - 50)/ 150.0f;
         float vec_x = (rand() % 100 - 50)/ 150.0f * (1-vec_y);
@@ -118,13 +118,13 @@ void Fire::update_particles()
             float z = p.Position.z;
             float te = p.Temp;
 
-            glm::vec3 u = vec3(vox->u);
+            glm::vec3 u = vec3(vox->u)*12.f;
 //            float c_dis = glm::distance(p.Position, m_center)+0.001f;
 //            u = glm::normalize(p.Position + glm::vec3(0,1,0) - m_center)*std::min(0.05f+0.2f/c_dis, 0.1f);
 
-            glm::vec3 b = glm::vec3(0, gravity_acceleration*thermal_expansion, 0)*(p.Temp - ambient_T)*0.f; // Buoyancy
+            glm::vec3 b = glm::vec3(0, gravity_acceleration*thermal_expansion*0.0f, 0)*(p.Temp - ambient_T); // Buoyancy
 
-            p.Position += (b+u) * fire_frame_rate * 50.f;
+            p.Position += (b+u) * fire_frame_rate;
 
             if(std::isnan(p.Position.x))
             {
@@ -133,11 +133,7 @@ void Fire::update_particles()
                 cout << "crash loop";
             }
 
-            glm::vec3 adjust_vec = p.Position - m_center;
-            adjust_vec.y = adjust_vec.y*0.5;
-            float adjust_len = glm::length(adjust_vec);
-            float neighbor_temp = 5 + 10*std::exp(-0.5*adjust_len*adjust_len/0.005);
-//            p.Temp = alpha_temp*p.Temp + beta_temp*(neighbor_temp + ambient_T);
+            p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
 
             if(p.Life < fire_frame_rate*1.5 || p.Temp < 10)
             {

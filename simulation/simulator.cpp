@@ -82,7 +82,7 @@ void Simulator::linear_step(VoxelGrid *grid, Forest *forest)
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
 
     threads.clear();
-    pressure_projection_Jacobi_cuda(diag, rhs, id_xyz, gridResolution, cell_num, 20);
+    pressure_projection_Jacobi_cuda(diag, rhs, id_xyz, gridResolution, cell_num, gridResolution*gridResolution);
     free(diag);
     free(id_xyz);
     for (int x = 0; x < gridResolution; x += jumpPerThread)
@@ -106,15 +106,14 @@ void Simulator::stepThreadHandlerWind(VoxelGrid *grid, Forest *forest, double de
                                       int minXInclusive, int maxXExclusive, double* diag_A, double* rhs, int* id_xyz)
 {
     double cell_size = grid->cellSideLength();
-    double density_term = deltaTime/0.02/cell_size/cell_size;
+    double density_term = deltaTime/air_density/cell_size/cell_size;
     int index, face_num = resolution*resolution;
 //    int cell_num = face_num*resolution;
     for (int x = minXInclusive; x < maxXExclusive; x++){
         index = x*face_num;
         for (int y = 0; y < resolution; y++){
             for (int z = 0; z < resolution; z++){
-                //<TODO: voxel water updates should go here>
-                stepVoxelHeatTransfer(grid->getVoxel(x, y, z), deltaTime);
+                stepVoxelHeatTransfer(grid->getVoxel(x, y, z), deltaTime*1000);
                 stepVoxelWind(grid->getVoxel(x, y, z), deltaTime);
 
                 double diag = 6;
@@ -145,6 +144,7 @@ void Simulator::stepThreadHandlerWind(VoxelGrid *grid, Forest *forest, double de
 void Simulator::stepThreadHandlerWater(VoxelGrid *grid ,Forest *, double deltaTime, int resolution,
                                        int minXInclusive, int maxXExclusive, double* pressure){
     int face_num = resolution*resolution;
+    double cell_size = grid->cellSideLength();
     for (int x = minXInclusive; x < maxXExclusive; x++){
         for (int y = 0; y < resolution; y++){
             for (int z = 0; z < resolution; z++){
@@ -154,19 +154,21 @@ void Simulator::stepThreadHandlerWater(VoxelGrid *grid ,Forest *, double deltaTi
                 else deltaP.x += pressure[index];
                 if(x>0) deltaP.x -= pressure[index-face_num];
                 else deltaP.x -= pressure[index];
+
                 if(y<resolution-1) deltaP.y += pressure[index+resolution];
                 else deltaP.y += pressure[index];
                 if(y>0) deltaP.y -= pressure[index-resolution];
                 else deltaP.y -= pressure[index];
+
                 if(z<resolution-1) deltaP.z += pressure[index+1];
                 else deltaP.z += pressure[index];
                 if(z>0) deltaP.z -= pressure[index-1];
                 else deltaP.z -= pressure[index];
                 Voxel* vox = grid->getVoxel(x,y,z);
-                vox->getCurrentState()->u -= deltaP*(double)deltaTime;
+                vox->getCurrentState()->u -= deltaP*(double)deltaTime/cell_size/air_density;
                 if(glm::length(vox->getCurrentState()->u)>100)
                 {
-                    std::cout << "[velocity magnitude error]";
+                    std::cout << "[large vel after pressure]";
                 }
 //                stepVoxelWater(vox, deltaTime);
             }

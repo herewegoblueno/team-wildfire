@@ -17,14 +17,14 @@ Voxel::Voxel(VoxelGrid *grid, int XIndex, int YIndex, int ZIndex, vec3 center) :
     currentPhysicalState.temperature = ambientTemperatureFunc(centerInWorldSpace);
 
     //for testing
-    int targetIndex = ceil(grid->getResolution() / 2.f);
-    int size = 4;
-    if (XIndex > targetIndex - size && XIndex < targetIndex + size &&
-            YIndex > targetIndex - size && YIndex < targetIndex + size &&
-            ZIndex > targetIndex - size && ZIndex < targetIndex + size){
-        lastFramePhysicalState.temperature = 10;
-        currentPhysicalState.temperature = 10;
-    }
+//    int targetIndex = ceil(grid->getResolution() / 2.f);
+//    int size = 2;
+//    if (XIndex > targetIndex - size - 1 && XIndex < targetIndex + size &&
+//            YIndex > targetIndex - size - 1 && YIndex < targetIndex + size &&
+//            ZIndex > targetIndex - size - 1 && ZIndex < targetIndex + size){
+//        lastFramePhysicalState.temperature = 10;
+//        currentPhysicalState.temperature = 10;
+//    }
 }
 
 //TODO: consider memoization for immediate neighbours
