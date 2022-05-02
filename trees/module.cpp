@@ -27,6 +27,21 @@ void Module::initMassAndArea() {
         _currentPhysicalData.area += area;
         _lastFramePhysicalData.area += area ;
     }
+    initCenterOfMass();
+}
+
+void Module::initCenterOfMass(){
+    dvec3 center(0);
+    for (Branch *branch : _branches) {
+        dvec3 branchBase = dvec3(branch->model*trunkObjectBottom);
+        dvec3 branchEnd = dvec3(branch->model*trunkObjectTop);
+        dvec3 branchDir = branchEnd - branchBase;
+        dvec3 branchCenter = branchBase +
+                normalize(branchDir) * branch->length / 2.0;
+        double mass = getBranchMass(branch);
+        center += mass * branchCenter;
+    }
+    _centerOfMass = center / _currentPhysicalData.mass;
 }
 
 /** Update mass and surface area of module based on branches (will only change due to burning) */
@@ -65,19 +80,8 @@ void Module::updateRadiiToReflectMassLoss(double massChange){
     while (testMass > targetMass);
 }
 
-/** Return center of mass of module */
-dvec3 Module::getCenter() const {
-    dvec3 center(0);
-    for (Branch *branch : _branches) {
-        dvec3 branchBase = dvec3(branch->model*trunkObjectBottom);
-        dvec3 branchEnd = dvec3(branch->model*trunkObjectTop);
-        dvec3 branchDir = branchEnd - branchBase;
-        dvec3 branchCenter = branchBase +
-                normalize(branchDir) * branch->length / 2.0;
-        double mass = getBranchMass(branch);
-        center += mass * branchCenter;
-    }
-    return center / _currentPhysicalData.mass;
+dvec3 Module::getCenterOfMass() const {
+    return _centerOfMass;
 }
 
 ModulePhysicalData *Module::getCurrentState() {
@@ -116,16 +120,22 @@ double Module::getBranchVolume(Branch *branch) const {
  */
 double Module::getTemperatureLaplaceFromPreviousFrame() {
     double thisTemp = getLastFrameState()->temperature;
-    dvec3 thisCenter = getCenter();
+    dvec3 thisCenter = getCenterOfMass();
+
+    bool hasChildren = _children.size() > 0;
+    bool hasParent = _parent != nullptr;
+
+    if (!hasChildren && !hasParent) return 0;
+
     // averages over all children
     double distToChildren;
     double childrenTemp;
-    if (_children.size() > 0) {
+    if (hasChildren) {
         dvec3 childrenCenter = dvec3(0.0);
         childrenTemp = 0.0;
         for (Module *child : _children) {
             childrenTemp += child->getLastFrameState()->temperature;
-            childrenCenter += child->getCenter();
+            childrenCenter += child->getCenterOfMass();
         }
         double childrenSize = static_cast<double>(_children.size());
         childrenTemp = childrenTemp / childrenSize;
@@ -138,9 +148,9 @@ double Module::getTemperatureLaplaceFromPreviousFrame() {
 
     double parentTemp;
     double distToParent;
-    if (_parent != nullptr) {
+    if (hasParent) {
         parentTemp = _parent->getLastFrameState()->temperature;
-        distToParent = length(thisCenter - _parent->getCenter());
+        distToParent = length(thisCenter - _parent->getCenterOfMass());
     } else {
         parentTemp = thisTemp;
         distToParent = 0;

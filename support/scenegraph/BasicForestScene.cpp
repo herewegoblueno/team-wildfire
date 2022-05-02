@@ -114,7 +114,7 @@ void BasicForestScene::renderTrunksVisualizedModules() {
         Module *module = _forest->getModuleFromId(moduleID);
 
         _moduleVisShader->setUniform("m",  bundle.model);
-        _moduleVisShader->setUniform("isSelected",  settings.selectedModuleId == moduleID);
+        _moduleVisShader->setUniform("isSelected",  !settings.hideSelectedModuleHighlight && settings.selectedModuleId == moduleID);
         _moduleVisShader->setUniform("warningFlag",  bundle.warning);
         _moduleVisShader->setUniform("propType",  settings.moduleVisualizationMode);
 
@@ -122,7 +122,12 @@ void BasicForestScene::renderTrunksVisualizedModules() {
             _moduleVisShader->setUniform("propMax",  settings.visualizeForestVoxelGridMaxTemp);
             _moduleVisShader->setUniform("propMin",  settings.visualizeForestVoxelGridMinTemp);
             double temp = module->getCurrentState()->temperature;
-            if (isnan(temp)) _moduleVisShader->setUniform("warningFlag",  true);
+            if (isnan(temp)) {
+                _moduleVisShader->setUniform("warningFlag",  true);
+                //Uncomment this if you want the simulation to pause the simulation
+                //once you start getting bad values....
+                settings.simulatorTimescale = 0;
+            }
             _moduleVisShader->setUniform("prop", (float) temp);
         }
 

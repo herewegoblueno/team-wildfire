@@ -345,3 +345,9 @@ void MainWindow::on_pauseTimescaleButton_clicked()
    ui->TimescaleSlider->setValue(0);
 }
 
+
+void MainWindow::on_hideCurrentModuleHighlight_stateChanged(int state)
+{
+    settings.hideSelectedModuleHighlight = state == Qt::CheckState::Checked;
+}
+

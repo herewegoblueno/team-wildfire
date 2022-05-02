@@ -42,6 +42,7 @@ void Settings::loadSettingsOrDefaults() {
     vectorGridMode = static_cast<VectorFieldVisualizationModes>(s.value("vectorGridMode", UFIELD).toInt());
 
     seeBranchModules = s.value("seeBranchModules", false).toBool();
+    hideSelectedModuleHighlight = s.value("hideSelectedModuleHighlight", false).toBool();
     moduleVisualizationMode = static_cast<ModuleVisualizationModes>(s.value("moduleVisualizationMode", ID).toInt());
 
     visualizeForestVoxelGridEyeX =  s.value("visualizeForestVoxelGridEyeX", 0).toDouble();

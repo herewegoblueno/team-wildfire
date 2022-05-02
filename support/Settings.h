@@ -64,6 +64,7 @@ struct Settings
     float visualizeForestVoxelGridMaxTemp;
     bool visualizeOnlyVoxelsTouchingSelectedModule;
     int selectedModuleId;
+    bool hideSelectedModuleHighlight;
 
     float simulatorTimescale;
 

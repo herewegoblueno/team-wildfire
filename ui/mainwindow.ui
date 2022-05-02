@@ -603,7 +603,7 @@
                <property name="geometry">
                 <rect>
                  <x>10</x>
-                 <y>10</y>
+                 <y>30</y>
                  <width>251</width>
                  <height>42</height>
                 </rect>
@@ -631,7 +631,7 @@
                <property name="geometry">
                 <rect>
                  <x>10</x>
-                 <y>60</y>
+                 <y>80</y>
                  <width>251</width>
                  <height>22</height>
                 </rect>
@@ -644,7 +644,7 @@
                <property name="geometry">
                 <rect>
                  <x>10</x>
-                 <y>90</y>
+                 <y>110</y>
                  <width>251</width>
                  <height>42</height>
                 </rect>
@@ -677,7 +677,7 @@
                <property name="geometry">
                 <rect>
                  <x>10</x>
-                 <y>140</y>
+                 <y>160</y>
                  <width>211</width>
                  <height>31</height>
                 </rect>
@@ -699,7 +699,7 @@
                <property name="geometry">
                 <rect>
                  <x>17</x>
-                 <y>180</y>
+                 <y>200</y>
                  <width>251</width>
                  <height>42</height>
                 </rect>
@@ -732,7 +732,7 @@
                <property name="geometry">
                 <rect>
                  <x>17</x>
-                 <y>220</y>
+                 <y>240</y>
                  <width>251</width>
                  <height>42</height>
                 </rect>
@@ -760,6 +760,19 @@
                  </widget>
                 </item>
                </layout>
+              </widget>
+              <widget class="QCheckBox" name="hideCurrentModuleHighlight">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>0</y>
+                 <width>251</width>
+                 <height>22</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Hide Current Module Highlight</string>
+               </property>
               </widget>
              </widget>
             </widget>

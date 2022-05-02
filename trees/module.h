@@ -71,7 +71,7 @@ public:
     // whether root is a branch in the module or just a pointer
     bool _includesRoot;
 
-    glm::dvec3 getCenter() const;
+    glm::dvec3 getCenterOfMass() const;
     void initMassAndArea();
     void updateMassAndAreaViaBurning(double deltaTimeInMs, VoxelSet &voxels);
     ModulePhysicalData *getCurrentState();
@@ -84,6 +84,9 @@ public:
 private:
     ModulePhysicalData _currentPhysicalData;
     ModulePhysicalData _lastFramePhysicalData;
+
+    glm::dvec3 _centerOfMass;
+    void initCenterOfMass();
 
     double getBranchMass(Branch *branch) const;
     double getBranchVolume(Branch *branch) const;

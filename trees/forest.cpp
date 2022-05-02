@@ -96,7 +96,7 @@ void Forest::initializeModuleVoxelMapping() {
    int resolution = _grid->getResolution();
    double cellSideLength = _grid->cellSideLength();
    for (Module *module: _modules) {
-       vec3 centerPos = vec3(module->getCenter());
+       vec3 centerPos = vec3(module->getCenterOfMass());
        Voxel *center = _grid->getVoxelClosestToPoint(centerPos);
        int xMin = std::max(0, center->XIndex - voxelSearchRadius);
        int xMax = std::min(resolution, center->XIndex + voxelSearchRadius);
