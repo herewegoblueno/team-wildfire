@@ -31,7 +31,7 @@ void main()
         }
     }
 
-    if (renderingVectorField) FragColor = vec4(0, 1, 1, alpha);
-    if (selectedVoxel) FragColor = vec4(0.22, 1, 0.1, 1);
+    if (renderingVectorField) FragColor = vec4(0, 1, 1, alpha); //cyan
+    if (selectedVoxel) FragColor = vec4(0.22, 1, 0.1, 1); //neon green
 
 }

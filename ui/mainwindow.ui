@@ -689,7 +689,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>Neon Green = selected, bright red = out of bounds of voxel field</string>
+                <string>Magenta = selected, neon green = out of bounds of voxel field / NaN temperature</string>
                </property>
                <property name="wordWrap">
                 <bool>true</bool>

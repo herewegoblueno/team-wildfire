@@ -25,9 +25,6 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
     for (Module *m : nearbyModules) {
         dMdt += m->getCurrentState()->massChangeRateFromLastFrame;
     }
-    if (isnan(dMdt)){
-
-    }
     dTdt -= module_to_air_diffusion * dMdt;
     v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt * deltaTimeInMs / 1000.0;
 };

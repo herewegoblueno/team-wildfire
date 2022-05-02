@@ -111,6 +111,7 @@ void BasicForestScene::renderTrunksVisualizedModules() {
     _trunk->bindVAO();
     for (PrimitiveBundle &bundle : _trunks) {
         int moduleID = bundle.moduleID;
+        Module *module = _forest->getModuleFromId(moduleID);
 
         _moduleVisShader->setUniform("m",  bundle.model);
         _moduleVisShader->setUniform("isSelected",  settings.selectedModuleId == moduleID);
@@ -120,7 +121,9 @@ void BasicForestScene::renderTrunksVisualizedModules() {
         if (settings.moduleVisualizationMode == MODULE_TEMPERATURE){
             _moduleVisShader->setUniform("propMax",  settings.visualizeForestVoxelGridMaxTemp);
             _moduleVisShader->setUniform("propMin",  settings.visualizeForestVoxelGridMinTemp);
-            _moduleVisShader->setUniform("prop",  (float)_forest->getModuleFromId(moduleID)->getCurrentState()->temperature);
+            double temp = module->getCurrentState()->temperature;
+            if (isnan(temp)) _moduleVisShader->setUniform("warningFlag",  true);
+            _moduleVisShader->setUniform("prop", (float) temp);
         }
 
         CS123SceneMaterial mat;

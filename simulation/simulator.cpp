@@ -25,17 +25,15 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
 
     if (forest != nullptr){ //Forest is optional
         forest->updateMassAndAreaOfModulesViaBurning(deltaTime);
-        //TODO: refactorabit
+        //TODO: refactor a bit (better encapsulation maybe)
         for (Module *m : forest->getModules()) {
             VoxelSet surroundingAir = forest->getVoxelsMappedToModule(m);
             stepModuleHeatTransfer(m, surroundingAir, deltaTime);
         }
-        //<TODO: Temperature changes, burning, and Radii updates should be here>
         //<TODO: water content of modules should go here>
         forest->updateMassOfVoxels();
     }
 
-    //(lines 7-12 in Algorithm 1 of paper)
     std::vector<std::thread> threads;
     for (int x = 0; x < gridResolution; x += jumpPerThread)
         threads.emplace_back(&Simulator::stepThreadHandler, this, grid, forest, deltaTime, gridResolution, x, x + jumpPerThread);
@@ -50,7 +48,7 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
     }
 }
 
-
+//TODO: eventually clean up, this is just here for testing
 void Simulator::linear_step(VoxelGrid *grid, Forest *forest)
 {
     milliseconds currentTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch());

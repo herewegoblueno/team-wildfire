@@ -10,16 +10,16 @@ uniform float propMin;
 uniform float propMax;
 
 uniform bool isSelected;
-uniform bool warningFlag;
+uniform bool warningFlag; //If there's something wrong with the voxel...
 
 
 void main(){
     if (isSelected){
+        //Magenta
+        fragColor = vec4(1, 0, 1, 1);
+    } else if (warningFlag){
         //Neon Green
         fragColor = vec4(0.22, 1, 0.1, 1);
-    } else if (warningFlag){
-        //Bright red
-        fragColor = vec4(1.0, 0.1, 0.1, 1);
     }else if (propType == 0){
         //use the color provided by the material (which should correlate to module ID)
         fragColor = vec4(color, 1);
