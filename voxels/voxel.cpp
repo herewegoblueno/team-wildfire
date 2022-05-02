@@ -1,6 +1,7 @@
 #include "voxel.h"
 #include "glm/ext.hpp"
 #include "simulation/physics.h"
+#include "voxelgrid.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 
@@ -16,14 +17,14 @@ Voxel::Voxel(VoxelGrid *grid, int XIndex, int YIndex, int ZIndex, vec3 center) :
     currentPhysicalState.temperature = ambientTemperatureFunc(centerInWorldSpace);
 
     //for testing
-    int targetIndex = ceil(grid->getResolution() / 2.f);
-    int size = 4;
-    if (XIndex > targetIndex - size && XIndex < targetIndex + size &&
-            YIndex > targetIndex - size && YIndex < targetIndex + size &&
-            ZIndex > targetIndex - size && ZIndex < targetIndex + size){
-        lastFramePhysicalState.temperature = 10;
-        currentPhysicalState.temperature = 10;
-    }
+//    int targetIndex = ceil(grid->getResolution() / 2.f);
+//    int size = 2;
+//    if (XIndex > targetIndex - size - 1 && XIndex < targetIndex + size &&
+//            YIndex > targetIndex - size - 1 && YIndex < targetIndex + size &&
+//            ZIndex > targetIndex - size - 1 && ZIndex < targetIndex + size){
+//        lastFramePhysicalState.temperature = 10;
+//        currentPhysicalState.temperature = 10;
+//    }
 }
 
 //TODO: consider memoization for immediate neighbours
@@ -119,6 +120,31 @@ dvec3 Voxel::getGradient(double (*func)(Voxel *))
     return gradient;
 }
 
+dvec3 Voxel::getVelGradient()
+{
+    Voxel *vox;
+    vox = getVoxelWithIndexOffset(vec3(0,1,0));
+    double temperatureTop = vox == nullptr ? getCurrentState()->u.y : get_uy(vox);
+    vox = getVoxelWithIndexOffset(vec3(0,-1,0));
+    double temperatureBottom = vox == nullptr ? 0 : get_uy(vox);
+    vox = getVoxelWithIndexOffset(vec3(1,0,0));
+    double temperatureRight = vox == nullptr ? 0 : get_ux(vox);
+    vox = getVoxelWithIndexOffset(vec3(-1,0,0));
+    double temperatureLeft = vox == nullptr ? 0 : get_ux(vox);
+    vox = getVoxelWithIndexOffset(vec3(0,0,1));
+    double temperatureForward = vox == nullptr ? 0 : get_uz(vox);
+    vox = getVoxelWithIndexOffset(vec3(0,0,-1));
+    double temperatureBack = vox == nullptr ? 0 : get_uz(vox);
+
+    float cellSize = grid->cellSideLength();
+
+    double yGradient = (temperatureTop - temperatureBottom) / (cellSize * 2);
+    double xGradient = (temperatureRight - temperatureLeft) / (cellSize * 2);
+    double zGradient = (temperatureForward - temperatureBack) / (cellSize * 2);
+    dvec3 gradient = dvec3(xGradient, yGradient, zGradient);
+    return gradient;
+}
+
 
 double Voxel::getLaplace(double (*func)(Voxel *))
 {
@@ -149,7 +175,7 @@ double Voxel::getLaplace(double (*func)(Voxel *))
 }
 
 
-dvec3 Voxel::getVerticity()
+dvec3 Voxel::getVorticity()
 {
     dvec3 grad_ux = getGradient(get_q_ux);
     dvec3 grad_uy = getGradient(get_q_uy);

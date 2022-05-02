@@ -1,0 +1,418 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{21AC2D98-255E-3E04-8352-9970612014A5}</ProjectGuid>
+    <RootNamespace>wildfire</RootNamespace>
+    <Keyword>QtVS_v304</Keyword>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformMinVersion>10.0.19041.0</WindowsTargetPlatformMinVersion>
+    <QtMsBuild Condition="'$(QtMsBuild)'=='' or !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <PlatformToolset>v142</PlatformToolset>
+    <OutputDirectory>..\bin\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>Application</ConfigurationType>
+    <IntermediateDirectory>release\</IntermediateDirectory>
+    <PrimaryOutput>wildfire</PrimaryOutput>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <PlatformToolset>v142</PlatformToolset>
+    <OutputDirectory>..\bin\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>Application</ConfigurationType>
+    <IntermediateDirectory>debug\</IntermediateDirectory>
+    <PrimaryOutput>wildfire</PrimaryOutput>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
+    <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
+  </Target>
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
+    <Import Project="$(QtMsBuild)\qt_defaults.props" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>..\bin\</OutDir>
+    <IntDir>debug\</IntDir>
+    <TargetName>wildfire</TargetName>
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>..\bin\</OutDir>
+    <IntDir>release\</IntDir>
+    <TargetName>wildfire</TargetName>
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <QtInstall>5.15.2</QtInstall>
+    <QtModules>core;xml;opengl;gui;widgets</QtModules>
+  </PropertyGroup>
+  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <QtInstall>5.15.2</QtInstall>
+    <QtModules>core;xml;opengl;gui;widgets</QtModules>
+  </PropertyGroup>
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
+    <Import Project="$(QtMsBuild)\qt.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>GeneratedFiles\$(ConfigurationName);GeneratedFiles;;.;..\eigen-master;glm;ui;glew-1.10.0\include;\Users\AlexL/eigen-git-mirror;D:\DL Tools\NVIDIA Corporation\NVIDIA GPU Computing Toolkit\CUDA\v11.1\include;release;/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-O3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>release\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <ObjectFileName>release\</ObjectFileName>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;GLEW_STATIC;_USE_MATH_DEFINES;TIXML_USE_STL;GLM_SWIZZLE;GLM_FORCE_RADIANS;NDEBUG;QT_NO_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <ProgramDataBaseFileName>
+      </ProgramDataBaseFileName>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <UndefinePreprocessorDefinitions>sers\AlexL/eigen-git-mirror;%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
+      <WarningLevel>Level3</WarningLevel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;"cuda.lib cudart.lib";shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\DL Tools\NVIDIA Corporation\NVIDIA GPU Computing Toolkit\CUDA\v11.1\lib\x64;C:\opensslx86\lib;C:\Utils\my_sql\mysql-5.7.25-win32\lib;C:\Utils\postgresqlx86\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreImportLibrary>true</IgnoreImportLibrary>
+      <LinkIncremental>false</LinkIncremental>
+      <OptimizeReferences>true</OptimizeReferences>
+      <OutputFile>$(OutDir)\wildfire.exe</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Link>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;GLEW_STATIC;_USE_MATH_DEFINES;TIXML_USE_STL;GLM_SWIZZLE;GLM_FORCE_RADIANS;NDEBUG;QT_NO_DEBUG;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_XML_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <QtMoc>
+      <CompilerFlavor>msvc</CompilerFlavor>
+      <Include>./$(Configuration)/moc_predefs.h</Include>
+      <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
+      <DynamicSource>output</DynamicSource>
+      <QtMocDir>$(Configuration)</QtMocDir>
+      <QtMocFileName>moc_%(Filename).cpp</QtMocFileName>
+    </QtMoc>
+    <QtRcc>
+      <Compression>default</Compression>
+      <InitFuncName>resources</InitFuncName>
+      <ExecutionDescription>Rcc'ing %(Identity)...</ExecutionDescription>
+      <QtRccDir>$(Configuration)</QtRccDir>
+      <QtRccFileName>qrc_%(Filename).cpp</QtRccFileName>
+    </QtRcc>
+    <QtUic>
+      <ExecutionDescription>Uic'ing %(Identity)...</ExecutionDescription>
+      <QtUicDir>$(ProjectDir)</QtUicDir>
+      <QtUicFileName>ui_%(Filename).h</QtUicFileName>
+    </QtUic>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>GeneratedFiles\$(ConfigurationName);GeneratedFiles;;.;..\eigen-master;glm;ui;glew-1.10.0\include;\Users\AlexL/eigen-git-mirror;D:\DL Tools\NVIDIA Corporation\NVIDIA GPU Computing Toolkit\CUDA\v11.1\include;debug;/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>debug\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4577;4467;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <ObjectFileName>debug\</ObjectFileName>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;GLEW_STATIC;_USE_MATH_DEFINES;TIXML_USE_STL;GLM_SWIZZLE;GLM_FORCE_RADIANS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <UndefinePreprocessorDefinitions>sers\AlexL/eigen-git-mirror;%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
+      <WarningLevel>Level3</WarningLevel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;"cuda.lib cudart.lib";shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\DL Tools\NVIDIA Corporation\NVIDIA GPU Computing Toolkit\CUDA\v11.1\lib\x64;C:\opensslx86\lib;C:\Utils\my_sql\mysql-5.7.25-win32\lib;C:\Utils\postgresqlx86\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreImportLibrary>true</IgnoreImportLibrary>
+      <OutputFile>$(OutDir)\wildfire.exe</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Link>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;GLEW_STATIC;_USE_MATH_DEFINES;TIXML_USE_STL;GLM_SWIZZLE;GLM_FORCE_RADIANS;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_XML_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <QtMoc>
+      <CompilerFlavor>msvc</CompilerFlavor>
+      <Include>./$(Configuration)/moc_predefs.h</Include>
+      <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
+      <DynamicSource>output</DynamicSource>
+      <QtMocDir>$(Configuration)</QtMocDir>
+      <QtMocFileName>moc_%(Filename).cpp</QtMocFileName>
+    </QtMoc>
+    <QtRcc>
+      <InitFuncName>resources</InitFuncName>
+      <Compression>default</Compression>
+      <ExecutionDescription>Rcc'ing %(Identity)...</ExecutionDescription>
+      <QtRccDir>$(Configuration)</QtRccDir>
+      <QtRccFileName>qrc_%(Filename).cpp</QtRccFileName>
+    </QtRcc>
+    <QtUic>
+      <ExecutionDescription>Uic'ing %(Identity)...</ExecutionDescription>
+      <QtUicDir>$(ProjectDir)</QtUicDir>
+      <QtUicFileName>ui_%(Filename).h</QtUicFileName>
+    </QtUic>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalOptions>$(Qt_LINK_OPTIONS_)  /SUBSYSTEM:WINDOWS %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalOptions>$(Qt_LINK_OPTIONS_)  /SUBSYSTEM:WINDOWS %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="support\scenegraph\BasicFireScene.cpp" />
+    <ClCompile Include="support\scenegraph\BasicForestScene.cpp" />
+    <ClCompile Include="support\gl\shaders\CS123Shader.cpp" />
+    <ClCompile Include="support\lib\CS123XmlSceneParser.cpp" />
+    <ClCompile Include="support\camera\CamtransCamera.cpp" />
+    <ClCompile Include="support\shapes\CircleBase.cpp" />
+    <ClCompile Include="support\shapes\Cone.cpp" />
+    <ClCompile Include="support\shapes\Cube.cpp" />
+    <ClCompile Include="support\shapes\Cylinder.cpp" />
+    <ClCompile Include="support\gl\textures\DepthBuffer.cpp" />
+    <ClCompile Include="support\gl\datatype\FBO.cpp" />
+    <ClCompile Include="support\shapes\Fruit.cpp" />
+    <ClCompile Include="support\gl\util\FullScreenQuad.cpp" />
+    <ClCompile Include="support\gl\GLDebug.cpp" />
+    <ClCompile Include="support\gl\datatype\IBO.cpp" />
+    <ClCompile Include="trees\LSystem.cpp" />
+    <ClCompile Include="support\shapes\Leaf.cpp" />
+    <ClCompile Include="support\scenegraph\OpenGLScene.cpp" />
+    <ClCompile Include="support\shapes\OpenGLShape.cpp" />
+    <ClCompile Include="support\camera\OrbitingCamera.cpp" />
+    <ClCompile Include="support\camera\QuaternionCamera.cpp" />
+    <ClCompile Include="support\lib\RGBA.cpp" />
+    <ClCompile Include="support\gl\textures\RenderBuffer.cpp" />
+    <ClCompile Include="support\lib\ResourceLoader.cpp" />
+    <ClCompile Include="support\scenegraph\Scene.cpp" />
+    <ClCompile Include="support\Settings.cpp" />
+    <ClCompile Include="support\gl\shaders\Shader.cpp" />
+    <ClCompile Include="support\shapes\Shape.cpp" />
+    <ClCompile Include="support\shapes\Sphere.cpp" />
+    <ClCompile Include="support\scenegraph\SupportCanvas3D.cpp" />
+    <ClCompile Include="support\shapes\Tessellator.cpp" />
+    <ClCompile Include="support\gl\textures\Texture.cpp" />
+    <ClCompile Include="support\gl\textures\Texture2D.cpp" />
+    <ClCompile Include="support\gl\textures\TextureParameters.cpp" />
+    <ClCompile Include="support\gl\textures\TextureParametersBuilder.cpp" />
+    <ClCompile Include="trees\TreeGenerator.cpp" />
+    <ClCompile Include="support\shapes\Trunk.cpp" />
+    <ClCompile Include="support\gl\datatype\VAO.cpp" />
+    <ClCompile Include="support\gl\datatype\VBO.cpp" />
+    <ClCompile Include="support\gl\datatype\VBOAttribMarker.cpp" />
+    <ClCompile Include="ui\extrawidgets\ctkrangeslider.cpp" />
+    <ClCompile Include="fire\fire.cpp" />
+    <ClCompile Include="trees\forest.cpp" />
+    <ClCompile Include="glew-1.10.0\src\glew.c" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="ui\mainwindow.cpp" />
+    <ClCompile Include="trees\module.cpp" />
+    <ClCompile Include="simulation\physics.cpp" />
+    <ClCompile Include="simulation\simulationheattransfer.cpp" />
+    <ClCompile Include="simulation\simulationwaterphysics.cpp" />
+    <ClCompile Include="simulation\simulationwindfield.cpp" />
+    <ClCompile Include="simulation\simulator.cpp" />
+    <ClCompile Include="fire\smoke.cpp" />
+    <ClCompile Include="trees\terrain.cpp" />
+    <ClCompile Include="voxels\voxel.cpp" />
+    <ClCompile Include="voxels\voxelgrid.cpp" />
+    <ClCompile Include="voxels\voxelgridline.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="support\scenegraph\BasicFireScene.h" />
+    <ClInclude Include="support\scenegraph\BasicForestScene.h" />
+    <ClInclude Include="support\lib\CS123ISceneParser.h" />
+    <ClInclude Include="support\lib\CS123SceneData.h" />
+    <ClInclude Include="support\gl\shaders\CS123Shader.h" />
+    <ClInclude Include="support\lib\CS123XmlSceneParser.h" />
+    <ClInclude Include="support\camera\Camera.h" />
+    <ClInclude Include="support\camera\CamtransCamera.h" />
+    <ClInclude Include="support\shapes\CircleBase.h" />
+    <ClInclude Include="support\shapes\Cone.h" />
+    <ClInclude Include="support\shapes\Cube.h" />
+    <ClInclude Include="support\shapes\Cylinder.h" />
+    <ClInclude Include="support\gl\textures\DepthBuffer.h" />
+    <ClInclude Include="support\gl\datatype\FBO.h" />
+    <ClInclude Include="support\shapes\Fruit.h" />
+    <ClInclude Include="support\gl\util\FullScreenQuad.h" />
+    <ClInclude Include="support\gl\GLDebug.h" />
+    <ClInclude Include="support\gl\datatype\IBO.h" />
+    <ClInclude Include="trees\LSystem.h" />
+    <ClInclude Include="support\shapes\Leaf.h" />
+    <ClInclude Include="support\scenegraph\OpenGLScene.h" />
+    <ClInclude Include="support\shapes\OpenGLShape.h" />
+    <ClInclude Include="support\camera\OrbitingCamera.h" />
+    <ClInclude Include="support\camera\QuaternionCamera.h" />
+    <ClInclude Include="support\lib\RGBA.h" />
+    <ClInclude Include="utils\Random.h" />
+    <ClInclude Include="support\gl\textures\RenderBuffer.h" />
+    <ClInclude Include="support\lib\ResourceLoader.h" />
+    <ClInclude Include="support\scenegraph\Scene.h" />
+    <ClInclude Include="support\Settings.h" />
+    <ClInclude Include="support\gl\shaders\Shader.h" />
+    <ClInclude Include="support\gl\shaders\ShaderAttribLocations.h" />
+    <ClInclude Include="support\shapes\Shape.h" />
+    <ClInclude Include="support\shapes\Sphere.h" />
+    <QtMoc Include="support\scenegraph\SupportCanvas3D.h">
+    </QtMoc>
+    <ClInclude Include="support\shapes\Tessellator.h" />
+    <ClInclude Include="support\gl\textures\Texture.h" />
+    <ClInclude Include="support\gl\textures\Texture2D.h" />
+    <ClInclude Include="support\gl\textures\TextureParameters.h" />
+    <ClInclude Include="support\gl\textures\TextureParametersBuilder.h" />
+    <ClInclude Include="trees\TreeGenerator.h" />
+    <ClInclude Include="support\shapes\TriMesh.h" />
+    <ClInclude Include="support\shapes\Trunk.h" />
+    <ClInclude Include="support\gl\datatype\VAO.h" />
+    <ClInclude Include="support\gl\datatype\VBO.h" />
+    <ClInclude Include="support\gl\datatype\VBOAttribMarker.h" />
+    <QtMoc Include="ui\extrawidgets\ctkrangeslider.h">
+    </QtMoc>
+    <ClInclude Include="fire\fire.h" />
+    <ClInclude Include="trees\forest.h" />
+    <ClInclude Include="glew-1.10.0\include\GL\glew.h" />
+    <QtMoc Include="ui\mainwindow.h">
+    </QtMoc>
+    <ClInclude Include="trees\module.h" />
+    <ClInclude Include="fire\particle.h" />
+    <ClInclude Include="simulation\physics.h" />
+    <ClInclude Include="simulation\simulator.h" />
+    <ClInclude Include="fire\smoke.h" />
+    <ClInclude Include="trees\terrain.h" />
+    <ClInclude Include="voxels\voxel.h" />
+    <ClInclude Include="voxels\voxelgrid.h" />
+    <ClInclude Include="voxels\voxelgridline.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="debug\moc_predefs.h.cbt">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">cl -Bx"$(QTDIR)\bin\qmake.exe" -I \Users\AlexL/eigen-git-mirror -Zi -MDd -std:c++14 -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -E $(QTDIR)\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;debug\moc_predefs.h</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generate moc_predefs.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">debug\moc_predefs.h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="release\moc_predefs.h.cbt">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">cl -Bx"$(QTDIR)\bin\qmake.exe" -I \Users\AlexL/eigen-git-mirror -MD /MT -O3 -std:c++14 -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -E $(QTDIR)\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;release\moc_predefs.h</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generate moc_predefs.h</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">release\moc_predefs.h;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="ui\mainwindow.ui">
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="xmlScenes\basicScene.xml" />
+    <None Include="shaders\fire.frag" />
+    <None Include="fire\fire_particle.jpg" />
+    <None Include="fire\fire_particle2.png" />
+    <None Include="shaders\gridline.frag" />
+    <None Include="shaders\gridline.vert" />
+    <None Include="icon\killWithFire.png" />
+    <None Include="shaders\module.frag" />
+    <None Include="shaders\particle.vert" />
+    <None Include="shaders\quad.vert" />
+    <QtRcc Include="resources.qrc">
+    </QtRcc>
+    <None Include="shaders\shader.frag" />
+    <None Include="shaders\shader.vert" />
+    <None Include="shaders\smoke.frag" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="xmlScenes\basicScene.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="cuda_lib\jacobi.cu">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">cuda_lib\jacobi.cu;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:/DL Tools/NVIDIA Corporation/NVIDIA GPU Computing Toolkit/CUDA/v11.1/bin/nvcc.exe --use_fast_math -I"." -I"../eigen-master" -I"glm" -I"ui" -I"glew-1.10.0/include" -I"\Users\AlexL/eigen-git-mirror" -I"D:/DL Tools/NVIDIA Corporation/NVIDIA GPU Computing Toolkit/CUDA/v11.1/include" -lopengl32 -lglu32 cuda.lib cudart.lib --machine 64 -arch=compute_75 -c -o release\cuda\jacobi_cuda.o cuda_lib\jacobi.cu</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:/DL</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">release\cuda\jacobi_cuda.o;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="cuda_lib\jacobi.cu">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">cuda_lib\jacobi.cu;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:/DL Tools/NVIDIA Corporation/NVIDIA GPU Computing Toolkit/CUDA/v11.1/bin/nvcc.exe -D_DEBUG --use_fast_math -I"." -I"../eigen-master" -I"glm" -I"ui" -I"glew-1.10.0/include" -I"\Users\AlexL/eigen-git-mirror" -I"D:/DL Tools/NVIDIA Corporation/NVIDIA GPU Computing Toolkit/CUDA/v11.1/include" -lopengl32 -lglu32 cuda.lib cudart.lib --machine 64 -arch=compute_75 -c -o debug\cuda\jacobi_cuda.o cuda_lib\jacobi.cu</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:/DL</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">debug\cuda\jacobi_cuda.o;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
+    <Import Project="$(QtMsBuild)\qt.targets" />
+  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

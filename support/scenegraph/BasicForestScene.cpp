@@ -7,17 +7,20 @@
 #include "support/scenegraph/SupportCanvas3D.h"
 #include "support/lib/ResourceLoader.h"
 
+
+#include "support/gl/shaders/CS123Shader.h"
 #include "support/shapes/Trunk.h"
 #include "support/shapes/Leaf.h"
 
 #include <chrono>
+#include <iostream>
 using namespace std::chrono;
 using namespace CS123::GL;
 
-#include <iostream>
+
 
 BasicForestScene::BasicForestScene(MainWindow *mainWindow):
-     _voxelGrid(forestWidth + gridBuffer, vec3(0,0,0), 60),
+     _voxelGrid(forestWidth + gridBuffer, vec3(0,0,0), 28),
      mainWindow(mainWindow)
 {
     loadShaders();
@@ -61,8 +64,7 @@ void BasicForestScene::loadShaders() {
 }
 
 void BasicForestScene::render(SupportCanvas3D *context) {
-
-    _simulator.step(&_voxelGrid, _forest.get());
+    _simulator.linear_step(&_voxelGrid, _forest.get());
 
     Camera *camera = context->getCamera();
     glClearColor(0.2, 0.2, 0.2, 0.3);

@@ -3,6 +3,9 @@
 #include <iostream>
 
 
+//extern "C" double* addVectorsGPU(double* a, double* b, int n);
+//extern "C" double* getDisplacement(double* a, double* b, double t, int n);
+
 void Simulator::stepVoxelWater(Voxel* v, double deltaTimeInMs)
 {
     double q_v = v->getLastFrameState()->q_v;
@@ -33,6 +36,10 @@ void Simulator::stepVoxelWater(Voxel* v, double deltaTimeInMs)
     v->getCurrentState()->q_v = q_v;
     v->getCurrentState()->q_c = q_c;
     v->getCurrentState()->q_r = q_r;
+    if(std::isnan(evp_temp))
+    {
+        std::cout << "[evaporation temperature error]";
+    }
     v->getCurrentState()->temperature += evp_temp;
 }
 
@@ -42,9 +49,10 @@ void Simulator::stepVoxelWater(Voxel* v, double deltaTimeInMs)
 double Simulator::advect(double (*func)(Voxel *), glm::dvec3 vel, double dt, Voxel* v)
 {
     glm::dvec3 pos = v->centerInWorldSpace - vel*dt;
-    Voxel* v_trace = v->grid->getVoxelClosestToPoint(glm::vec3(pos));
+    Voxel* v_trace = v->grid->getVoxelClosestToPoint(glm::vec3(pos[0], pos[1], pos[2]));
     return func(v_trace);
 }
+
 
 // saturation ratio calculation of Eq.16 Stormscape
 double Simulator::saturate(double pressure, double temperature)

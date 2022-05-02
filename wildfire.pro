@@ -1,9 +1,10 @@
-QT += opengl xml
+QT += opengl xml widgets
 TARGET = wildfire
 TEMPLATE = app
 
 QMAKE_CXXFLAGS += -std=c++14
 CONFIG += c++14
+
 
 unix:!macx {
     LIBS += -lGLU
@@ -17,6 +18,7 @@ macx {
 win32 {
     DEFINES += GLEW_STATIC
     LIBS += -lopengl32 -lglu32
+    INCLUDEPATH +=  ../eigen-master
 }
 
 SOURCES += ui/mainwindow.cpp \
@@ -38,8 +40,8 @@ SOURCES += ui/mainwindow.cpp \
     support/gl/datatype/VAO.cpp \
     support/gl/datatype/VBO.cpp \
     support/gl/datatype/VBOAttribMarker.cpp \
-    support/gl/shaders/CS123Shader.cpp \
     support/gl/shaders/Shader.cpp \
+    support/gl/shaders/CS123Shader.cpp \
     support/gl/textures/DepthBuffer.cpp \
     support/gl/textures/RenderBuffer.cpp \
     support/gl/textures/Texture.cpp \
@@ -94,8 +96,8 @@ HEADERS += ui/mainwindow.h \
     support/gl/datatype/VAO.h \
     support/gl/datatype/VBO.h \
     support/gl/datatype/VBOAttribMarker.h \
-    support/gl/shaders/CS123Shader.h \
     support/gl/shaders/Shader.h \
+    support/gl/shaders/CS123Shader.h \
     support/gl/shaders/ShaderAttribLocations.h \
     support/gl/textures/DepthBuffer.h \
     support/gl/textures/RenderBuffer.h \
@@ -141,7 +143,7 @@ HEADERS += ui/mainwindow.h \
     voxels/voxelgridline.h
 
 FORMS += ui/mainwindow.ui
-INCLUDEPATH += glm ui glew-1.10.0/include ../eigen-master
+INCLUDEPATH += glm ui glew-1.10.0/include
 DEPENDPATH += glm ui glew-1.10.0/include
 
 DEFINES += _USE_MATH_DEFINES
@@ -157,6 +159,16 @@ QMAKE_CXXFLAGS_WARN_ON += -Waddress -Warray-bounds -Wc++0x-compat -Wchar-subscri
                           -Wsequence-point -Wsign-compare -Wstrict-overflow=1 -Wswitch \
                           -Wtrigraphs -Wuninitialized -Wunused-label -Wunused-variable \
                           -Wvolatile-register-var -Wno-extra
+win32 {
+QMAKE_CXXFLAGS_WARN_ON -= -Waddress -Warray-bounds -Wc++0x-compat -Wchar-subscripts -Wformat\
+                          -Wmain -Wmissing-braces -Wparentheses -Wreorder -Wreturn-type \
+                          -Wsequence-point -Wsign-compare -Wstrict-overflow=1 -Wswitch \
+                          -Wtrigraphs -Wuninitialized -Wunused-label -Wunused-variable \
+                          -Wvolatile-register-var -Wno-extra
+QMAKE_CXXFLAGS += -Wno-enum-compare
+}
+
+
 
 QMAKE_CXXFLAGS += -g
 
@@ -184,3 +196,6 @@ win32 {
 QMAKE_CXXFLAGS = -I "$${HOME_DIR}/eigen-git-mirror"
 INCLUDEPATH += "$${HOME_DIR}/eigen-git-mirror"
 DEPENDPATH += "$${HOME_DIR}/eigen-git-mirror"
+
+include(cuda_lib/cuda_lib.pri)
+

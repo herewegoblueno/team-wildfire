@@ -1,10 +1,10 @@
 #include "simulator.h"
 #include <thread>
+#include <iostream>
 
 //eq 21 in Fire in Paradise paper
 //TODO: add in last 2 terms
 void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int deltaTimeInMs){
-
     VoxelTemperatureGradientInfo tempGradientInfo = v->getTemperatureGradientInfoFromPreviousFrame();
     v->getCurrentState()->tempGradientFromPrevState = tempGradientInfo.gradient;
     v->getCurrentState()->tempLaplaceFromPrevState = tempGradientInfo.laplace;
@@ -21,6 +21,7 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
     dTdt -= RADIATIVE_COOLING_TERM * pow(differenceFromAmbience, 4) * ((differenceFromAmbience > 0) ? 1 : -1);
     dTdt -= glm::dot(tempGradientInfo.gradient, v->getLastFrameState()->u);
 
+    
     double dMdt = 0.0;
     for (Module *m : nearbyModules) {
         dMdt += m->getCurrentState()->massChangeRateFromLastFrame;

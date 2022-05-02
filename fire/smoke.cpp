@@ -15,6 +15,7 @@
 
 #include "fire/smoke.h"
 #include "voxels/voxelgrid.h"
+#include "simulation/physics.h"
 
 #include <iostream>
 #include <QImage>
@@ -73,13 +74,13 @@ void Smoke::update_particles()
             VoxelPhysicalData* vox = m_grid->getVoxelClosestToPoint(p.Position)->getCurrentState();
 
             glm::vec3 u = vec3(vox->u);
-            u = glm::vec3(0, 0.1, 0);
             float ambient_T = vox->temperature;
 
-            if(isnan(ambient_T)) ambient_T = 0;
+            if(std::isnan(ambient_T)) ambient_T = 0;
 
-            glm::vec3 b = -thermal_expansion*glm::vec3(0, gravity_acceleration, 0)*(p.Temp - ambient_T); // Buoyancy
-            b.y = std::max(b.y, 0.1f);
+
+            glm::vec3 b = glm::vec3(0, gravity_acceleration*thermal_expansion*5, 0)*(p.Temp - ambient_T); // Buoyancy
+            b.y = std::max(b.y, 0.1f) * 0.f;
 
             p.Position += (b+u+p.Velocity) * m_frame_rate;
             p.Temp = alpha_temp*p.Temp + beta_temp*(ambient_T);

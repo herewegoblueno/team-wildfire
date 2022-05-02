@@ -29,7 +29,6 @@ private:
      std::vector<std::unique_ptr<Fire>> fires;
 
     void setShaderSceneUniforms(SupportCanvas3D *context);
-    void setLights();
 
     std::vector<std::unique_ptr<CS123::GL::CS123Shader>> shader_bank;
     CS123::GL::CS123Shader *current_shader;
