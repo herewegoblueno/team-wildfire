@@ -1,5 +1,6 @@
 #include "simulator.h"
 #include <thread>
+#include <iostream>
 
 //eq 21 in Fire in Paradise paper
 //TODO: add in last 2 terms
@@ -12,10 +13,14 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, int deltaTimeInMs){
     double dTdt = HEAT_DIFFUSION_INTENSITY_TERM * tempGradientInfo.laplace;
     double differenceFromAmbience = v->getLastFrameState()->temperature - v->getAmbientTemperature();
     dTdt -= RADIATIVE_COOLING_TERM * pow(differenceFromAmbience, 4) * ((differenceFromAmbience > 0) ? 1 : -1);
-    dTdt -= glm::dot(tempGradientInfo.gradient, v->getLastFrameState()->u);
+//    dTdt -= glm::dot(tempGradientInfo.gradient, v->getLastFrameState()->u);
 
     v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt * deltaTimeInMs / 1000.0;
-};
+    if(std::abs(v->getCurrentState()->temperature) > 100)
+    {
+        std::cout << "error";
+    }
+}
 
 /** Equation 25 of Fire in Paradise paper */
 void Simulator::stepModuleHeatTransfer(Module *m, VoxelSet surroundingAir, int deltaTimeInMs) {

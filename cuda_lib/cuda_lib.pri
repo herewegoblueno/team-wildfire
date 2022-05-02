@@ -8,14 +8,16 @@ CUDA_OBJECTS_DIR = ./
 #    $$PWD/base_op.cu
 CUDA_SOURCES += \
     $$PWD/jacobi.cu \
-    $$PWD/base_op.cu
+    $$PWD/base_op.cu \
+    $$PWD/info.cu
+
 
 # MSVCRT link option (static or dynamic, it must be the same with your Qt SDK link option)
 MSVCRT_LINK_FLAG_DEBUG   = "/MDd"
 MSVCRT_LINK_FLAG_RELEASE = "/MD"
 
 win32 {
-#    CONFIG += console
+    CONFIG += console
 #    DEFINES += USE_CUDA
 
     # CUDA settings
@@ -80,5 +82,8 @@ win32 {
     }
 
 }
+
+HEADERS += \
+    $$PWD/info.h
 
 

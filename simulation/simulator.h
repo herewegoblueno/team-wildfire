@@ -25,8 +25,10 @@ public:
 private:
     milliseconds timeLastFrame;
     void stepThreadHandler(VoxelGrid *grid, Forest *forest, int deltaTime, int resolution, int minX, int maxX);
-    void stepThreadHandlerWind(VoxelGrid *grid, Forest *forest, int deltaTime, int resolution, int minX, int maxX, double* mat_A, double* dvg);
-    void stepThreadHandlerWater(VoxelGrid *grid, Forest *forest, int deltaTime, int resolution, int minX, int maxX);
+    void stepThreadHandlerWind(VoxelGrid *grid, Forest *forest, double deltaTime, int resolution, int minX, int maxX,
+                               double* diag, double* rhs, int* id_xyz);
+    void stepThreadHandlerWater(VoxelGrid *grid, Forest *forest, double deltaTime, int resolution, int minX, int maxX,
+                                double* pressure);
     void stepCleanupThreadHandler(VoxelGrid *grid, Forest *forest, int resolution, int minX, int maxX);
 
     void stepVoxelHeatTransfer(Voxel* v, int deltaTimeInMs);
@@ -47,11 +49,10 @@ private:
     static double heat_capacity(double gamma, double mass);
 
     // wind related equation
-    static glm::dvec3 verticity_confinement(glm::dvec3 u, Voxel* v, double time);
-    static void pressure_projection_LLT(VoxelGrid *grid, double time);
+    static glm::dvec3 vorticity_confinement(glm::dvec3 u, Voxel* v, double time);
     static void pressure_projection_PCG(VoxelGrid *grid, double time);
     static void pressure_projection_Jacobi(VoxelGrid *grid, double time);
-    static void pressure_projection_Jacobi_cuda(double* A_mat, double* dvg, int N, int Ni, int iter);
+    static void pressure_projection_Jacobi_cuda(double* diag, double* rhs, int* id_xyz, int N, int Ni, int iter);
 //    void jacobi_cuda();
 
 };

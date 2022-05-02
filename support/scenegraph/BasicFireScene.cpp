@@ -19,7 +19,7 @@ using namespace CS123::GL;
 
 
 BasicFireScene::BasicFireScene():
-     voxelGrids(8, vec3(0,0,0), 60)
+     voxelGrids(8, vec3(0,0,0), 52)
 {
     fires.clear();
     fires.push_back(  std::make_unique<Fire> (500, glm::vec3(-0.8, -0.5, 1.2), 0.6, &voxelGrids) );
@@ -34,7 +34,7 @@ BasicFireScene::BasicFireScene():
 //    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(2, -0.5, 0.8), 0.5, &voxelGrids) );
 //    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(2, -0.5, 0.8), 0.6, &voxelGrids) );
 
-    voxelGrids.getVisualization()->toggle(false, false);
+    voxelGrids.getVisualization()->toggle(false, true);
 
     simulator.init();
     constructShaders();
@@ -69,11 +69,11 @@ void BasicFireScene::render(SupportCanvas3D *context) {
 
     current_shader = shader_bank[0].get();
 
-    current_shader->bind();
+//    current_shader->bind();
     Camera *camera = context->getCamera();
     voxelGrids.getVisualization()->setPV(camera->getProjectionMatrix() * camera->getViewMatrix());
     voxelGrids.getVisualization()->draw(context);
-    current_shader->unbind();
+//    current_shader->unbind();
 
     std::vector<std::unique_ptr<CS123Shader>> *shaders = getShaderPrograms();
     CS123Shader* fire_shader = shaders->at(0).get();

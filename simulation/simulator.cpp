@@ -4,8 +4,6 @@
 #include <iostream>
 #include <memory.h>
 #include "support/Settings.h"
-extern "C"
-void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h, int resolution);
 
 const int Simulator::NUMBER_OF_SIMULATION_THREADS = 4;
 
@@ -59,9 +57,9 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
 void Simulator::linear_step(VoxelGrid *grid, Forest *forest)
 {
     milliseconds currentTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-    int deltaTime = (currentTime - timeLastFrame).count();
+    double deltaTime = (currentTime - timeLastFrame).count();
     if (deltaTime > 100) deltaTime = 100;
-    deltaTime *= settings.simulatorTimescale;
+    deltaTime *= settings.simulatorTimescale*0.001;
     timeLastFrame = currentTime;
     if (deltaTime == 0) return; //Don't bother doing anything
 
@@ -71,26 +69,25 @@ void Simulator::linear_step(VoxelGrid *grid, Forest *forest)
     int jumpPerThread = gridResolution / NUMBER_OF_SIMULATION_THREADS;
 
     int cell_num = gridResolution*gridResolution*gridResolution;
-    double* mat_A = (double *) malloc(cell_num*cell_num*sizeof(double));
-    double* dvg = (double *) malloc(cell_num*sizeof(double));
-
-    memset(mat_A, 0, cell_num*cell_num*sizeof(double));
-    memset(dvg, 0, cell_num*sizeof(double));
+    double* diag = (double *) malloc(cell_num*sizeof(double));
+    int* id_xyz = (int *) malloc(cell_num*sizeof(int)*3);
+    double* rhs = (double *) malloc(cell_num*sizeof(double));
 
     //(lines 7-12 in Algorithm 1 of paper)
     std::vector<std::thread> threads;
     for (int x = 0; x < gridResolution; x += jumpPerThread)
         threads.emplace_back(&Simulator::stepThreadHandlerWind, this, grid, forest, deltaTime,
-                             gridResolution, x, x + jumpPerThread, mat_A, dvg);
+                             gridResolution, x, x + jumpPerThread, diag, rhs, id_xyz);
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
 
     threads.clear();
-    pressure_projection_Jacobi_cuda(mat_A, dvg, cell_num*cell_num, cell_num, 20);
-    free(mat_A);
-    free(dvg);
+    pressure_projection_Jacobi_cuda(diag, rhs, id_xyz, gridResolution, cell_num, 20);
+    free(diag);
+    free(id_xyz);
     for (int x = 0; x < gridResolution; x += jumpPerThread)
-        threads.emplace_back(&Simulator::stepThreadHandlerWater, this, grid, forest, deltaTime, gridResolution, x, x + jumpPerThread);
+        threads.emplace_back(&Simulator::stepThreadHandlerWater, this, grid, forest, deltaTime, gridResolution, x, x + jumpPerThread, rhs);
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
+    free(rhs);
 }
 
 void Simulator::stepThreadHandler(VoxelGrid *grid ,Forest *, int deltaTime, int resolution, int minXInclusive, int maxXExclusive){
@@ -99,19 +96,18 @@ void Simulator::stepThreadHandler(VoxelGrid *grid ,Forest *, int deltaTime, int 
             for (int z = 0; z < resolution; z++){
                 //<TODO: voxel water updates should go here>
                 stepVoxelHeatTransfer(grid->getVoxel(x, y, z), deltaTime);
-                stepVoxelWind(grid->getVoxel(x, y, z), deltaTime);
             }
         }
     }
 }
 
-void Simulator::stepThreadHandlerWind(VoxelGrid *grid, Forest *forest, int deltaTime, int resolution,
-                                      int minXInclusive, int maxXExclusive, double* mat_A, double* dvg)
+void Simulator::stepThreadHandlerWind(VoxelGrid *grid, Forest *forest, double deltaTime, int resolution,
+                                      int minXInclusive, int maxXExclusive, double* diag_A, double* rhs, int* id_xyz)
 {
     double cell_size = grid->cellSideLength();
-    double density_term = deltaTime/1/cell_size/cell_size;
+    double density_term = deltaTime/air_density/cell_size/cell_size;
     int index, face_num = resolution*resolution;
-    int cell_num = face_num*resolution;
+//    int cell_num = face_num*resolution;
     for (int x = minXInclusive; x < maxXExclusive; x++){
         index = x*face_num;
         for (int y = 0; y < resolution; y++){
@@ -120,37 +116,58 @@ void Simulator::stepThreadHandlerWind(VoxelGrid *grid, Forest *forest, int delta
                 stepVoxelHeatTransfer(grid->getVoxel(x, y, z), deltaTime);
                 stepVoxelWind(grid->getVoxel(x, y, z), deltaTime);
 
-
                 double diag = 6;
-
-                if(x<resolution-1) mat_A[index*cell_num + index+face_num] = -1;
-                else diag --;
-                if(x>0) mat_A[index*cell_num +  index-face_num] = -1;
-                else diag --;
-                if(y<resolution-1) mat_A[index*cell_num +  index+resolution] = -1;
-                else diag --;
-                if(y>0) mat_A[index*cell_num + index-resolution] = -1;
-                else diag --;
-                if(z<resolution-1) mat_A[index*cell_num + index+1] = -1;
-                else diag --;
-                if(z>0) mat_A[index*cell_num + index-1] = -1;
-                else diag --;
-
-                mat_A[index*cell_num + index] = diag;
-
                 glm::dvec3 gradient = grid->getVoxel(x,y,z)->getVelGradient();
-                dvg[index] = (gradient.x + gradient.y + gradient.z)/density_term;
+                double this_rhs = (gradient.x + gradient.y + gradient.z)/density_term;
+
+//                if(x>resolution-2) diag --;
+//                if(x<1) diag --;
+//                if(y>resolution-2) diag --;
+                if(y<1) diag --;
+//                if(z>resolution-2) diag --;
+//                if(z<1) diag --;
+
+                diag_A[index] = diag;
+                int* i_xyz = id_xyz+index*3;
+                i_xyz[0] = x;
+                i_xyz[1] = y;
+                i_xyz[2] = z;
+
+                assert(!std::isnan(this_rhs));
+                rhs[index] = this_rhs;
+                index++;
             }
         }
     }
 }
 
-void Simulator::stepThreadHandlerWater(VoxelGrid *grid ,Forest *, int deltaTime, int resolution, int minXInclusive, int maxXExclusive){
+void Simulator::stepThreadHandlerWater(VoxelGrid *grid ,Forest *, double deltaTime, int resolution,
+                                       int minXInclusive, int maxXExclusive, double* pressure){
+    int face_num = resolution*resolution;
     for (int x = minXInclusive; x < maxXExclusive; x++){
         for (int y = 0; y < resolution; y++){
             for (int z = 0; z < resolution; z++){
-                //<TODO: voxel water updates should go here>
-                stepVoxelWater(grid->getVoxel(x, y, z), deltaTime);
+                glm::dvec3 deltaP(0,0,0);
+                int index = x*face_num+y*resolution+z;
+                if(x<resolution-1) deltaP.x += pressure[index+face_num];
+                else deltaP.x += pressure[index];
+                if(x>0) deltaP.x -= pressure[index-face_num];
+                else deltaP.x -= pressure[index];
+                if(y<resolution-1) deltaP.y += pressure[index+resolution];
+                else deltaP.y += pressure[index];
+                if(y>0) deltaP.y -= pressure[index-resolution];
+                else deltaP.y -= pressure[index];
+                if(z<resolution-1) deltaP.z += pressure[index+1];
+                else deltaP.z += pressure[index];
+                if(z>0) deltaP.z -= pressure[index-1];
+                else deltaP.z -= pressure[index];
+                Voxel* vox = grid->getVoxel(x,y,z);
+                vox->getCurrentState()->u -= deltaP*(double)deltaTime;
+                if(glm::length(vox->getCurrentState()->u)>100)
+                {
+                    std::cout << "error";
+                }
+//                stepVoxelWater(vox, deltaTime);
             }
         }
     }

@@ -1,5 +1,7 @@
 #include <QApplication>
 #include "mainwindow.h"
+extern "C" void get_deviceinfo();
+
 
 int main(int argc, char *argv[])
 {
@@ -7,6 +9,8 @@ int main(int argc, char *argv[])
     MainWindow w;
     bool startFullscreen = false;
     w.show();
+
+    get_deviceinfo();
 
     if (startFullscreen) {
         // We cannot use w.showFullscreen() here because on Linux that creates the

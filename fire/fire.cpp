@@ -95,6 +95,7 @@ void Fire::update_particles()
             RespawnParticle(unusedParticle);
     }
     // update all particles
+    VoxelPhysicalData voxel;
     for (unsigned int i = 0; i < m_density; ++i)
     {
         Particle &p = m_particles[i];
@@ -104,22 +105,24 @@ void Fire::update_particles()
         if (p.Life > 0.0f)
         {
             // particle is alive, thus update
-            Voxel* voxel = m_grid->getVoxelClosestToPoint(p.Position);
-            VoxelPhysicalData* vox = voxel->getCurrentState();
+            voxel = m_grid->getStateInterpolatePoint(p.Position);
+            VoxelPhysicalData* vox = &voxel;
             float ambient_T = vox->temperature;
 
-            if(std::isnan(ambient_T)) ambient_T = 0;
+            if(std::isnan(ambient_T)){
 
+                ambient_T = 0;
+            }
             float x = p.Position.x;
             float y = p.Position.y;
             float z = p.Position.z;
             float te = p.Temp;
 
             glm::vec3 u = vec3(vox->u);
-            float c_dis = glm::distance(p.Position, m_center)+0.001f;
-            u = glm::normalize(p.Position + glm::vec3(0,1,0) - m_center)*std::min(0.05f+0.2f/c_dis, 0.1f);
+//            float c_dis = glm::distance(p.Position, m_center)+0.001f;
+//            u = glm::normalize(p.Position + glm::vec3(0,1,0) - m_center)*std::min(0.05f+0.2f/c_dis, 0.1f);
 
-            glm::vec3 b = -glm::vec3(0, gravity_acceleration*thermal_expansion, 0)*(p.Temp - ambient_T); // Buoyancy
+            glm::vec3 b = glm::vec3(0, gravity_acceleration*thermal_expansion, 0)*(p.Temp - ambient_T); // Buoyancy
 
             p.Position += (b+u) * fire_frame_rate;
 

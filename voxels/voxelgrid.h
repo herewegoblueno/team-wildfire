@@ -22,6 +22,7 @@ public:
     int getResolution();
     Voxel *getVoxel(int xIndex, int yIndex, int zIndex);
     Voxel *getVoxelClosestToPoint(vec3 point);
+    VoxelPhysicalData getStateInterpolatePoint(vec3 point);
     VoxelGridLine *getVisualization();
     double getVolumePerCell();
     double cellSideLength();
@@ -41,5 +42,7 @@ private:
     vector<vector<vector<std::unique_ptr<Voxel>>>> voxels;
     float cellVolume;
 };
+
+
 
 #endif // VOXELGRID_H

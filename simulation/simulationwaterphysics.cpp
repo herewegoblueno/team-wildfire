@@ -36,6 +36,10 @@ void Simulator::stepVoxelWater(Voxel* v, double deltaTimeInMs)
     v->getCurrentState()->q_v = q_v;
     v->getCurrentState()->q_c = q_c;
     v->getCurrentState()->q_r = q_r;
+    if(std::isnan(evp_temp))
+    {
+        std::cout << "error";
+    }
     v->getCurrentState()->temperature += evp_temp;
 }
 

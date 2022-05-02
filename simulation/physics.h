@@ -16,8 +16,9 @@ const double raindrop_accelerate = 0.01; // K c
 const double evaporation_rate = 0.001; // w
 
 // wind component related
-const double verticity_epsilon = 0.001;
+const double vorticity_epsilon = 0.0001;
 const double gravity_acceleration = 0.1;
+const double air_density = 1.225;
 
 // heat transfer
 const double HEAT_DIFFUSION_INTENSITY_TERM = 0.02; //alpha
@@ -34,6 +35,6 @@ const double woodDensity = 40;
 const double alpha_temp = 0.98;
 const double beta_temp = 0.02;
 const double burn_coef = 0.1;
-const double thermal_expansion = 0.001;
+const double thermal_expansion = 0.1;
 
 #endif // PHYSICS_H
