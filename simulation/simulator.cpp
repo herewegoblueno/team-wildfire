@@ -151,6 +151,9 @@ void Simulator::stepThreadHandlerWater(VoxelGrid *grid ,Forest *, double deltaTi
     for (int x = minXInclusive; x < maxXExclusive; x++){
         for (int y = 0; y < resolution; y++){
             for (int z = 0; z < resolution; z++){
+                Voxel* vox = grid->getVoxel(x,y,z);
+
+            #ifdef CUDA_FLUID
                 glm::dvec3 deltaP(0,0,0);
                 int index = x*face_num+y*resolution+z;
                 if(x<resolution-1) deltaP.x += pressure[index+face_num];
@@ -167,9 +170,8 @@ void Simulator::stepThreadHandlerWater(VoxelGrid *grid ,Forest *, double deltaTi
                 else deltaP.z += pressure[index];
                 if(z>0) deltaP.z -= pressure[index-1];
                 else deltaP.z -= pressure[index];
-                Voxel* vox = grid->getVoxel(x,y,z);
                 vox->getCurrentState()->u -= deltaP*(double)deltaTime/cell_size/air_density;
-
+            #endif
                 stepVoxelWater(vox, deltaTime);
             }
         }
