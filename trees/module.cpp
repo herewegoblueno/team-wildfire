@@ -46,6 +46,7 @@ double Module::getMassChangeDueToBurning(double deltaTimeInMs, VoxelSet &voxels)
    double windSpeed = 0;
    for (Voxel *v : voxels) windSpeed += length(v->getLastFrameState()->u);
    double dMdt = getMassChangeRateFromPreviousFrame(windSpeed);
+   _currentPhysicalData.massChangeRateFromLastFrame = dMdt;
    return dMdt * deltaTimeInMs / 1000.0;
 }
 

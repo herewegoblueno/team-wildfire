@@ -3,7 +3,7 @@
 
 //eq 21 in Fire in Paradise paper
 //TODO: add in last 2 terms
-void Simulator::stepVoxelHeatTransfer(Voxel* v, int deltaTimeInMs){
+void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int deltaTimeInMs){
 
     VoxelTemperatureGradientInfo tempGradientInfo = v->getTemperatureGradientInfoFromPreviousFrame();
     v->getCurrentState()->tempGradientFromPrevState = tempGradientInfo.gradient;
@@ -21,6 +21,14 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, int deltaTimeInMs){
     dTdt -= RADIATIVE_COOLING_TERM * pow(differenceFromAmbience, 4) * ((differenceFromAmbience > 0) ? 1 : -1);
     dTdt -= glm::dot(tempGradientInfo.gradient, v->getLastFrameState()->u);
 
+    double dMdt = 0.0;
+    for (Module *m : nearbyModules) {
+        dMdt += m->getCurrentState()->massChangeRateFromLastFrame;
+    }
+    if (isnan(dMdt)){
+
+    }
+    dTdt -= module_to_air_diffusion * dMdt;
     v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt * deltaTimeInMs / 1000.0;
 };
 
@@ -34,6 +42,6 @@ void Simulator::stepModuleHeatTransfer(Module *m, VoxelSet surroundingAir, int d
     }
     surroundingAirTemp = surroundingAirTemp / static_cast<double>(surroundingAir.size());
     double dTdt = adjacent_module_diffusion * tempLaplace
-            + module_air_diffusion * (surroundingAirTemp - moduleTemp);
+            + air_to_module_diffusion * (surroundingAirTemp - moduleTemp);
     m->getCurrentState()->temperature = moduleTemp + dTdt * deltaTimeInMs / 1000.0;
 };

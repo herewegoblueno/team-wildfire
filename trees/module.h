@@ -53,6 +53,8 @@ struct ModulePhysicalData {
     double area;        // total surface area of all the branches
     double temperature; // surface temperature of module
     double radiusRatio = 1;
+
+    double massChangeRateFromLastFrame = 0;
 };
 
 class Module
@@ -75,6 +77,7 @@ public:
     ModulePhysicalData *getCurrentState();
     ModulePhysicalData *getLastFrameState();
 
+    double getMassChangeRateFromPreviousFrame(double windSpeed);
     double getTemperatureLaplaceFromPreviousFrame();
     void updateLastFrameData();
 
@@ -90,7 +93,6 @@ private:
     double sigmoidFunc(double x);
     double getMassChangeDueToBurning(double deltaTimeInMs, VoxelSet &voxels);
     void updateRadiiToReflectMassLoss(double massLoss);
-    double getMassChangeRateFromPreviousFrame(double windSpeed);
 };
 
 #endif // MODULE_H

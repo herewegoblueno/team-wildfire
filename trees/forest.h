@@ -23,6 +23,7 @@ public:
     void artificiallyUpdateTemperatureOfModule(int moduleID, double delta);
     void artificiallyUpdateVoxelTemperatureAroundModule(int moduleID, double delta);
 
+    ModuleSet getModulesMappedToVoxel(Voxel *v);
     VoxelSet getVoxelsMappedToModule(Module *m);
     Module *getModuleFromId(int id);
     std::vector<int> getAllModuleIDs();

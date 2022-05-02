@@ -23,14 +23,15 @@ const float gravity_acceleration = 0.1;
 const double HEAT_DIFFUSION_INTENSITY_TERM = 0.02; //alpha
 const double RADIATIVE_COOLING_TERM = 0.01; //gamma
 const double adjacent_module_diffusion = 0.04; // alpha_M
-const double module_air_diffusion = 0.04; // b
+const double air_to_module_diffusion = 0.75; // b
+const double module_to_air_diffusion = 100; // tau
 
 // combustion
-const double reaction_rate_t0 = 2.0; // TODO: make these physically accurate
-const double reaction_rate_t1 = 3.5;
+const double reaction_rate_t0 = 12.0; // TODO: make these physically accurate
+const double reaction_rate_t1 = 20.0;
 const double max_wind_combustion_boost = 1.5; // n_max
 const double speed_for_max_wind_boost = 1.0; // u_ref
-const double reation_rate_multiplier = 1.5; //Not in paper, added by us
+const double reation_rate_multiplier = 1.0; //Not in paper, added by us
 
 //Voxels
 double ambientTemperatureFunc(glm::dvec3 point);

@@ -65,7 +65,8 @@ void Simulator::linear_step(VoxelGrid *grid, Forest *forest)
     for (int x = 0; x < gridResolution; x++){
         for (int y = 0; y < gridResolution; y++){
             for (int z = 0; z < gridResolution; z++){
-                stepVoxelHeatTransfer(grid->getVoxel(x, y, z), deltaTime);
+                Voxel *v = grid->getVoxel(x, y, z);
+                stepVoxelHeatTransfer(v, forest->getModulesMappedToVoxel(v), deltaTime);
                 stepVoxelWind(grid->getVoxel(x, y, z), deltaTime);
             }
         }
@@ -83,12 +84,13 @@ void Simulator::linear_step(VoxelGrid *grid, Forest *forest)
 
 }
 
-void Simulator::stepThreadHandler(VoxelGrid *grid ,Forest *, int deltaTime, int resolution, int minXInclusive, int maxXExclusive){
+void Simulator::stepThreadHandler(VoxelGrid *grid ,Forest *forest, int deltaTime, int resolution, int minXInclusive, int maxXExclusive){
     for (int x = minXInclusive; x < maxXExclusive; x++){
         for (int y = 0; y < resolution; y++){
             for (int z = 0; z < resolution; z++){
                 //<TODO: voxel water updates should go here>
-                stepVoxelHeatTransfer(grid->getVoxel(x, y, z), deltaTime);
+                Voxel *v = grid->getVoxel(x, y, z);
+                stepVoxelHeatTransfer(v, forest->getModulesMappedToVoxel(v), deltaTime);
             }
         }
     }
