@@ -10,7 +10,14 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, int deltaTimeInMs){
     v->getCurrentState()->tempLaplaceFromPrevState = tempGradientInfo.laplace;
 
     double dTdt = HEAT_DIFFUSION_INTENSITY_TERM * tempGradientInfo.laplace;
-    double differenceFromAmbience = v->getLastFrameState()->temperature - v->getAmbientTemperature();
+    double differenceFromAmbienceCap = 50;
+    //Clamping this because since we raise it to the power 4, larger values can make the tempertature
+    //oscilate between very -ve and very +ve until it explodes, similar to
+    //https://www.desmos.com/calculator/k86lqwvxvd
+    //of course, we woudn't need this if we had a better intergrator or smaller timesteps
+    double differenceFromAmbience = clamp(
+                v->getLastFrameState()->temperature - v->getAmbientTemperature(),
+                -differenceFromAmbienceCap, differenceFromAmbienceCap);
     dTdt -= RADIATIVE_COOLING_TERM * pow(differenceFromAmbience, 4) * ((differenceFromAmbience > 0) ? 1 : -1);
     dTdt -= glm::dot(tempGradientInfo.gradient, v->getLastFrameState()->u);
 
