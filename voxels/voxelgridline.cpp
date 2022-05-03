@@ -190,6 +190,8 @@ void VoxelGridLine::renderVoxel(Voxel *vox, bool renderingInEyeMode){
     if (vectorFieldEnabled){
         //Now using the last part of the VAO to render vector field
         if (vectorMode == UFIELD){
+            //TODO: this should be based on the iterpolated u field (to get the u field in the center),
+            //not the u field the voxel is storing (which is relative to its faces)
             shader->setUniform("u", vec3(vox->getCurrentState()->u));
         }else{
             shader->setUniform("u", vec3(vox->getCurrentState()->tempGradientFromPrevState));

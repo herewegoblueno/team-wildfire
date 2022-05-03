@@ -131,14 +131,28 @@ int VoxelGrid::getClampedIndex(int i){
     return clamp(i, 0, resolution - 1);
 }
 
+dvec3 VoxelGrid::getGlobalFField(){
+    return globalFField;
+}
 
-void VoxelGrid::artificiallyAlterUField(vec3 u){
+void VoxelGrid::setGlobalFField(vec3 f){
+    globalFField = f;
+
+    //If we're going through the whole physics simulation (which makes use of CUDA to edit the u
+    //field of voxels for things like vortexes), then we shouldn't alter the u field of voxels directly.
+    //(f field is taken into account there).
+    //If we aren't, then the u field is never actually altered during the simulation, so we should just alter
+    //it here.
+#ifdef CUDA_FLUID
+    return
+#endif
+
     for (int x = 0; x < resolution; x++){
         for (int y = 0; y < resolution; y++){
             for (int z = 0; z < resolution; z++){
                 Voxel *v = getVoxel(x, y, z);
-                v->getCurrentState()->u = u;
-                v->getLastFrameState()->u = u;
+                v->getCurrentState()->u = f;
+                v->getLastFrameState()->u = f;
             }
         }
     }
