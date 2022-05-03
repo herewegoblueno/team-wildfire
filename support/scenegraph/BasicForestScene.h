@@ -47,6 +47,7 @@ private:
     void setGlobalData(CS123::GL::CS123Shader *s);
     void setSceneUniforms(SupportCanvas3D *context, CS123::GL::CS123Shader *s);
 
+    uint _lastFrameNumModules;
     std::unique_ptr<CS123::GL::CS123Shader> _phongShader;
     std::unique_ptr<CS123::GL::CS123Shader> _moduleVisShader;
     VoxelGrid _voxelGrid;

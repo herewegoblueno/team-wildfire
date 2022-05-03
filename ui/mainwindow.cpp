@@ -163,6 +163,7 @@ void MainWindow::openXmlFileForForestScene(QString file) {
 }
 
 void MainWindow::updateModuleSelectionOptions(std::vector<int> moduleIDs){
+    ui->ModuleSelectionDropDown->clear();
     for (int id : moduleIDs){
         ui->ModuleSelectionDropDown->addItem(QString::number(id));
     }
