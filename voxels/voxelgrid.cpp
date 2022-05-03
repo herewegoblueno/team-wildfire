@@ -108,3 +108,15 @@ int VoxelGrid::getClampedIndex(int i){
     return clamp(i, 0, resolution - 1);
 }
 
+
+void VoxelGrid::artificiallyAlterUField(vec3 u){
+    for (int x = 0; x < resolution; x++){
+        for (int y = 0; y < resolution; y++){
+            for (int z = 0; z < resolution; z++){
+                Voxel *v = getVoxel(x, y, z);
+                v->getCurrentState()->u = u;
+                v->getLastFrameState()->u = u;
+            }
+        }
+    }
+}

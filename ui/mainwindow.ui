@@ -113,7 +113,7 @@
    <property name="minimumSize">
     <size>
      <width>304</width>
-     <height>487</height>
+     <height>513</height>
     </size>
    </property>
    <attribute name="dockWidgetArea">
@@ -362,7 +362,7 @@
            <item>
             <widget class="QToolBox" name="forestToolBox">
              <property name="currentIndex">
-              <number>1</number>
+              <number>2</number>
              </property>
              <widget class="QWidget" name="ForestVisualization">
               <property name="geometry">
@@ -370,7 +370,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>273</width>
-                <height>365</height>
+                <height>335</height>
                </rect>
               </property>
               <attribute name="label">
@@ -379,8 +379,8 @@
               <widget class="QWidget" name="verticalLayoutWidget_2">
                <property name="geometry">
                 <rect>
-                 <x>9</x>
-                 <y>79</y>
+                 <x>130</x>
+                 <y>30</y>
                  <width>103</width>
                  <height>42</height>
                 </rect>
@@ -416,8 +416,8 @@
               <widget class="QWidget" name="verticalLayoutWidget_3">
                <property name="geometry">
                 <rect>
-                 <x>9</x>
-                 <y>129</y>
+                 <x>10</x>
+                 <y>80</y>
                  <width>103</width>
                  <height>42</height>
                 </rect>
@@ -490,8 +490,8 @@
               <widget class="QWidget" name="verticalLayoutWidget_4">
                <property name="geometry">
                 <rect>
-                 <x>9</x>
-                 <y>179</y>
+                 <x>130</x>
+                 <y>80</y>
                  <width>103</width>
                  <height>42</height>
                 </rect>
@@ -518,7 +518,7 @@
                 <item>
                  <widget class="QLabel" name="forestVisualizationEyeRValue">
                   <property name="text">
-                   <string>TextLabel</string>
+                   <string>0</string>
                   </property>
                  </widget>
                 </item>
@@ -527,8 +527,8 @@
               <widget class="QWidget" name="verticalLayoutWidget_5">
                <property name="geometry">
                 <rect>
-                 <x>0</x>
-                 <y>230</y>
+                 <x>50</x>
+                 <y>150</y>
                  <width>160</width>
                  <height>80</height>
                 </rect>
@@ -593,7 +593,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>273</width>
-                <height>365</height>
+                <height>335</height>
                </rect>
               </property>
               <attribute name="label">
@@ -773,6 +773,201 @@
                <property name="text">
                 <string>Hide Current Module Highlight</string>
                </property>
+              </widget>
+             </widget>
+             <widget class="QWidget" name="WindFieldEditing">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>273</width>
+                <height>335</height>
+               </rect>
+              </property>
+              <attribute name="label">
+               <string>Wind Field</string>
+              </attribute>
+              <widget class="QLabel" name="CUDAwarning">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>10</y>
+                 <width>251</width>
+                 <height>51</height>
+                </rect>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QLabel{
+    background-color: rgb(10, 140, 10);
+	color: rgb(248, 247, 255);
+}
+</string>
+               </property>
+               <property name="text">
+                <string>CUDA wind field manipulation is active. Users may not edit global wind field.</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+               <property name="wordWrap">
+                <bool>true</bool>
+               </property>
+              </widget>
+              <widget class="QWidget" name="WindFieldEditParent" native="true">
+               <property name="geometry">
+                <rect>
+                 <x>84</x>
+                 <y>70</y>
+                 <width>171</width>
+                 <height>156</height>
+                </rect>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_4">
+                <item>
+                 <layout class="QVBoxLayout" name="WindFieldXSuperParent">
+                  <item>
+                   <layout class="QHBoxLayout" name="WindFieldXParent">
+                    <item>
+                     <widget class="QLabel" name="WindFieldXSuperParentLabel">
+                      <property name="text">
+                       <string>X</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QSlider" name="WindFieldXSlider">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="WindFieldXValue">
+                    <property name="text">
+                     <string>0</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QVBoxLayout" name="WindFieldYSuperParent">
+                  <item>
+                   <layout class="QHBoxLayout" name="WindFieldYParent">
+                    <item>
+                     <widget class="QLabel" name="WindFieldYLabel">
+                      <property name="text">
+                       <string>Y</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QSlider" name="WindFieldYSlider">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="WindFieldYValue">
+                    <property name="text">
+                     <string>0</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QVBoxLayout" name="WindFieldZSuperParent">
+                  <item>
+                   <layout class="QHBoxLayout" name="WindFieldZParent">
+                    <item>
+                     <widget class="QLabel" name="WindFieldZLabel">
+                      <property name="text">
+                       <string>Z</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QSlider" name="WindFieldZSlider">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="WindFieldZValue">
+                    <property name="text">
+                     <string>0</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="WindFieldResetButtonParent" native="true">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>80</y>
+                 <width>71</width>
+                 <height>141</height>
+                </rect>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_5">
+                <property name="spacing">
+                 <number>2</number>
+                </property>
+                <property name="topMargin">
+                 <number>3</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>3</number>
+                </property>
+                <item>
+                 <widget class="QPushButton" name="resetWindfieldX">
+                  <property name="font">
+                   <font>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Reset</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="resetWindfieldY">
+                  <property name="font">
+                   <font>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Reset</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="resetWindfieldZ">
+                  <property name="font">
+                   <font>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Reset</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </widget>
             </widget>

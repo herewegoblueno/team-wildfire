@@ -20,7 +20,7 @@ using namespace CS123::GL;
 
 
 BasicForestScene::BasicForestScene(MainWindow *mainWindow):
-     _voxelGrid(forestWidth + gridBuffer, vec3(0,0,0), 28),
+     _voxelGrid(forestWidth + gridBuffer, vec3(0,0,0), 40),
      mainWindow(mainWindow)
 {
     loadShaders();
@@ -215,4 +215,8 @@ void BasicForestScene::settingsChanged() {
 
 Forest * BasicForestScene::getForest(){
     return _forest.get();
+}
+
+VoxelGrid * BasicForestScene::getVoxelGrid(){
+    return &_voxelGrid;
 }
