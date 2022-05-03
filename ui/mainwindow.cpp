@@ -366,9 +366,6 @@ void MainWindow::on_hideCurrentModuleHighlight_stateChanged(int state)
 
 void MainWindow::on_WindFieldXSlider_valueChanged(int value)
 {
-    #ifdef CUDA_FLUID
-    return;
-    #endif
     ui->WindFieldXValue->setText(QString::number(value / 10.0));
     vec3 newF = vec3(value / 10.0, ui->WindFieldYSlider->value() / 10.0, ui->WindFieldZSlider->value() / 10.0);
     m_canvas3D->getForestScene()->getVoxelGrid()->setGlobalFField(newF);
@@ -377,9 +374,6 @@ void MainWindow::on_WindFieldXSlider_valueChanged(int value)
 
 void MainWindow::on_WindFieldYSlider_valueChanged(int value)
 {
-    #ifdef CUDA_FLUID
-    return;
-    #endif
     ui->WindFieldYValue->setText(QString::number(value / 10.0));
     vec3 newF = vec3(ui->WindFieldXSlider->value() / 10.0, value / 10.0, ui->WindFieldZSlider->value() / 10.0);
     m_canvas3D->getForestScene()->getVoxelGrid()->setGlobalFField(newF);
@@ -388,9 +382,6 @@ void MainWindow::on_WindFieldYSlider_valueChanged(int value)
 
 void MainWindow::on_WindFieldZSlider_valueChanged(int value)
 {
-    #ifdef CUDA_FLUID
-    return;
-    #endif
     ui->WindFieldZValue->setText(QString::number(value / 10.0));
     vec3 newF = vec3(ui->WindFieldXSlider->value() / 10.0, ui->WindFieldYSlider->value() / 10.0, value / 10.0);
     m_canvas3D->getForestScene()->getVoxelGrid()->setGlobalFField(newF);
