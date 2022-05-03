@@ -30,7 +30,8 @@ public:
     bool isGoodIndex(int i);
     int getClampedIndex(int i);
 
-    void artificiallyAlterUField(vec3 u);
+    void setGlobalFField(vec3 f);
+    dvec3 getGlobalFField();
 
 private:
     VoxelGridLine gridlines;
@@ -43,6 +44,8 @@ private:
     //Interstingly, flattening this to 1D is slower (when i tried it, at least)
     vector<vector<vector<std::unique_ptr<Voxel>>>> voxels;
     float cellVolume;
+
+    dvec3 globalFField; //Global wind (Stormscapes paper Eq 20), think of it like global wind
 };
 
 

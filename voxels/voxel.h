@@ -14,6 +14,8 @@ struct VoxelPhysicalData {
     dvec3 tempGradientFromPrevState = dvec3(0,0,0); // ∇T (here just to make debugging easier if need be)
     double tempLaplaceFromPrevState = 0; // ∇^2T (here just to make debugging easier if need be)
 
+    //Relative to the faces of the voxel, not it's cenet
+    //Explained at /README_and_docs_images/uFieldExplanation.png
     dvec3 u = dvec3(0,-0.001,0);  // velocity field
 
     // water coefs
@@ -22,32 +24,32 @@ struct VoxelPhysicalData {
     float q_r = 0.1; // rain (ignore for now)
 
     VoxelPhysicalData operator+(const VoxelPhysicalData& rhs) const
-        {
-            VoxelPhysicalData newdata;
-            newdata.mass = this->mass + rhs.mass;
-            newdata.temperature = this->temperature + rhs.temperature;
-            newdata.tempGradientFromPrevState = this->tempGradientFromPrevState + rhs.tempGradientFromPrevState;
-            newdata.tempLaplaceFromPrevState = this->tempLaplaceFromPrevState + rhs.tempLaplaceFromPrevState;
-            newdata.u = this->u + rhs.u;
-            newdata.q_v = this->q_v + rhs.q_v;
-            newdata.q_c = this->q_c + rhs.q_c;
-            newdata.q_r = this->q_r + rhs.q_r;
-            return newdata;
-        }
+    {
+        VoxelPhysicalData newdata;
+        newdata.mass = this->mass + rhs.mass;
+        newdata.temperature = this->temperature + rhs.temperature;
+        newdata.tempGradientFromPrevState = this->tempGradientFromPrevState + rhs.tempGradientFromPrevState;
+        newdata.tempLaplaceFromPrevState = this->tempLaplaceFromPrevState + rhs.tempLaplaceFromPrevState;
+        newdata.u = this->u + rhs.u;
+        newdata.q_v = this->q_v + rhs.q_v;
+        newdata.q_c = this->q_c + rhs.q_c;
+        newdata.q_r = this->q_r + rhs.q_r;
+        return newdata;
+    }
 
     VoxelPhysicalData operator*(const double& t) const
-        {
-            VoxelPhysicalData newdata;
-            newdata.mass = this->mass*t;
-            newdata.temperature = this->temperature*t;
-            newdata.tempGradientFromPrevState = this->tempGradientFromPrevState*t;
-            newdata.tempLaplaceFromPrevState = this->tempLaplaceFromPrevState*t;
-            newdata.u = this->u*t;
-            newdata.q_v = this->q_v*t;
-            newdata.q_c = this->q_c*t;
-            newdata.q_r = this->q_r*t;
-            return newdata;
-        }
+    {
+        VoxelPhysicalData newdata;
+        newdata.mass = this->mass*t;
+        newdata.temperature = this->temperature*t;
+        newdata.tempGradientFromPrevState = this->tempGradientFromPrevState*t;
+        newdata.tempLaplaceFromPrevState = this->tempLaplaceFromPrevState*t;
+        newdata.u = this->u*t;
+        newdata.q_v = this->q_v*t;
+        newdata.q_c = this->q_c*t;
+        newdata.q_r = this->q_r*t;
+        return newdata;
+    }
 };
 
 struct VoxelTemperatureGradientInfo {

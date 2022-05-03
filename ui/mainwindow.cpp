@@ -70,17 +70,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
     #ifdef CUDA_FLUID
         ui->CUDAwarning->show();
-        ui->WindFieldEditParent->hide();
-        ui->WindFieldResetButtonParent->hide();
     #else
         ui->CUDAwarning->hide();
-        ui->WindFieldEditParent->show();
-        ui->WindFieldResetButtonParent->show();
-        ui->WindFieldYSlider->setRange(-50, 50);
-        ui->WindFieldZSlider->setRange(-50, 50);
-        ui->WindFieldXSlider->setRange(-50, 50);
     #endif
 
+    ui->WindFieldEditParent->show();
+    ui->WindFieldResetButtonParent->show();
+    ui->WindFieldYSlider->setRange(-50, 50);
+    ui->WindFieldZSlider->setRange(-50, 50);
+    ui->WindFieldXSlider->setRange(-50, 50);
 
     #ifdef QT_DEBUG
         ui->DebugBuildWarning->show();
@@ -372,8 +370,8 @@ void MainWindow::on_WindFieldXSlider_valueChanged(int value)
     return;
     #endif
     ui->WindFieldXValue->setText(QString::number(value / 10.0));
-    vec3 newU = vec3(value / 10.0, ui->WindFieldYSlider->value() / 10.0, ui->WindFieldZSlider->value() / 10.0);
-    m_canvas3D->getForestScene()->getVoxelGrid()->artificiallyAlterUField(newU);
+    vec3 newF = vec3(value / 10.0, ui->WindFieldYSlider->value() / 10.0, ui->WindFieldZSlider->value() / 10.0);
+    m_canvas3D->getForestScene()->getVoxelGrid()->setGlobalFField(newF);
 }
 
 
@@ -383,8 +381,8 @@ void MainWindow::on_WindFieldYSlider_valueChanged(int value)
     return;
     #endif
     ui->WindFieldYValue->setText(QString::number(value / 10.0));
-    vec3 newU = vec3(ui->WindFieldXSlider->value() / 10.0, value / 10.0, ui->WindFieldZSlider->value() / 10.0);
-    m_canvas3D->getForestScene()->getVoxelGrid()->artificiallyAlterUField(newU);
+    vec3 newF = vec3(ui->WindFieldXSlider->value() / 10.0, value / 10.0, ui->WindFieldZSlider->value() / 10.0);
+    m_canvas3D->getForestScene()->getVoxelGrid()->setGlobalFField(newF);
 }
 
 
@@ -394,8 +392,8 @@ void MainWindow::on_WindFieldZSlider_valueChanged(int value)
     return;
     #endif
     ui->WindFieldZValue->setText(QString::number(value / 10.0));
-    vec3 newU = vec3(ui->WindFieldXSlider->value() / 10.0, ui->WindFieldYSlider->value() / 10.0, value / 10.0);
-    m_canvas3D->getForestScene()->getVoxelGrid()->artificiallyAlterUField(newU);
+    vec3 newF = vec3(ui->WindFieldXSlider->value() / 10.0, ui->WindFieldYSlider->value() / 10.0, value / 10.0);
+    m_canvas3D->getForestScene()->getVoxelGrid()->setGlobalFField(newF);
 }
 
 
