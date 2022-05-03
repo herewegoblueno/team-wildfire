@@ -71,9 +71,11 @@ MainWindow::MainWindow(QWidget *parent) :
     #ifdef CUDA_FLUID
         ui->CUDAwarning->show();
         ui->WindFieldEditParent->hide();
+        ui->WindFieldResetButtonParent->hide();
     #else
         ui->CUDAwarning->hide();
         ui->WindFieldEditParent->show();
+        ui->WindFieldResetButtonParent->show();
         ui->WindFieldYSlider->setRange(-50, 50);
         ui->WindFieldZSlider->setRange(-50, 50);
         ui->WindFieldXSlider->setRange(-50, 50);
@@ -394,5 +396,23 @@ void MainWindow::on_WindFieldZSlider_valueChanged(int value)
     ui->WindFieldZValue->setText(QString::number(value / 10.0));
     vec3 newU = vec3(ui->WindFieldXSlider->value() / 10.0, ui->WindFieldYSlider->value() / 10.0, value / 10.0);
     m_canvas3D->getForestScene()->getVoxelGrid()->artificiallyAlterUField(newU);
+}
+
+
+void MainWindow::on_resetWindfieldX_clicked()
+{
+    ui->WindFieldXSlider->setValue(0);
+}
+
+
+void MainWindow::on_resetWindfieldY_clicked()
+{
+    ui->WindFieldYSlider->setValue(0);
+}
+
+
+void MainWindow::on_resetWindfieldZ_clicked()
+{
+    ui->WindFieldZSlider->setValue(0);
 }
 
