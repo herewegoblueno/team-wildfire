@@ -5,7 +5,7 @@
 
 // water particle related equation
 double advect(double (*func)(Voxel *), glm::dvec3 vel, double dt, Voxel* v);
-dvec3  advect_vel(glm::dvec3 vel, double dt, Voxel* v);
+dvec3  advect_vel(dvec3 u, double dt, Voxel* v);
 double saturate(double pressure, double temperature);
 double absolute_temp(double height);
 double absolute_pres(double height);

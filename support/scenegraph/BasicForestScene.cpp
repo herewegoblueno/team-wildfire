@@ -33,6 +33,15 @@ BasicForestScene::BasicForestScene(MainWindow *mainWindow):
     _simulator.init();
     _voxelGrid.getVisualization()->setForestReference(_forest.get());
     mainWindow->updateModuleSelectionOptions(_forest->getAllModuleIDs());
+
+    vec3 fire_center(0,0,0);
+    Voxel* v = _voxelGrid.getVoxelClosestToPoint(fire_center);
+    _fire_mngr.addFire(v, fire_center, 0.8);
+
+    fire_center = vec3 (1,1,1);
+    v = _voxelGrid.getVoxelClosestToPoint(fire_center);
+    _fire_mngr.addFire(v, fire_center, 0.8);
+
 }
 
 BasicForestScene::~BasicForestScene()
@@ -84,6 +93,9 @@ void BasicForestScene::render(SupportCanvas3D *context) {
     _voxelGrid.getVisualization()->setPV(camera->getProjectionMatrix() * camera->getViewMatrix());
     _voxelGrid.getVisualization()->draw(context);
 
+    _fire_mngr.setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
+    _fire_mngr.setScale(0.03, 0.05);
+    _fire_mngr.drawFire(false);
     // Clean up dead modules, update radii, update UI
     _simulator.cleanupForNextStep(&_voxelGrid, _forest.get());
     updatePrimitivesFromForest();

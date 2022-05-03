@@ -18,36 +18,15 @@ void Simulator::stepVoxelWind(Voxel* v, double deltaTimeInMs)
     return;
     #endif
 
+    int x=v->XIndex, y=v->YIndex, z=v->ZIndex;
     dvec3 u = v->getLastFrameState()->u;
-    dvec3 d_ux = v->getGradient(get_q_ux);
-    dvec3 d_uy = v->getGradient(get_q_uy);
-    dvec3 d_uz = v->getGradient(get_q_uz);
 
-    int debug_pos[3] = {v->XIndex, v->YIndex, v->ZIndex};
-
-    // the original euler step is definitely impossible
-//    u.x -= glm::dot(d_ux, u)*deltaTimeInMs;
-//    u.y -= glm::dot(d_uy, u)*deltaTimeInMs;
-//    u.z -= glm::dot(d_uz, u)*deltaTimeInMs;
-    // another advection scheme
-//    u = advect_vel(u, deltaTimeInMs, v);
-    if(glm::length(u)>100)
-    {
-        std::cout << "[large vel after advect]";
-    }
-
-//    u.x += viscosity*(d_ux.x+d_ux.y+d_ux.z)*deltaTimeInMs;
-//    u.y += viscosity*(d_uy.x+d_uy.y+d_uy.z)*deltaTimeInMs;
-//    u.z += viscosity*(d_uz.x+d_uz.y+d_uz.z)*deltaTimeInMs;
-    if(glm::length(u)>100)
-    {
-//        std::cout << "[large vel after diffuse]";
-    }
-//    u = vorticity_confinement(u, v, deltaTimeInMs);
-    if(glm::length(u)>100)
-    {
-//        std::cout << "[large vel after vorticity]";
-    }
+    if(x==20 && y==20 && z==20) cout << "[" << u.x << "," << u.y << "," << u.z << "]-";
+    u = advect_vel(u, deltaTimeInMs, v);
+    if(x==20 && y==20 && z==20) cout << "[" << u.x << "," << u.y << "," << u.z << "]\n" << flush;
+    dvec3 u_laplace = v->getVelLaplace();
+    u += viscosity*u_laplace*deltaTimeInMs;
+    u = vorticity_confinement(u, v, deltaTimeInMs);
     double T_th = simTempToWorldTemp(v->getCurrentState()->temperature);
     double T_air = absolute_temp(v->centerInWorldSpace.y);
     double q_v = v->getLastFrameState()->q_v;
@@ -58,10 +37,7 @@ void Simulator::stepVoxelWind(Voxel* v, double deltaTimeInMs)
     dvec3 buoyancy = buoyancy_gravity*(28.96*T_th/(M_th*T_air) - 1);
     u = u + buoyancy*deltaTimeInMs; // can't think of externel force
 
-    if(glm::length(u)>100)
-    {
-        std::cout << "[large vel after buoyancy]";
-    }
+
     v->getCurrentState()->u = u;
 }
 
@@ -77,12 +53,12 @@ glm::dvec3 calc_pressure_effect(int x, int y, int z, int resolution, double* pre
     if(z<resolution-1) deltaP.z = pressure[index+1] - pressure[index];
     else deltaP.z += 0;
 
-    return deltaP*time/(cell_size*air_density*0.01);
+    return deltaP*time/(cell_size*air_density);
 }
 
 double calc_density_term(double cell_size, double time)
 {
-    return time/(air_density*cell_size*cell_size*0.01);
+    return time/(air_density*cell_size*cell_size);
 }
 
 
@@ -96,11 +72,23 @@ dvec3 vorticity_confinement(glm::dvec3 u, Voxel* v, double time)
     return u + f_omega*time;
 }
 
-glm::dvec3 advect_vel(glm::dvec3 vel, double dt, Voxel* v)
+glm::dvec3 advect_vel(dvec3 u, double dt, Voxel* v)
 {
-    glm::dvec3 pos = v->centerInWorldSpace - vel*dt;
-    VoxelPhysicalData data = v->grid->getStateInterpolatePoint(glm::vec3(pos[0], pos[1], pos[2]));
-    return data.u;
+    VoxelGrid* grid = v->grid;
+    int x=v->XIndex, y=v->YIndex, z=v->ZIndex;
+    double cell_size = grid->cellSideLength();
+    float ua, ub;
+
+    ua = grid->getVel(x-1,y,z,0);
+    ub = grid->getVel(x,y,z,0);
+    u.x -= (ub - ua)/cell_size*(ub+ua)/2*dt;
+    ua = grid->getVel(x,y-1,z,1);
+    ub = grid->getVel(x,y,z,1);
+    u.y -= (ub - ua)/cell_size*(ub+ua)/2*dt;
+    ua = grid->getVel(x,y,z-1,2);
+    ub = grid->getVel(x,y,z,2);
+    u.z -= (ub - ua)/cell_size*(ub+ua)/2*dt;
+    return u;
 }
 
 void fill_jacobi_rhs(Voxel* v, int resolution, int index, double density_term,
@@ -135,6 +123,38 @@ void pressure_projection_Jacobi_cuda(double* diag, double* rhs, int* id_xyz, int
 
 
 
-
-
+//// semi lagrangian advection
+//glm::dvec3 advect_vel(dvec3 u, double dt, Voxel* v)
+//{
+//    VoxelGrid* grid = v->grid;
+//    int x=v->XIndex, y=v->YIndex, z=v->ZIndex;
+//    double half_cell = grid->cellSideLength()/2;
+//    dvec3 out;
+//    dvec3 du, pos, pos_v = v->centerInWorldSpace;
+//    // for ux(x+0.5, y, z)
+//    du.x = v->getLastFrameState()->u.x;
+//    du.y = (grid->getVel(x,  y-1,z  , 1) + grid->getVel(x,  y, z, 1) +
+//            grid->getVel(x+1,y-1,z  , 1) + grid->getVel(x+1,y, z, 1))/4;
+//    du.z = (grid->getVel(x,  y,  z-1, 2) + grid->getVel(x,  y, z, 2) +
+//            grid->getVel(x+1,y,  z-1, 2) + grid->getVel(x+1,y, z, 2))/4;
+//    pos = pos_v + dvec3(half_cell, 0, 0) - du*dt;
+//    out.x = grid->getVelInterpolatePoint(vec3(pos)).x;
+//    // for uy(x, y+0.5, z)
+//    du.x = (grid->getVel(x-1,y  ,z, 0) + grid->getVel(x,y,  z, 0) +
+//            grid->getVel(x-1,y+1,z, 0) + grid->getVel(x,y+1,z, 0))/4;
+//    du.y = v->getLastFrameState()->u.x;
+//    du.z = (grid->getVel(x,  y,  z-1, 2) + grid->getVel(x,y,  z, 2) +
+//            grid->getVel(x,  y+1,z-1, 2) + grid->getVel(x,y+1,z, 2))/4;
+//    pos = pos_v + dvec3(0, half_cell, 0) - du*dt;
+//    out.y = grid->getVelInterpolatePoint(vec3(pos)).y;
+//    // for uz(x, y, z+0.5)
+//    du.x = (grid->getVel(x-1,y,z  , 0) + grid->getVel(x,y,z  , 0) +
+//            grid->getVel(x-1,y,z+1, 0) + grid->getVel(x,y,z+1, 0))/4;
+//    du.y = (grid->getVel(x, y-1,z , 1) + grid->getVel(x,y,z  , 1) +
+//            grid->getVel(x,y-1,z+1, 1) + grid->getVel(x,y,z+1, 1))/4;
+//    du.z = v->getLastFrameState()->u.z;
+//    pos = pos_v + dvec3(0, 0, half_cell) - du*dt;
+//    out.z = grid->getVelInterpolatePoint(vec3(pos)).z;
+//    return out;
+//}
 

@@ -21,17 +21,12 @@ using namespace CS123::GL;
 BasicFireScene::BasicFireScene():
      voxelGrids(8, vec3(0,0,0), 36)
 {
-    fires.clear();
 
-    Voxel* v = voxelGrids.getVoxel(20, 20, 20);
+    Voxel* v = voxelGrids.getVoxel(18, 18, 18);
     v->getLastFrameState()->temperature = 15;
     v->getCurrentState()->temperature = 15;
     glm::dvec3 c = v->centerInWorldSpace;
-//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(c.x, c.y, c.z), 0.5, &voxelGrids) );
-    fires.push_back(  std::make_unique<Fire> (200, glm::vec3(0, 0, 2), 4, &voxelGrids) );
-    fires.push_back(  std::make_unique<Fire> (200, glm::vec3(0, 0, -2), 4, &voxelGrids) );
-    fires.push_back(  std::make_unique<Fire> (200, glm::vec3(0, -2, 2), 4, &voxelGrids) );
-    fires.push_back(  std::make_unique<Fire> (200, glm::vec3(0, -2, -2), 4, &voxelGrids) );
+    fire_mngr.addFire(v, vec3(v->centerInWorldSpace), 0.5);
 
     voxelGrids.getVisualization()->toggle(false, true);
 
@@ -45,23 +40,14 @@ BasicFireScene::~BasicFireScene()
 
 void BasicFireScene::constructShaders() {
     shader_bank.clear();
-
-    std::string vertexSource = ResourceLoader::loadResourceFileToString(":/shaders/particle.vert");
-    std::string fragmentSource = ResourceLoader::loadResourceFileToString(":/shaders/fire.frag");
-    shader_bank.push_back(std::make_unique<CS123Shader>(vertexSource, fragmentSource));
-
-    vertexSource = ResourceLoader::loadResourceFileToString(":/shaders/particle.vert");
-    fragmentSource = ResourceLoader::loadResourceFileToString(":/shaders/smoke.frag");
-    shader_bank.push_back(std::make_unique<CS123Shader>(vertexSource, fragmentSource));
 }
-
 
 std::vector<std::unique_ptr<CS123Shader>> *BasicFireScene::getShaderPrograms(){
     return &shader_bank;
 }
 
 void BasicFireScene::render(SupportCanvas3D *context) {
-    Voxel* v = voxelGrids.getVoxel(20, 20, 20);
+    Voxel* v = voxelGrids.getVoxel(18, 18, 18);
     v->getLastFrameState()->temperature = 15;
     v->getCurrentState()->temperature = 15;
     voxelGrids.getVisualization()->updateValuesFromSettings();
@@ -70,46 +56,14 @@ void BasicFireScene::render(SupportCanvas3D *context) {
     glClearColor(0.2, 0.2, 0.2, 0.3);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    current_shader = shader_bank[0].get();
 
-//    current_shader->bind();
     Camera *camera = context->getCamera();
     voxelGrids.getVisualization()->setPV(camera->getProjectionMatrix() * camera->getViewMatrix());
     voxelGrids.getVisualization()->draw(context);
-//    current_shader->unbind();
 
-    std::vector<std::unique_ptr<CS123Shader>> *shaders = getShaderPrograms();
-    CS123Shader* fire_shader = shaders->at(0).get();
-    CS123Shader* smoke_shader = shaders->at(1).get();
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
-    fire_shader->bind();
-    fire_shader->setUniform("p", camera->getProjectionMatrix());
-    fire_shader->setUniform("v", camera->getViewMatrix());
-    smoke_shader->setUniform("scale", 0.03f);
-
-    int len = fires.size();
-    for (int f=0; f<len;f++)
-    {
-        fires[f]->drawParticles(fire_shader);
-    }
-    fire_shader->unbind();
-
-    smoke_shader->bind();
-    smoke_shader->setUniform("p", camera->getProjectionMatrix());
-    smoke_shader->setUniform("v", camera->getViewMatrix());
-    smoke_shader->setUniform("scale", 0.05f);
-
-    for (int f=0; f<len;f++)
-    {
-        fires[f]->drawSmoke(smoke_shader);
-    }
-    smoke_shader->unbind();
-
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDisable(GL_BLEND);
+    fire_mngr.setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
+    fire_mngr.setScale(0.03, 0.05);
+    fire_mngr.drawFire(false);
 
     //Trigger another render
     simulator.cleanupForNextStep(&voxelGrids);

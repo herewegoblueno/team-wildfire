@@ -11,6 +11,7 @@
 #include "support/shapes/Trunk.h"
 #include "support/shapes/Leaf.h"
 #include "simulation/simulator.h"
+#include "fire/firemanager.h"
 #include <unordered_map>
 
 
@@ -58,6 +59,7 @@ private:
     std::vector<PrimitiveBundle> _leaves;
     std::unordered_map<int, CS123SceneMaterial> _moduleIDToMat;
     Simulator _simulator;
+    FireManager _fire_mngr;
 
     MainWindow *mainWindow;
 };
