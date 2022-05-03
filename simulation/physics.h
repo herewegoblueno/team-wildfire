@@ -18,7 +18,7 @@ const double evaporation_rate = 0.001; // w
 
 // wind component related
 const double vorticity_epsilon = 0.1;
-const double viscosity = 0.1;
+const double viscosity = 0.01;
 const double gravity_acceleration = 1;
 const double air_density = 1.225;
 
@@ -47,7 +47,7 @@ const double woodDensity = 40;
 const double alpha_temp = 0.98;
 const double beta_temp = 0.02;
 const double burn_coef = 0.1;
-const double thermal_expansion = 0.5;
+const double thermal_expansion = 0.05;
 
 
 //For temperature conversions

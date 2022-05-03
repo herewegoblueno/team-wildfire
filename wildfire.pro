@@ -22,6 +22,7 @@ win32 {
 }
 
 SOURCES += ui/mainwindow.cpp \
+    fire/firemanager.cpp \
     fire/smoke.cpp \
     main.cpp \
     glew-1.10.0/src/glew.c \
@@ -81,6 +82,7 @@ SOURCES += ui/mainwindow.cpp \
 
 
 HEADERS += ui/mainwindow.h \
+    fire/firemanager.h \
     fire/particle.h \
     fire/smoke.h \
     simulation/fluid.h \

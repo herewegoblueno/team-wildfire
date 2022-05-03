@@ -120,7 +120,7 @@ dvec3 Voxel::getGradient(double (*func)(Voxel *))
     return gradient;
 }
 
-dvec3 Voxel::getVelGradient()
+dvec3 Voxel::getVelGradient() // this function uses the current state
 {
     int resolution = this->grid->getResolution();
 
@@ -142,26 +142,31 @@ dvec3 Voxel::getVelGradient()
     return gradient;
 }
 
-dvec3 Voxel::getVelLaplace()
+dvec3 Voxel::getVelLaplace() // this function uses the lastframe state
 {
     int resolution = this->grid->getResolution();
+    if(this->XIndex==resolution-1 || this->YIndex==resolution-1 || this->ZIndex==resolution-1)
+        return dvec3(0,0,0);
 
-    double Top = this->YIndex == resolution-1 ? 0 : get_uy(this);
-    double Bottom = this->YIndex == 0 ? 0 : get_uy(getVoxelWithIndexOffset(vec3(0,-1,0)));
-
-    double Right = this->XIndex == resolution-1 ? 0 : get_ux(this);
-    double Left = this->XIndex == 0 ? 0 : get_ux(getVoxelWithIndexOffset(vec3(-1,0,0)));
-
-    double Forward = this->ZIndex == resolution-1 ? 0 : get_uz(this);
-    double Back = this->ZIndex == 0 ? 0 : get_uz(getVoxelWithIndexOffset(vec3(0,0,-1)));
+    int x = this->XIndex, y = this->YIndex, z = this->ZIndex;
+    double Top     = this->grid->getVel(x, y+1, z, 1);
+    double Right   = this->grid->getVel(x+1, y, z, 0);
+    double Forward = this->grid->getVel(x, y, z+1, 2);
+    dvec3 Middle = this->getLastFrameState()->u;
+    double Bottom  = this->grid->getVel(x, y-1, z, 1);
+    double Left    = this->grid->getVel(x-1, y, z, 0);
+    double Back    = this->grid->getVel(x, y, z-1, 2);
 
     float cellSize = grid->cellSideLength();
 
-    double yGradient = (Top - Bottom) / cellSize;
-    double xGradient = (Right - Left) / cellSize;
-    double zGradient = (Forward - Back) / cellSize;
-    dvec3 gradient = dvec3(xGradient, yGradient, zGradient);
-    return gradient;
+    double rateOfChangeOfYGradient = (Top - Middle.y) - (Middle.y - Bottom);
+    rateOfChangeOfYGradient /= pow(cellSize, 2);
+    double rateOfChangeOfXGradient =  (Right - Middle.x) - (Middle.x - Left);
+    rateOfChangeOfXGradient /= pow(cellSize, 2);
+    double rateOfChangeOfZGradient = (Forward - Middle.z) - (Middle.z - Back) ;
+    rateOfChangeOfZGradient /= pow(cellSize, 2);
+    dvec3 laplace = dvec3(rateOfChangeOfXGradient, rateOfChangeOfYGradient, rateOfChangeOfZGradient);
+    return laplace;
 }
 
 double Voxel::getLaplace(double (*func)(Voxel *))
@@ -183,17 +188,17 @@ double Voxel::getLaplace(double (*func)(Voxel *))
     float cellSize = grid->cellSideLength();
 
     double rateOfChangeOfYGradient = (temperatureTop - temperatureMiddle) - (temperatureMiddle - temperatureBottom);
-    rateOfChangeOfYGradient /= pow(cellSize, 2) * 2;
+    rateOfChangeOfYGradient /= pow(cellSize, 2);
     double rateOfChangeOfZGradient = (temperatureForward - temperatureMiddle) - (temperatureMiddle - temperatureBack) ;
-    rateOfChangeOfZGradient /= pow(cellSize, 2) * 2;
+    rateOfChangeOfZGradient /= pow(cellSize, 2);
     double rateOfChangeOfXGradient =  (temperatureRight - temperatureMiddle) - (temperatureMiddle - temperatureLeft);
-    rateOfChangeOfXGradient /= pow(cellSize, 2) * 2;
+    rateOfChangeOfXGradient /= pow(cellSize, 2);
     double laplace = rateOfChangeOfYGradient + rateOfChangeOfZGradient + rateOfChangeOfXGradient;
     return laplace;
 }
 
 
-dvec3 Voxel::getVorticity()
+dvec3 Voxel::getVorticity() // this function uses the lastframe state
 {
     dvec3 grad_ux = getGradient(get_q_ux);
     dvec3 grad_uy = getGradient(get_q_uy);
@@ -202,14 +207,26 @@ dvec3 Voxel::getVorticity()
     return dvec3(grad_uz.y - grad_uy.z, grad_ux.z - grad_uz.x, grad_uy.x - grad_ux.y);
 }
 
-double get_q_ux(Voxel* v) {return v->getLastFrameState()->u.x;}
-double get_q_uy(Voxel* v) {return v->getLastFrameState()->u.y;}
-double get_q_uz(Voxel* v) {return v->getLastFrameState()->u.z;}
+ // calculate the center velocity of lastframestate
+double get_q_ux(Voxel* v) {
+    int x=v->XIndex, y=v->YIndex, z=v->ZIndex;
+    return (v->grid->getVel(x,y,z,0) + v->grid->getVel(x-1,y,z,0))/2;
+}
+double get_q_uy(Voxel* v) {
+    int x=v->XIndex, y=v->YIndex, z=v->ZIndex;
+    return (v->grid->getVel(x,y,z,1) + v->grid->getVel(x,y-1,z,1))/2;
+}
+double get_q_uz(Voxel* v) {
+    int x=v->XIndex, y=v->YIndex, z=v->ZIndex;
+    return (v->grid->getVel(x,y,z,2) + v->grid->getVel(x,y,z-1,2))/2;
+}
 
-double get_ux(Voxel* v) {return v->getCurrentState()->u.x;}
+// get the current state
+double get_ux(Voxel* v) { return v->getCurrentState()->u.x;}
 double get_uy(Voxel* v) {return v->getCurrentState()->u.y;}
 double get_uz(Voxel* v) {return v->getCurrentState()->u.z;}
 
+// get the lastframe state
 double get_q_v(Voxel* v) {return v->getLastFrameState()->q_v;}
 double get_q_c(Voxel* v) {return v->getLastFrameState()->q_c;}
 double get_q_r(Voxel* v) {return v->getLastFrameState()->q_r;}

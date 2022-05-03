@@ -11,15 +11,6 @@
 #include "particle.h"
 #include "smoke.h"
 
-namespace CS123 { namespace GL {
-    class Shader;
-    class CS123Shader;
-    class Texture2D;
-}}
-
-class OpenGLShape;
-class VoxelGrid;
-
 
 class Fire
 {
@@ -27,8 +18,8 @@ public:
     Fire(int density, glm::vec3 center, float size, VoxelGrid* grid);
     ~Fire();
 
-    void drawParticles( CS123::GL::CS123Shader* shader);
-    void drawSmoke( CS123::GL::CS123Shader* shader);
+    void drawParticles( CS123::GL::CS123Shader* shader, OpenGLShape* shape);
+    void drawSmoke( CS123::GL::CS123Shader* shader, OpenGLShape* shape);
 
 private:
     // particle cluster property
@@ -51,9 +42,6 @@ private:
 
     // render components
     VoxelGrid* m_grid;
-    std::unique_ptr<OpenGLShape> m_quad;
-    std::unique_ptr<CS123::GL::Texture2D> m_texture;
-    void InitRender();
 
     // gaussian random generator
     const float mean = 0.0;

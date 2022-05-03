@@ -5,15 +5,8 @@
 #include <vector>
 #include "OpenGLScene.h"
 #include "voxels/voxelgrid.h"
-#include "fire/fire.h"
+#include "fire/firemanager.h"
 #include "simulation/simulator.h"
-
-namespace CS123 { namespace GL {
-    class Shader;
-    class CS123Shader;
-    class Texture2D;
-}}
-
 
 class BasicFireScene : public OpenGLScene {
 public:
@@ -26,7 +19,7 @@ public:
     std::vector<std::unique_ptr<CS123::GL::CS123Shader>> * getShaderPrograms();
 
 private:
-     std::vector<std::unique_ptr<Fire>> fires;
+    FireManager fire_mngr;
 
     void setShaderSceneUniforms(SupportCanvas3D *context);
 

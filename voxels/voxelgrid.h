@@ -23,6 +23,8 @@ public:
     Voxel *getVoxel(int xIndex, int yIndex, int zIndex);
     Voxel *getVoxelClosestToPoint(vec3 point);
     VoxelPhysicalData getStateInterpolatePoint(vec3 point);
+    dvec3 getVelInterpolatePoint(vec3 point);
+    double getVel(int xIndex, int yIndex, int zIndex, int dim);
     VoxelGridLine *getVisualization();
     double getVolumePerCell();
     double cellSideLength();

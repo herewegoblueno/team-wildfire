@@ -52,34 +52,11 @@ Fire::Fire(int density, glm::vec3 center, float size, VoxelGrid* grid):
     m_respawn_num = std::max(m_respawn_num, 2);
 
     // init renderer
-    InitRender();
     generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
     // init smoke
     m_smoke = std::make_unique<Smoke>(density, fire_frame_rate, size, m_grid);
 }
 
-
-void Fire::InitRender()
-{
-
-    std::vector<float> particle_quad = { -1, 1, 0, 0, 0,
-                               -1, -1, 0, 0, 1,
-                               1, 1, 0, 1, 0,
-                                1, -1, 0, 1, 1};
-
-    m_quad = std::make_unique<OpenGLShape>();
-    m_quad->m_vertexData = particle_quad;
-    std::vector<CS123::GL::VBOAttribMarker> attribs;
-    attribs.push_back(VBOAttribMarker(ShaderAttrib::POSITION, 3, 0, VBOAttribMarker::DATA_TYPE::FLOAT, false));
-    attribs.push_back(VBOAttribMarker(ShaderAttrib::TEXCOORD0, 2, 3*sizeof(GLfloat), VBOAttribMarker::DATA_TYPE::FLOAT, false));
-    CS123::GL::VBO vbo(particle_quad.data(), 20, attribs, VBO::GEOMETRY_LAYOUT::LAYOUT_TRIANGLE_STRIP);
-    m_quad->m_VAO = std::make_unique<VAO>(vbo, 4);
-
-
-    QImage img(":/textures/fire2.png");
-    QImage gl_img = QGLWidget::convertToGLFormat(img);
-    m_texture = std::make_unique<Texture2D>(gl_img.bits(), gl_img.width(), gl_img.height());
-}
 
 Fire::~Fire()
 {
@@ -102,7 +79,7 @@ void Fire::update_particles()
     {
         Particle &p = m_particles[i];
 //        p.Life -= fire_frame_rate*p.Temp*burn_coef;
-        p.Life -= fire_frame_rate*0.01;
+        p.Life -= fire_frame_rate;
 
         if (p.Life > 0.0f)
         {
@@ -110,35 +87,19 @@ void Fire::update_particles()
             voxel = m_grid->getStateInterpolatePoint(p.Position);
             VoxelPhysicalData* vox = &voxel;
             float ambient_T = vox->temperature;
-            if(std::isnan(ambient_T)){
-                ambient_T = 0;
-            }
+            if(std::isnan(ambient_T)) ambient_T = 0;
 
-            float x = p.Position.x;
-            float y = p.Position.y;
-            float z = p.Position.z;
-            float te = p.Temp;
-
+            float b_factor = 0.15;
 
             glm::vec3 u = vec3(vox->u);
-            #ifndef CUDA_FLUID
-            float c_dis = glm::distance(p.Position, m_center)+0.001f;
-            u = glm::normalize(p.Position + glm::vec3(0,1,0) - m_center)*std::min(0.05f+0.2f/c_dis, 0.1f);
+            #ifdef CUDA_FLUID
+            b_factor = 0.03;
             #endif
-            glm::vec3 b = glm::vec3(0, gravity_acceleration*thermal_expansion*0.2f, 0)*
+            glm::vec3 b = glm::vec3(0, gravity_acceleration*thermal_expansion*b_factor, 0)*
                     (float)(simTempToWorldTemp(p.Temp) - simTempToWorldTemp(ambient_T)); // Buoyancy
 
-            p.Position += u * fire_frame_rate;
-
-            if(std::isnan(p.Position.x))
-            {
-                cout << x << " " << y << " " << z << " " << te<< endl << flush;
-                cout << (b+u).x << " " << (b+u).y << " " << (b+u).z << endl << flush;
-                cout << "crash loop";
-            }
-
-
-//            p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
+            p.Position += (b + u) * fire_frame_rate;
+            p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
 
             if(p.Life < fire_frame_rate*1.5 || p.Temp < 10)
             {
@@ -168,22 +129,12 @@ void Fire::RespawnParticle(int index)
 
 
 
-void Fire::drawSmoke(CS123::GL::CS123Shader* shader) {
-    m_smoke->drawParticles(shader);
+void Fire::drawSmoke(CS123::GL::CS123Shader* shader, OpenGLShape* shape) {
+    m_smoke->drawParticles(shader, shape);
 }
 
-void Fire::drawParticles(CS123::GL::CS123Shader* shader) {
+void Fire::drawParticles(CS123::GL::CS123Shader* shader, OpenGLShape* shape) {
     update_particles();
-
-    // bind texture (though currently it's not even used in the shader since it doesn't work on Mac)
-    TextureParametersBuilder builder;
-    builder.setFilter(TextureParameters::FILTER_METHOD::LINEAR);
-    builder.setWrap(TextureParameters::WRAP_METHOD::REPEAT);
-
-    TextureParameters parameters = builder.build();
-    parameters.applyTo(*m_texture);
-    std::string filename = "sprite";
-    shader->setTexture(filename, *m_texture);
 
     for (Particle particle : m_particles)
     {
@@ -194,7 +145,7 @@ void Fire::drawParticles(CS123::GL::CS123Shader* shader) {
             shader->setUniform("m", M_fire);
             shader->setUniform("temp", particle.Temp);
 
-            m_quad->draw();
+            shape->drawVAO();
         }
     }
 }

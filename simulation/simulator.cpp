@@ -59,7 +59,7 @@ void Simulator::linear_step(VoxelGrid *grid, Forest *forest)
     double deltaTime = (currentTime - timeLastFrame).count();
     if (deltaTime > 100) deltaTime = 100;
 
-    deltaTime = 0.0001;
+    deltaTime = 0.001;
     timeLastFrame = currentTime;
     if (deltaTime == 0) return; //Don't bother doing anything
 
@@ -152,11 +152,7 @@ void Simulator::stepThreadHandlerWater(VoxelGrid *grid ,Forest *, double deltaTi
             #ifdef CUDA_FLUID
                 dvec3 d_u = calc_pressure_effect(x, y, z, resolution, pressure, deltaTime, cell_size);
                 dvec3 o_u = vox->getCurrentState()->u;
-                if(x==20 && y==20 && z==20)
-                {
-                    cout << "[" << d_u.x << "," << d_u.y << "," << d_u.z << "]-";
-                    cout << "[" << o_u.x << "," << o_u.y << "," << o_u.z << "]\n";
-                }
+
                 vox->getCurrentState()->u = o_u - d_u;
             #endif
 //                stepVoxelWater(vox, deltaTime);

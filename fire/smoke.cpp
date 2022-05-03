@@ -31,31 +31,9 @@ Smoke::Smoke(int density, float frame_rate, float size, VoxelGrid* grid):
     for (unsigned int i = 0; i < m_density; ++i)
         m_particles.push_back(Particle());
 
-    InitRender();
 }
 
 
-void Smoke::InitRender()
-{
-
-    std::vector<float> particle_quad = { -1, 1, 0, 0, 0,
-                               -1, -1, 0, 0, 1,
-                               1, 1, 0, 1, 0,
-                                1, -1, 0, 1, 1};
-
-    m_quad = std::make_unique<OpenGLShape>();
-    m_quad->m_vertexData = particle_quad;
-    std::vector<CS123::GL::VBOAttribMarker> attribs;
-    attribs.push_back(VBOAttribMarker(ShaderAttrib::POSITION, 3, 0, VBOAttribMarker::DATA_TYPE::FLOAT, false));
-    attribs.push_back(VBOAttribMarker(ShaderAttrib::TEXCOORD0, 2, 3*sizeof(GLfloat), VBOAttribMarker::DATA_TYPE::FLOAT, false));
-    CS123::GL::VBO vbo(particle_quad.data(), 20, attribs, VBO::GEOMETRY_LAYOUT::LAYOUT_TRIANGLE_STRIP);
-    m_quad->m_VAO = std::make_unique<VAO>(vbo, 4);
-
-
-    QImage img(":/textures/fire.png");
-    QImage gl_img = QGLWidget::convertToGLFormat(img);
-    m_texture = std::make_unique<Texture2D>(gl_img.bits(), gl_img.width(), gl_img.height());
-}
 
 Smoke::~Smoke()
 {
@@ -115,7 +93,7 @@ void Smoke::RespawnParticle(int index, Particle& fire_particle)
     particle.Color = glm::vec4(0.5, 0.5, 0.5, 1.0f);
 }
 
-void Smoke::drawParticles(CS123::GL::CS123Shader* shader) {
+void Smoke::drawParticles(CS123::GL::CS123Shader* shader, OpenGLShape* shape) {
     update_particles();
 
     for (Particle particle : m_particles)
@@ -127,7 +105,7 @@ void Smoke::drawParticles(CS123::GL::CS123Shader* shader) {
             shader->setUniform("m", M_fire);
             shader->setUniform("temp", particle.Temp);
 
-            m_quad->draw();
+            shape->drawVAO();
         }
     }
 
