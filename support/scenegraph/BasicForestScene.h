@@ -19,12 +19,6 @@ const int numTrees = 20;
 const float forestHeight = 10;
 const float forestWidth = 10;
 
-//namespace CS123 { namespace GL {
-//    class Shader;
-//    class CS123Shader;
-//    class Texture2D;
-//}}
-
 
 class BasicForestScene : public OpenGLScene {
 public:
@@ -35,6 +29,7 @@ public:
     virtual void settingsChanged() override;
 
     Forest *getForest();
+    VoxelGrid *getVoxelGrid();
 
 private:
     void updatePrimitivesFromForest();

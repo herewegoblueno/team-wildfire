@@ -216,3 +216,7 @@ void BasicForestScene::settingsChanged() {
 Forest * BasicForestScene::getForest(){
     return _forest.get();
 }
+
+VoxelGrid * BasicForestScene::getVoxelGrid(){
+    return &_voxelGrid;
+}

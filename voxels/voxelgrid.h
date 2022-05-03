@@ -30,6 +30,8 @@ public:
     bool isGoodIndex(int i);
     int getClampedIndex(int i);
 
+    void artificiallyAlterUField(vec3 u);
+
 private:
     VoxelGridLine gridlines;
     int resolution;

@@ -68,11 +68,22 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->TimescaleSlider->setRange(0, 20);
     ui->TimescaleSlider->setValue(settings.simulatorTimescale * 10);
 
+    #ifdef CUDA_FLUID
+        ui->CUDAwarning->show();
+        ui->WindFieldEditParent->hide();
+    #else
+        ui->CUDAwarning->hide();
+        ui->WindFieldEditParent->show();
+        ui->WindFieldYSlider->setRange(-50, 50);
+        ui->WindFieldZSlider->setRange(-50, 50);
+        ui->WindFieldXSlider->setRange(-50, 50);
+    #endif
+
 
     #ifdef QT_DEBUG
-      ui->DebugBuildWarning->show();
+        ui->DebugBuildWarning->show();
     #else
-      ui->DebugBuildWarning->hide();
+        ui->DebugBuildWarning->hide();
     #endif
 }
 
@@ -350,5 +361,38 @@ void MainWindow::on_pauseTimescaleButton_clicked()
 void MainWindow::on_hideCurrentModuleHighlight_stateChanged(int state)
 {
     settings.hideSelectedModuleHighlight = state == Qt::CheckState::Checked;
+}
+
+
+void MainWindow::on_WindFieldXSlider_valueChanged(int value)
+{
+    #ifdef CUDA_FLUID
+    return;
+    #endif
+    ui->WindFieldXValue->setText(QString::number(value / 10.0));
+    vec3 newU = vec3(value / 10.0, ui->WindFieldYSlider->value() / 10.0, ui->WindFieldZSlider->value() / 10.0);
+    m_canvas3D->getForestScene()->getVoxelGrid()->artificiallyAlterUField(newU);
+}
+
+
+void MainWindow::on_WindFieldYSlider_valueChanged(int value)
+{
+    #ifdef CUDA_FLUID
+    return;
+    #endif
+    ui->WindFieldYValue->setText(QString::number(value / 10.0));
+    vec3 newU = vec3(ui->WindFieldXSlider->value() / 10.0, value / 10.0, ui->WindFieldZSlider->value() / 10.0);
+    m_canvas3D->getForestScene()->getVoxelGrid()->artificiallyAlterUField(newU);
+}
+
+
+void MainWindow::on_WindFieldZSlider_valueChanged(int value)
+{
+    #ifdef CUDA_FLUID
+    return;
+    #endif
+    ui->WindFieldZValue->setText(QString::number(value / 10.0));
+    vec3 newU = vec3(ui->WindFieldXSlider->value() / 10.0, ui->WindFieldYSlider->value() / 10.0, value / 10.0);
+    m_canvas3D->getForestScene()->getVoxelGrid()->artificiallyAlterUField(newU);
 }
 
