@@ -34,14 +34,14 @@ BasicForestScene::BasicForestScene(MainWindow *mainWindow):
     _voxelGrid.getVisualization()->setForestReference(_forest.get());
     mainWindow->updateModuleSelectionOptions(_forest->getAllModuleIDs());
 
-    vec3 fire_center(0,0,0);
-    Voxel* v = _voxelGrid.getVoxelClosestToPoint(fire_center);
-    _fire_mngr.addFire(v, fire_center, 0.8);
-
-    fire_center = vec3 (1,1,1);
-    v = _voxelGrid.getVoxelClosestToPoint(fire_center);
-    _fire_mngr.addFire(v, fire_center, 0.8);
-
+    //Here just for testing atm
+    std::default_random_engine generator;
+    std::uniform_real_distribution<double> distribution(-10.0, 10.0);
+    for (int i = 0; i < 400; i++){
+        vec3 fire_center(distribution(generator), distribution(generator), distribution(generator));
+        Voxel* v = _voxelGrid.getVoxelClosestToPoint(fire_center);
+        _fire_mngr.addFire(v, fire_center, 0.8);
+    }
 }
 
 BasicForestScene::~BasicForestScene()
@@ -95,9 +95,10 @@ void BasicForestScene::render(SupportCanvas3D *context) {
 
     _fire_mngr.setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
     _fire_mngr.setScale(0.03, 0.05);
-    _fire_mngr.drawFire(false);
-    // Clean up dead modules, update radii, update UI
+    _fire_mngr.drawFires(false);
+
     _simulator.cleanupForNextStep(&_voxelGrid, _forest.get());
+
     updatePrimitivesFromForest();
     std::vector<int> moduleIDs = _forest->getAllModuleIDs();
     uint numModules = moduleIDs.size();
@@ -105,6 +106,7 @@ void BasicForestScene::render(SupportCanvas3D *context) {
         mainWindow->updateModuleSelectionOptions(moduleIDs);
     }
     _lastFrameNumModules = numModules;
+
     //Trigger another render
     context->update();
 }

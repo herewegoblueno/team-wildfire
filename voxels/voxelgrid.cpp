@@ -94,11 +94,12 @@ VoxelPhysicalData VoxelGrid::getStateInterpolatePoint(vec3 point){
 
     VoxelPhysicalData out = c0*(1-zd) + c1*zd;
     out.u.x = (1-xd)*getVel(xIndex-1, yIndex, zIndex, 0) + xd*getVel(xIndex, yIndex, zIndex, 0);
-    out.u.y = (1-xd)*getVel(xIndex, yIndex-1, zIndex, 1) + xd*getVel(xIndex, yIndex, zIndex, 1);
-    out.u.z = (1-xd)*getVel(xIndex, yIndex, zIndex-1, 2) + xd*getVel(xIndex, yIndex, zIndex, 2);
+    out.u.y = (1-yd)*getVel(xIndex, yIndex-1, zIndex, 1) + yd*getVel(xIndex, yIndex, zIndex, 1);
+    out.u.z = (1-zd)*getVel(xIndex, yIndex, zIndex-1, 2) + zd*getVel(xIndex, yIndex, zIndex, 2);
     return out;
 }
 
+//Not used at the moment, added in case it becomes useful
 dvec3 VoxelGrid::getVelInterpolatePoint(vec3 point)
 {
     vec3 distancesToPoint = point - minXYZ;
@@ -112,8 +113,8 @@ dvec3 VoxelGrid::getVelInterpolatePoint(vec3 point)
     double zd = (point.z - p000->centerInWorldSpace.z)/voxelSize;
     dvec3 u;
     u.x = (1-xd)*getVel(xIndex-1, yIndex, zIndex, 0) + xd*getVel(xIndex, yIndex, zIndex, 0);
-    u.y = (1-xd)*getVel(xIndex, yIndex-1, zIndex, 1) + xd*getVel(xIndex, yIndex, zIndex, 1);
-    u.z = (1-xd)*getVel(xIndex, yIndex, zIndex-1, 2) + xd*getVel(xIndex, yIndex, zIndex, 2);
+    u.y = (1-yd)*getVel(xIndex, yIndex-1, zIndex, 1) + yd*getVel(xIndex, yIndex, zIndex, 1);
+    u.z = (1-zd)*getVel(xIndex, yIndex, zIndex-1, 2) + zd*getVel(xIndex, yIndex, zIndex, 2);
     return u;
 }
 
@@ -158,20 +159,21 @@ void VoxelGrid::setGlobalFField(vec3 f){
     }
 }
 
+
 double VoxelGrid::getVel(int x, int y, int z, int dim)
 {
-    Voxel* v = getVoxel(x,  y, z);
-    if (v==nullptr) return 0;
+    Voxel* v = getVoxel(x, y, z);
+    if (v == nullptr) return 0;
     int resolution = getResolution();
     dvec3 u = v->getCurrentState()->u;
-    if(dim==0) {
-        if(x==resolution-1) return 0;
+    if(dim == 0) {
+        if(x == resolution - 1) return 0;
         else return u.x;
-    } else if(dim==1) {
-        if(y==resolution-1) return 0;
+    } else if(dim == 1) {
+        if(y == resolution - 1) return 0;
         else return u.y;
-    } else if(dim==2) {
-        if(z==resolution-1) return 0;
+    } else if(dim == 2) {
+        if(z == resolution - 1) return 0;
         else return u.z;
     } return 0;
 }

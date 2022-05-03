@@ -63,7 +63,7 @@ void BasicFireScene::render(SupportCanvas3D *context) {
 
     fire_mngr.setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
     fire_mngr.setScale(0.03, 0.05);
-    fire_mngr.drawFire(false);
+    fire_mngr.drawFires(false);
 
     //Trigger another render
     simulator.cleanupForNextStep(&voxelGrids);

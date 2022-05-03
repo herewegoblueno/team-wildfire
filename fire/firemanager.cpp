@@ -86,7 +86,7 @@ void FireManager::setCamera(glm::mat4 projection, glm::mat4 view)
 
 
 
-void FireManager::drawFire(bool smoke)
+void FireManager::drawFires(bool smoke)
 {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
@@ -106,8 +106,7 @@ void FireManager::drawFire(bool smoke)
     m_fireshader->setUniform("v", v);
 
     m_quad->bindVAO();
-    for(auto fire:m_fires)
-        fire.second->drawParticles(m_fireshader.get(), m_quad.get());
+    for(auto &fire : m_fires) fire.second->drawParticles(m_fireshader.get(), m_quad.get());
     m_quad->unbindVAO();
 
     m_fireshader->unbind();
@@ -119,8 +118,7 @@ void FireManager::drawFire(bool smoke)
         m_smokeshader->setUniform("p", p);
         m_smokeshader->setUniform("v", v);
         m_quad->bindVAO();
-        for(auto fire:m_fires)
-            fire.second->drawSmoke(m_fireshader.get(), m_quad.get());
+        for(auto &fire:m_fires) fire.second->drawSmoke(m_fireshader.get(), m_quad.get());
         m_quad->unbindVAO();
         m_smokeshader->unbind();
     }

@@ -26,13 +26,13 @@ public:
     ~FireManager() {}
     void addFire(Voxel* v, glm::vec3 pos, float size);
     void removeFire(Voxel* v);
-    void drawFire(bool smoke=true);
+    void drawFires(bool smoke=true);
 
     void setScale(float fire_particle_size, float smoke_particle_size);
     void setCamera(glm::mat4 projection, glm::mat4 view);
 
 private:
-    std::map<int,  std::shared_ptr<Fire>> m_fires;
+    std::map<int, std::shared_ptr<Fire>> m_fires;
 
     // render components
     std::unique_ptr<OpenGLShape> m_quad;
