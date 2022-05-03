@@ -3,9 +3,6 @@
 DESTDIR = ../bin
 CUDA_OBJECTS_DIR = ./
 
-#OTHER_FILES += \
-#    $$PWD/jacobi.cu \
-#    $$PWD/base_op.cu
 CUDA_SOURCES += \
     $$PWD/jacobi.cu \
     $$PWD/base_op.cu \
@@ -28,8 +25,6 @@ win32 {
     CUDA_CODE = sm_75               # Type of CUDA architecture
     NVCC_OPTIONS = --use_fast_math
 
-
-    # include paths
     # include paths
     INCLUDEPATH += $$CUDA_DIR/include \
                    $$CUDA_DIR/common/inc \
@@ -85,5 +80,3 @@ win32 {
 
 HEADERS += \
     $$PWD/info.h
-
-

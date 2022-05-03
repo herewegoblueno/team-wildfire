@@ -52,7 +52,6 @@ private:
     static double heat_capacity(double gamma, double mass);
 
     // wind related equation
-
     static glm::dvec3 vorticity_confinement(glm::dvec3 u, Voxel* v, double time);
     static void pressure_projection_Jacobi_cuda(double* diag, double* rhs, int* id_xyz, int N, int Ni, int iter);
 };

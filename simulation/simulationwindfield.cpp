@@ -7,13 +7,14 @@
 extern "C" void jacobiGPU(double* diag, double* rhs, int* id_xyz, int N, int Ni, int iter);
 #endif
 
-double get_vorticity_len(Voxel* v) {return v->getVorticity().length();}
+double get_vorticity_len(Voxel* v) {
+    return v->getVorticity().length();
+}
 
 void Simulator::stepVoxelWind(Voxel* v, double deltaTimeInMs)
 {
 
-    #ifdef CUDA_FLUID
-    #else
+    #ifndef CUDA_FLUID
     return;
     #endif
 

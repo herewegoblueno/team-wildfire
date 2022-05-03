@@ -198,4 +198,3 @@ INCLUDEPATH += "$${HOME_DIR}/eigen-git-mirror"
 DEPENDPATH += "$${HOME_DIR}/eigen-git-mirror"
 
 include(cuda_lib/cuda_lib.pri)
-

@@ -2,10 +2,6 @@
 #include <math.h>
 #include <iostream>
 
-
-//extern "C" double* addVectorsGPU(double* a, double* b, int n);
-//extern "C" double* getDisplacement(double* a, double* b, double t, int n);
-
 void Simulator::stepVoxelWater(Voxel* v, double deltaTimeInMs)
 {
     double q_v = v->getLastFrameState()->q_v;
