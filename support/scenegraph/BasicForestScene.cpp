@@ -64,7 +64,7 @@ void BasicForestScene::loadShaders() {
 }
 
 void BasicForestScene::render(SupportCanvas3D *context) {
-    _simulator.linear_step(&_voxelGrid, _forest.get());
+    _simulator.step(&_voxelGrid, _forest.get());
 
     Camera *camera = context->getCamera();
     glClearColor(0.2, 0.2, 0.2, 0.3);
@@ -124,7 +124,7 @@ void BasicForestScene::renderTrunksVisualizedModules() {
             _moduleVisShader->setUniform("propMax",  settings.visualizeForestVoxelGridMaxTemp);
             _moduleVisShader->setUniform("propMin",  settings.visualizeForestVoxelGridMinTemp);
             double temp = module->getCurrentState()->temperature;
-            if (isnan(temp)) {
+            if (std::isnan(temp)) {
                 _moduleVisShader->setUniform("warningFlag",  true);
                 //Uncomment this if you want the simulation to pause the simulation
                 //once you start getting bad values....

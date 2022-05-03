@@ -46,7 +46,7 @@ void Simulator::stepVoxelWater(Voxel* v, double deltaTimeInMs)
 
 
 // Advection function based on *Stable Fluids* Jos Stam 1999
-double Simulator::advect(double (*func)(Voxel *), glm::dvec3 vel, double dt, Voxel* v)
+double advect(double (*func)(Voxel *), glm::dvec3 vel, double dt, Voxel* v)
 {
     glm::dvec3 pos = v->centerInWorldSpace - vel*dt;
     Voxel* v_trace = v->grid->getVoxelClosestToPoint(glm::vec3(pos[0], pos[1], pos[2]));
@@ -55,36 +55,37 @@ double Simulator::advect(double (*func)(Voxel *), glm::dvec3 vel, double dt, Vox
 
 
 // saturation ratio calculation of Eq.16 Stormscape
-double Simulator::saturate(double pressure, double temperature)
+double saturate(double pressure, double temperature)
 {
     return 380.16/pressure*exp(17.67*temperature/(temperature+243.5));
 }
 
 
 // absolute temperature calculation based on Eq.27 Stormscape
-double Simulator::absolute_temp(double height)
+double absolute_temp(double height)
 {
-    height = height_scale*height;
+//    height = height_scale*height;
+    height = (height + 20)*10;
     return sealevel_temperature - 0.0065*height - 273.15;
 }
 
 // absolute pressure calculation based on Eq.28 Stormscape
-double Simulator::absolute_pres(double height)
+double absolute_pres(double height)
 {
-    height = height_scale*height;
+    height = (height + 20)*10;
     float tmp = 1 - 0.0065*height/sealevel_temperature;
     return sealevel_pressure*std::pow(tmp, 5.2561);
 }
 
  // Stormscape Eq.9
-double Simulator::mole_fraction(double ratio)
+double mole_fraction(double ratio)
 {
     if (ratio < 0) ratio = 0; // fail safe
     return ratio / (1 + ratio);
 }
 
  // Stormscape Eq.7
-double Simulator::avg_mole_mass(double ratio)
+double avg_mole_mass(double ratio)
 {
     float real_mass = 18.02*ratio + 28.96*(1-ratio);
 //    return real_mass*mass_scale;
@@ -92,12 +93,12 @@ double Simulator::avg_mole_mass(double ratio)
 }
 
 // Stormscape Eq.11
-double Simulator::isentropic_exponent(double ratio)
+double isentropic_exponent(double ratio)
 {
     return ratio*1.33 + (1-ratio)*1.4;
 }
 
-double Simulator::heat_capacity(double gamma, double mass)
+double heat_capacity(double gamma, double mass)
 {
     return gamma*8.3/(mass*(gamma-1));
 }

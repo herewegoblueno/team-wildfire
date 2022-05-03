@@ -102,7 +102,7 @@ void Fire::update_particles()
     {
         Particle &p = m_particles[i];
 //        p.Life -= fire_frame_rate*p.Temp*burn_coef;
-        p.Life -= fire_frame_rate;
+        p.Life -= fire_frame_rate*0.01;
 
         if (p.Life > 0.0f)
         {
@@ -110,21 +110,23 @@ void Fire::update_particles()
             voxel = m_grid->getStateInterpolatePoint(p.Position);
             VoxelPhysicalData* vox = &voxel;
             float ambient_T = vox->temperature;
-
             if(std::isnan(ambient_T)){
                 ambient_T = 0;
             }
+
             float x = p.Position.x;
             float y = p.Position.y;
             float z = p.Position.z;
             float te = p.Temp;
 
 
-            glm::vec3 u = vec3(vox->u)*12.f;
-//            float c_dis = glm::distance(p.Position, m_center)+0.001f;
-//            u = glm::normalize(p.Position + glm::vec3(0,1,0) - m_center)*std::min(0.05f+0.2f/c_dis, 0.1f);
-
-            glm::vec3 b = glm::vec3(0, gravity_acceleration*thermal_expansion*0.0f, 0)*(p.Temp - ambient_T); // Buoyancy
+            glm::vec3 u = vec3(vox->u);
+            #ifndef CUDA_FLUID
+            float c_dis = glm::distance(p.Position, m_center)+0.001f;
+            u = glm::normalize(p.Position + glm::vec3(0,1,0) - m_center)*std::min(0.05f+0.2f/c_dis, 0.1f);
+            #endif
+            glm::vec3 b = glm::vec3(0, gravity_acceleration*thermal_expansion*0.2f, 0)*
+                    (float)(simTempToWorldTemp(p.Temp) - simTempToWorldTemp(ambient_T)); // Buoyancy
 
             p.Position += u * fire_frame_rate;
 
@@ -136,7 +138,7 @@ void Fire::update_particles()
             }
 
 
-            p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
+//            p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
 
             if(p.Life < fire_frame_rate*1.5 || p.Temp < 10)
             {

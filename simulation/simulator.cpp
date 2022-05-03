@@ -59,19 +59,20 @@ void Simulator::linear_step(VoxelGrid *grid, Forest *forest)
     double deltaTime = (currentTime - timeLastFrame).count();
     if (deltaTime > 100) deltaTime = 100;
 
-    deltaTime = 0.001;
+    deltaTime = 0.0001;
     timeLastFrame = currentTime;
     if (deltaTime == 0) return; //Don't bother doing anything
 
 
     int gridResolution = grid->getResolution();
+    int face_num = gridResolution*gridResolution;
     assert(gridResolution % NUMBER_OF_SIMULATION_THREADS == 0);
     int jumpPerThread = gridResolution / NUMBER_OF_SIMULATION_THREADS;
 
     int cell_num = gridResolution*gridResolution*gridResolution;
     double* diag = (double *) malloc(cell_num*sizeof(double));
-    int* id_xyz = (int *) malloc(cell_num*sizeof(int)*3);
     double* rhs = (double *) malloc(cell_num*sizeof(double));
+    int* id_xyz = (int *) malloc(cell_num*sizeof(int)*3);
 
     //(lines 7-12 in Algorithm 1 of paper)
     std::vector<std::thread> threads;
@@ -79,15 +80,26 @@ void Simulator::linear_step(VoxelGrid *grid, Forest *forest)
         threads.emplace_back(&Simulator::stepThreadHandlerWind, this, grid, forest, deltaTime,
                              gridResolution, x, x + jumpPerThread, diag, rhs, id_xyz);
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
+    double pressure[10][10][10];
+    for (int x=0;x<10;x++)
+        for (int y=0;y<10;y++)
+            for (int z=0;z<10;z++)
+                pressure[x][y][z] = rhs[x*face_num + y*gridResolution + z];
 
     threads.clear();
-    pressure_projection_Jacobi_cuda(diag, rhs, id_xyz, gridResolution, cell_num, gridResolution*gridResolution);
-    free(diag);
-    free(id_xyz);
+    pressure_projection_Jacobi_cuda(diag, rhs, id_xyz, gridResolution, cell_num, 20);
+    for (int x=0;x<10;x++)
+        for (int y=0;y<10;y++)
+            for (int z=0;z<10;z++)
+                pressure[x][y][z] = rhs[x*face_num + y*gridResolution + z];
+
     for (int x = 0; x < gridResolution; x += jumpPerThread)
-        threads.emplace_back(&Simulator::stepThreadHandlerWater, this, grid, forest, deltaTime, gridResolution, x, x + jumpPerThread, rhs);
+        threads.emplace_back(&Simulator::stepThreadHandlerWater, this, grid, forest, deltaTime,
+                             gridResolution, x, x + jumpPerThread, rhs);
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
-    free(rhs);
+
+    free(diag);free(rhs);free(id_xyz);
+
 }
 
 void Simulator::stepThreadHandler(VoxelGrid *grid ,Forest * forest, int deltaTime, int resolution, int minXInclusive, int maxXExclusive){
@@ -107,7 +119,7 @@ void Simulator::stepThreadHandlerWind(VoxelGrid *grid, Forest *forest, double de
                                       int minXInclusive, int maxXExclusive, double* diag_A, double* rhs, int* id_xyz)
 {
     double cell_size = grid->cellSideLength();
-    double density_term = deltaTime/air_density/cell_size/cell_size;
+    double density_term = calc_density_term(cell_size, deltaTime);
     int index, face_num = resolution*resolution;
 //    int cell_num = face_num*resolution;
     for (int x = minXInclusive; x < maxXExclusive; x++){
@@ -119,25 +131,10 @@ void Simulator::stepThreadHandlerWind(VoxelGrid *grid, Forest *forest, double de
                 stepVoxelHeatTransfer(v, nearbyModules, deltaTime);
                 stepVoxelWind(grid->getVoxel(x, y, z), deltaTime);
 
-                double diag = 6;
-                glm::dvec3 gradient = grid->getVoxel(x,y,z)->getVelGradient();
-                double this_rhs = (gradient.x + gradient.y + gradient.z)/density_term;
-
-                if(x>resolution-2) diag --;
-                if(x<1) diag --;
-//                if(y>resolution-2) diag --;
-                if(y<1) diag --;
-                if(z>resolution-2) diag --;
-                if(z<1) diag --;
-
-                diag_A[index] = diag;
-                int* i_xyz = id_xyz+index*3;
-                i_xyz[0] = x;
-                i_xyz[1] = y;
-                i_xyz[2] = z;
-
-                assert(!std::isnan(this_rhs));
-                rhs[index] = this_rhs;
+            #ifdef CUDA_FLUID
+                fill_jacobi_rhs(grid->getVoxel(x,y,z), resolution, index, density_term,
+                                     diag_A+index, rhs+index, id_xyz+index*3);
+            #endif
                 index++;
             }
         }
@@ -146,7 +143,6 @@ void Simulator::stepThreadHandlerWind(VoxelGrid *grid, Forest *forest, double de
 
 void Simulator::stepThreadHandlerWater(VoxelGrid *grid ,Forest *, double deltaTime, int resolution,
                                        int minXInclusive, int maxXExclusive, double* pressure){
-    int face_num = resolution*resolution;
     double cell_size = grid->cellSideLength();
     for (int x = minXInclusive; x < maxXExclusive; x++){
         for (int y = 0; y < resolution; y++){
@@ -154,25 +150,16 @@ void Simulator::stepThreadHandlerWater(VoxelGrid *grid ,Forest *, double deltaTi
                 Voxel* vox = grid->getVoxel(x,y,z);
 
             #ifdef CUDA_FLUID
-                glm::dvec3 deltaP(0,0,0);
-                int index = x*face_num+y*resolution+z;
-                if(x<resolution-1) deltaP.x += pressure[index+face_num];
-                else deltaP.x += pressure[index];
-                if(x>0) deltaP.x -= pressure[index-face_num];
-                else deltaP.x -= pressure[index];
-
-                if(y<resolution-1) deltaP.y += pressure[index+resolution];
-                else deltaP.y += pressure[index];
-                if(y>0) deltaP.y -= pressure[index-resolution];
-                else deltaP.y -= pressure[index];
-
-                if(z<resolution-1) deltaP.z += pressure[index+1];
-                else deltaP.z += pressure[index];
-                if(z>0) deltaP.z -= pressure[index-1];
-                else deltaP.z -= pressure[index];
-                vox->getCurrentState()->u -= deltaP*(double)deltaTime/cell_size/air_density;
+                dvec3 d_u = calc_pressure_effect(x, y, z, resolution, pressure, deltaTime, cell_size);
+                dvec3 o_u = vox->getCurrentState()->u;
+                if(x==20 && y==20 && z==20)
+                {
+                    cout << "[" << d_u.x << "," << d_u.y << "," << d_u.z << "]-";
+                    cout << "[" << o_u.x << "," << o_u.y << "," << o_u.z << "]\n";
+                }
+                vox->getCurrentState()->u = o_u - d_u;
             #endif
-                stepVoxelWater(vox, deltaTime);
+//                stepVoxelWater(vox, deltaTime);
             }
         }
     }

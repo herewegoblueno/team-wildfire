@@ -17,14 +17,14 @@ Voxel::Voxel(VoxelGrid *grid, int XIndex, int YIndex, int ZIndex, vec3 center) :
     currentPhysicalState.temperature = ambientTemperatureFunc(centerInWorldSpace);
 
     //for testing
-//    int targetIndex = ceil(grid->getResolution() / 2.f);
-//    int size = 2;
-//    if (XIndex > targetIndex - size - 1 && XIndex < targetIndex + size &&
-//            YIndex > targetIndex - size - 1 && YIndex < targetIndex + size &&
-//            ZIndex > targetIndex - size - 1 && ZIndex < targetIndex + size){
-//        lastFramePhysicalState.temperature = 10;
-//        currentPhysicalState.temperature = 10;
-//    }
+    int targetIndex = ceil(grid->getResolution() / 2.f);
+    int size = 4;
+    if (XIndex > targetIndex - size - 1 && XIndex < targetIndex + size &&
+            YIndex > targetIndex - size - 1 && YIndex < targetIndex + size &&
+            ZIndex > targetIndex - size - 1 && ZIndex < targetIndex + size){
+        lastFramePhysicalState.temperature = 10;
+        currentPhysicalState.temperature = 10;
+    }
 }
 
 //TODO: consider memoization for immediate neighbours
@@ -122,29 +122,47 @@ dvec3 Voxel::getGradient(double (*func)(Voxel *))
 
 dvec3 Voxel::getVelGradient()
 {
-    Voxel *vox;
-    vox = getVoxelWithIndexOffset(vec3(0,1,0));
-    double temperatureTop = vox == nullptr ? getCurrentState()->u.y : get_uy(vox);
-    vox = getVoxelWithIndexOffset(vec3(0,-1,0));
-    double temperatureBottom = vox == nullptr ? 0 : get_uy(vox);
-    vox = getVoxelWithIndexOffset(vec3(1,0,0));
-    double temperatureRight = vox == nullptr ? 0 : get_ux(vox);
-    vox = getVoxelWithIndexOffset(vec3(-1,0,0));
-    double temperatureLeft = vox == nullptr ? 0 : get_ux(vox);
-    vox = getVoxelWithIndexOffset(vec3(0,0,1));
-    double temperatureForward = vox == nullptr ? 0 : get_uz(vox);
-    vox = getVoxelWithIndexOffset(vec3(0,0,-1));
-    double temperatureBack = vox == nullptr ? 0 : get_uz(vox);
+    int resolution = this->grid->getResolution();
+
+    double Top = this->YIndex == resolution-1 ? 0 : get_uy(this);
+    double Bottom = this->YIndex == 0 ? 0 : get_uy(getVoxelWithIndexOffset(vec3(0,-1,0)));
+
+    double Right = this->XIndex == resolution-1 ? 0 : get_ux(this);
+    double Left = this->XIndex == 0 ? 0 : get_ux(getVoxelWithIndexOffset(vec3(-1,0,0)));
+
+    double Forward = this->ZIndex == resolution-1 ? 0 : get_uz(this);
+    double Back = this->ZIndex == 0 ? 0 : get_uz(getVoxelWithIndexOffset(vec3(0,0,-1)));
 
     float cellSize = grid->cellSideLength();
 
-    double yGradient = (temperatureTop - temperatureBottom) / (cellSize * 2);
-    double xGradient = (temperatureRight - temperatureLeft) / (cellSize * 2);
-    double zGradient = (temperatureForward - temperatureBack) / (cellSize * 2);
+    double yGradient = (Top - Bottom) / cellSize;
+    double xGradient = (Right - Left) / cellSize;
+    double zGradient = (Forward - Back) / cellSize;
     dvec3 gradient = dvec3(xGradient, yGradient, zGradient);
     return gradient;
 }
 
+dvec3 Voxel::getVelLaplace()
+{
+    int resolution = this->grid->getResolution();
+
+    double Top = this->YIndex == resolution-1 ? 0 : get_uy(this);
+    double Bottom = this->YIndex == 0 ? 0 : get_uy(getVoxelWithIndexOffset(vec3(0,-1,0)));
+
+    double Right = this->XIndex == resolution-1 ? 0 : get_ux(this);
+    double Left = this->XIndex == 0 ? 0 : get_ux(getVoxelWithIndexOffset(vec3(-1,0,0)));
+
+    double Forward = this->ZIndex == resolution-1 ? 0 : get_uz(this);
+    double Back = this->ZIndex == 0 ? 0 : get_uz(getVoxelWithIndexOffset(vec3(0,0,-1)));
+
+    float cellSize = grid->cellSideLength();
+
+    double yGradient = (Top - Bottom) / cellSize;
+    double xGradient = (Right - Left) / cellSize;
+    double zGradient = (Forward - Back) / cellSize;
+    dvec3 gradient = dvec3(xGradient, yGradient, zGradient);
+    return gradient;
+}
 
 double Voxel::getLaplace(double (*func)(Voxel *))
 {

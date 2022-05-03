@@ -83,6 +83,7 @@ SOURCES += ui/mainwindow.cpp \
 HEADERS += ui/mainwindow.h \
     fire/particle.h \
     fire/smoke.h \
+    simulation/fluid.h \
     simulation/physics.h \
     simulation/simulator.h \
     support/Settings.h \

@@ -14,7 +14,7 @@ struct VoxelPhysicalData {
     dvec3 tempGradientFromPrevState = dvec3(0,0,0); // ∇T (here just to make debugging easier if need be)
     double tempLaplaceFromPrevState = 0; // ∇^2T (here just to make debugging easier if need be)
 
-    dvec3 u = dvec3(0,0.001,0);  // velocity field
+    dvec3 u = dvec3(0,-0.001,0);  // velocity field
 
     // water coefs
     float q_v = 0.6; // water vapor
@@ -77,8 +77,10 @@ public:
     double getAmbientTemperature();
 
     dvec3 getGradient(double (*func)(Voxel *));
-    dvec3 getVelGradient();
     double getLaplace(double (*func)(Voxel *));
+
+    dvec3 getVelGradient();
+    dvec3 getVelLaplace();
     dvec3 getVorticity();
 
 private:

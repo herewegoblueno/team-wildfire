@@ -19,7 +19,7 @@ const double evaporation_rate = 0.001; // w
 // wind component related
 const double vorticity_epsilon = 0.1;
 const double viscosity = 0.1;
-const double gravity_acceleration = 0.1;
+const double gravity_acceleration = 1;
 const double air_density = 1.225;
 
 

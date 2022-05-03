@@ -19,21 +19,21 @@ using namespace CS123::GL;
 
 
 BasicFireScene::BasicFireScene():
-     voxelGrids(13, vec3(0,0,0), 28)
+     voxelGrids(8, vec3(0,0,0), 36)
 {
     fires.clear();
 
-    Voxel* v = voxelGrids.getVoxel(14, 13, 14);
+    Voxel* v = voxelGrids.getVoxel(20, 20, 20);
     v->getLastFrameState()->temperature = 15;
     v->getCurrentState()->temperature = 15;
     glm::dvec3 c = v->centerInWorldSpace;
-    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(c.x, c.y, c.z), 0.5, &voxelGrids) );
-//    fires.push_back(  std::make_unique<Fire> (100, glm::vec3(0, 0, 1), 5, &voxelGrids) );
-//    fires.push_back(  std::make_unique<Fire> (100, glm::vec3(0, 0, -1), 5, &voxelGrids) );
-//    fires.push_back(  std::make_unique<Fire> (100, glm::vec3(0, -1, 1), 5, &voxelGrids) );
-//    fires.push_back(  std::make_unique<Fire> (100, glm::vec3(0, -1, -1), 5, &voxelGrids) );
+//    fires.push_back(  std::make_unique<Fire> (500, glm::vec3(c.x, c.y, c.z), 0.5, &voxelGrids) );
+    fires.push_back(  std::make_unique<Fire> (200, glm::vec3(0, 0, 2), 4, &voxelGrids) );
+    fires.push_back(  std::make_unique<Fire> (200, glm::vec3(0, 0, -2), 4, &voxelGrids) );
+    fires.push_back(  std::make_unique<Fire> (200, glm::vec3(0, -2, 2), 4, &voxelGrids) );
+    fires.push_back(  std::make_unique<Fire> (200, glm::vec3(0, -2, -2), 4, &voxelGrids) );
 
-    voxelGrids.getVisualization()->toggle(true, true);
+    voxelGrids.getVisualization()->toggle(false, true);
 
     simulator.init();
     constructShaders();
@@ -61,7 +61,7 @@ std::vector<std::unique_ptr<CS123Shader>> *BasicFireScene::getShaderPrograms(){
 }
 
 void BasicFireScene::render(SupportCanvas3D *context) {
-    Voxel* v = voxelGrids.getVoxel(14, 13, 14);
+    Voxel* v = voxelGrids.getVoxel(20, 20, 20);
     v->getLastFrameState()->temperature = 15;
     v->getCurrentState()->temperature = 15;
     voxelGrids.getVisualization()->updateValuesFromSettings();
