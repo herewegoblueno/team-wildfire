@@ -79,7 +79,13 @@ VoxelPhysicalData VoxelGrid::getStateInterpolatePoint(vec3 point){
     Voxel* p111 = getVoxel(xIndex+1, yIndex+1, zIndex+1);
     if(p000==nullptr || p001==nullptr || p010==nullptr || p011==nullptr ||
        p100==nullptr || p101==nullptr || p110==nullptr || p111==nullptr)
-        return *getVoxel(xIndex, yIndex, zIndex)->getCurrentState();
+    {
+        if(getVoxel(xIndex, yIndex, zIndex) != nullptr)
+            return *getVoxel(xIndex, yIndex, zIndex)->getCurrentState();
+        else
+            return VoxelPhysicalData();
+    }
+
 
     double xd = (point.x - p000->centerInWorldSpace.x)/voxelSize;
     double yd = (point.y - p000->centerInWorldSpace.y)/voxelSize;
@@ -145,7 +151,7 @@ void VoxelGrid::setGlobalFField(vec3 f){
     //If we aren't, then the u field is never actually altered during the simulation, so we should just alter
     //it here.
 #ifdef CUDA_FLUID
-    return
+    return;
 #endif
 
     for (int x = 0; x < resolution; x++){
