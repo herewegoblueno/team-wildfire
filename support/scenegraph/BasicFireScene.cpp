@@ -19,16 +19,17 @@ using namespace CS123::GL;
 
 
 BasicFireScene::BasicFireScene():
-     voxelGrids(8, vec3(0,0,0), 36)
+     voxelGrid(8, vec3(0,0,0), 36),
+     fireManager(&voxelGrid)
 {
 
-    Voxel* v = voxelGrids.getVoxel(18, 18, 18);
+    Voxel* v = voxelGrid.getVoxel(18, 18, 18);
     v->getLastFrameState()->temperature = 15;
     v->getCurrentState()->temperature = 15;
     glm::dvec3 c = v->centerInWorldSpace;
-    fire_mngr.addFire(v, vec3(v->centerInWorldSpace), 0.5);
+    fireManager.addFire(nullptr, vec3(v->centerInWorldSpace), 0.5);
 
-    voxelGrids.getVisualization()->toggle(false, true);
+    voxelGrid.getVisualization()->toggle(false, true);
 
     simulator.init();
     constructShaders();
@@ -47,26 +48,26 @@ std::vector<std::unique_ptr<CS123Shader>> *BasicFireScene::getShaderPrograms(){
 }
 
 void BasicFireScene::render(SupportCanvas3D *context) {
-    Voxel* v = voxelGrids.getVoxel(18, 18, 18);
+    Voxel* v = voxelGrid.getVoxel(18, 18, 18);
     v->getLastFrameState()->temperature = 15;
     v->getCurrentState()->temperature = 15;
-    voxelGrids.getVisualization()->updateValuesFromSettings();
-    simulator.linear_step(&voxelGrids);
+    voxelGrid.getVisualization()->updateValuesFromSettings();
+    simulator.linear_step(&voxelGrid);
 
     glClearColor(0.2, 0.2, 0.2, 0.3);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
     Camera *camera = context->getCamera();
-    voxelGrids.getVisualization()->setPV(camera->getProjectionMatrix() * camera->getViewMatrix());
-    voxelGrids.getVisualization()->draw(context);
+    voxelGrid.getVisualization()->setPV(camera->getProjectionMatrix() * camera->getViewMatrix());
+    voxelGrid.getVisualization()->draw(context);
 
-    fire_mngr.setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
-    fire_mngr.setScale(0.03, 0.05);
-    fire_mngr.drawFires(false);
+    fireManager.setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
+    fireManager.setScale(0.03, 0.05);
+    fireManager.drawFires(false);
 
     //Trigger another render
-    simulator.cleanupForNextStep(&voxelGrids);
+    simulator.cleanupForNextStep(&voxelGrid);
     context->update();
 }
 

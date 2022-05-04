@@ -5,6 +5,7 @@
 #include "glm/glm.hpp"
 #include "simulation/physics.h"
 #include "voxels/voxelgrid.h"
+#include "utils/Random.h"
 
 const float branchWidthDecay = 0.7; // Amount to scale x, z size of each successive iteration
 
@@ -70,9 +71,11 @@ public:
     BranchSet _branches;
     // whether root is a branch in the module or just a pointer
     bool _includesRoot;
+    // pre-computed points for fire particles to spawn during combustion
+    std::vector<glm::vec3> _fireSpawnPoints;
 
     glm::dvec3 getCenterOfMass() const;
-    void initMassAndArea();
+    void initPropertiesFromBranches();
     void updateMassAndAreaViaBurning(double deltaTimeInMs, VoxelSet &voxels);
     ModulePhysicalData *getCurrentState();
     ModulePhysicalData *getLastFrameState();
@@ -91,6 +94,7 @@ private:
     double getBranchMass(Branch *branch) const;
     double getBranchVolume(Branch *branch) const;
     double getBranchLateralSurfaceArea(Branch *branch) const;
+    glm::vec3 sampleFromBranchCenter(Branch *branch) const;
 
     double getReactionRateFromPreviousFrame(double windSpeed);
     double sigmoidFunc(double x);

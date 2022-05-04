@@ -13,13 +13,18 @@ Module::Module() :
 {
 }
 
-/** Init mass and surface area of module based on branches  */
-void Module::initMassAndArea() {
+/**
+ * Init mass and surface area of module based on branches.
+ * Also pre-compute the points where fire should spawn by randomly sampling
+ * a point along the center axis of each branch.
+ */
+void Module::initPropertiesFromBranches() {
     _currentPhysicalData.mass = 0;
     _lastFramePhysicalData.mass = 0;
     _currentPhysicalData.area = 0;
     _lastFramePhysicalData.area = 0;
     for (Branch *branch : _branches) {
+        _fireSpawnPoints.push_back(sampleFromBranchCenter(branch));
         double mass = getBranchMass(branch);
         double area = getBranchLateralSurfaceArea(branch);
         _currentPhysicalData.mass += mass;
@@ -200,6 +205,16 @@ double Module::getMassChangeRateFromPreviousFrame(double windSpeed) {
     double reactionRate = getReactionRateFromPreviousFrame(windSpeed);
     double surfaceArea = getLastFrameState()->area;
     return -reactionRate * reation_rate_multiplier * surfaceArea;
+}
+
+/** Sample a random point from the center of a branch */
+vec3 Module::sampleFromBranchCenter(Branch *branch) const {
+    mat4 model = branch->model;
+    dvec3 branchStart = dvec3(model * trunkObjectBottom);
+    dvec3 branchEnd = dvec3(model * trunkObjectTop);
+    double distanceAlongBranch = randomFloat() * branch->length;
+    dvec3 branchDir = normalize(branchEnd - branchStart);
+    return vec3(branchStart + branchDir * distanceAlongBranch);
 }
 
 void Module::updateLastFrameData(){

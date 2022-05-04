@@ -4,6 +4,7 @@
 
 #include "OpenGLScene.h"
 
+#include <map>
 #include <memory>
 #include <vector>
 #include "support/shapes/Shape.h"
@@ -11,10 +12,10 @@
 #include "support/shapes/Trunk.h"
 #include "support/shapes/Leaf.h"
 #include "simulation/simulator.h"
-#include "fire/firemanager.h"
 #include <unordered_map>
 
 
+const float fireSize = 1.0;
 const int gridBuffer = 3; // make grid slightly larger than forest
 const int numTrees = 20;
 const float forestHeight = 10;
@@ -34,6 +35,7 @@ public:
 
 private:
     void updatePrimitivesFromForest();
+    void updateFires();
 
     void renderTrunksVisualizedModules();
     void renderTrunks();
@@ -48,6 +50,7 @@ private:
     void setGlobalData(CS123::GL::CS123Shader *s);
     void setSceneUniforms(SupportCanvas3D *context, CS123::GL::CS123Shader *s);
 
+    std::map<Module *, bool> _lastFrameModuleBurnState;
     uint _lastFrameNumModules;
     std::unique_ptr<CS123::GL::CS123Shader> _phongShader;
     std::unique_ptr<CS123::GL::CS123Shader> _moduleVisShader;
@@ -59,7 +62,7 @@ private:
     std::vector<PrimitiveBundle> _leaves;
     std::unordered_map<int, CS123SceneMaterial> _moduleIDToMat;
     Simulator _simulator;
-    FireManager _fire_mngr;
+    FireManager _fireManager;
 
     MainWindow *mainWindow;
 };

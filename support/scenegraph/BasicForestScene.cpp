@@ -21,12 +21,14 @@ using namespace CS123::GL;
 
 BasicForestScene::BasicForestScene(MainWindow *mainWindow):
      _voxelGrid(forestWidth + gridBuffer, vec3(0,0,0), 40),
+     _fireManager(&_voxelGrid),
      mainWindow(mainWindow)
 {
     loadShaders();
     tessellateShapes();
     _voxelGrid.getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeVectorField);
-    _forest = std::make_unique<Forest>(&_voxelGrid, numTrees, forestWidth, forestHeight);
+    _forest = std::make_unique<Forest>(&_voxelGrid, &_fireManager,
+                                       numTrees, forestWidth, forestHeight);
     _lastFrameNumModules = _forest->getAllModuleIDs().size();
     //The forest also initializes the mass of the voxels
     updatePrimitivesFromForest();
@@ -34,20 +36,38 @@ BasicForestScene::BasicForestScene(MainWindow *mainWindow):
     _voxelGrid.getVisualization()->setForestReference(_forest.get());
     mainWindow->updateModuleSelectionOptions(_forest->getAllModuleIDs());
 
-    //Here just for testing atm
-    std::default_random_engine generator;
-    std::uniform_real_distribution<double> distribution(-10.0, 10.0);
-    for (int i = 0; i < 400; i++){
-        vec3 fire_center(distribution(generator), distribution(generator), distribution(generator));
-        Voxel* v = _voxelGrid.getVoxelClosestToPoint(fire_center);
-        _fire_mngr.addFire(v, fire_center, 0.8);
-    }
+//    //Fire stress test (TODO: remove)
+//    std::default_random_engine generator;
+//    std::uniform_real_distribution<double> distribution(-10.0, 10.0);
+//    for (int i = 0; i < 400; i++){
+//        vec3 fire_center(distribution(generator), distribution(generator), distribution(generator));
+//        _fireManager.addFire(nullptr, fire_center, 0.8);
+//    }
 }
 
 BasicForestScene::~BasicForestScene()
 {
 }
 
+/**
+ * Update fires for any modules that started or stopped burning since previous frame
+ */
+void BasicForestScene::updateFires() {
+    for (Module *m : _forest->getModules()) {
+        bool burningLastFrame = _lastFrameModuleBurnState[m];
+        bool burningThisFrame = m->getCurrentState()->massChangeRateFromLastFrame < 0.0;
+        if (burningThisFrame && !burningLastFrame) {
+            for (vec3 &fireSpawnPos : m->_fireSpawnPoints) {
+                _fireManager.addFire(m, fireSpawnPos, fireSize);
+            }
+        } else if (burningLastFrame && !burningThisFrame) {
+            _fireManager.removeFires(m);
+        }
+        _lastFrameModuleBurnState[m] = burningThisFrame;
+    }
+}
+
+/** Update scene primitives based on the new state of the forest */
 void BasicForestScene::updatePrimitivesFromForest() {
     _leaves.clear();
     _trunks.clear();
@@ -93,9 +113,10 @@ void BasicForestScene::render(SupportCanvas3D *context) {
     _voxelGrid.getVisualization()->setPV(camera->getProjectionMatrix() * camera->getViewMatrix());
     _voxelGrid.getVisualization()->draw(context);
 
-    _fire_mngr.setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
-    _fire_mngr.setScale(0.03, 0.05);
-    _fire_mngr.drawFires(false);
+    updateFires();
+    _fireManager.setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
+    _fireManager.setScale(0.03, 0.05);
+    _fireManager.drawFires(false);
 
     _simulator.cleanupForNextStep(&_voxelGrid, _forest.get());
 

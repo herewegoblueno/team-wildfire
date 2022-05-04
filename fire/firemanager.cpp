@@ -24,7 +24,8 @@
 
 using namespace CS123::GL;
 
-FireManager::FireManager()
+FireManager::FireManager(VoxelGrid *grid) :
+    m_grid(grid)
 {
     m_fires.clear();
     std::vector<float> particle_quad = { -1, 1, 0, 0, 0,
@@ -55,21 +56,16 @@ FireManager::FireManager()
 }
 
 
-void FireManager::addFire(Voxel* v, glm::vec3 pos, float size)
+void FireManager::addFire(Module *m, glm::vec3 pos, float size)
 {
     int density = size*size*1000;
-    std::shared_ptr<Fire> fire = std::make_shared<Fire>(density, pos, size, v->grid);
-    int resolution = v->grid->getResolution();
-    int index = v->XIndex*resolution*resolution + v->YIndex*resolution + v->ZIndex;
-    if(m_fires.count(index)>0) m_fires.erase(index);
-    m_fires.insert({index, fire});
+    std::shared_ptr<Fire> fire = std::make_shared<Fire>(density, pos, size, m_grid);
+    m_fires.insert({m, fire});
 }
 
-void FireManager::removeFire(Voxel* v)
+void FireManager::removeFires(Module *m)
 {
-    int resolution = v->grid->getResolution();
-    int index = v->XIndex*resolution*resolution + v->YIndex*resolution + v->ZIndex;
-    if(m_fires.count(index)>0) m_fires.erase(index);
+    m_fires.erase(m);
 }
 
 void FireManager::setScale(float fire_particle_size, float smoke_particle_size)

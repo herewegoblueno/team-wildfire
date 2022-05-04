@@ -2,7 +2,6 @@
 #define FIREMANAGER_H
 
 #include <map>
-
 #include <memory>
 #include <vector>
 #include <random>
@@ -15,24 +14,22 @@
 #include "particle.h"
 #include "fire.h"
 #include "smoke.h"
-
-
-
+#include "trees/module.h"
 
 class FireManager
 {
 public:
-    FireManager();
-    ~FireManager() {}
-    void addFire(Voxel* v, glm::vec3 pos, float size);
-    void removeFire(Voxel* v);
+    FireManager(VoxelGrid *grid);
+    void addFire(Module *m, glm::vec3 pos, float size);
+    void removeFires(Module *m);
     void drawFires(bool smoke=true);
 
     void setScale(float fire_particle_size, float smoke_particle_size);
     void setCamera(glm::mat4 projection, glm::mat4 view);
 
 private:
-    std::map<int, std::shared_ptr<Fire>> m_fires;
+    VoxelGrid *m_grid;
+    std::multimap<Module *, std::shared_ptr<Fire>> m_fires;
 
     // render components
     std::unique_ptr<OpenGLShape> m_quad;
