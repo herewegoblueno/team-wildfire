@@ -42,14 +42,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->vizualizeForestVoxelGrid->setCheckState(settings.visualizeForestVoxelGrid ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
     ui->vizualizeForestField->setCheckState(settings.visualizeVectorField ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 
-    ui->forestVisualizationEyeXSlider->setRange(-50, 50);
+    int vizEyeRange = 50;
+    ui->forestVisualizationEyeXSlider->setRange(-vizEyeRange, vizEyeRange);
     ui->forestVisualizationEyeXSlider->setValue(settings.visualizeForestVoxelGridEyeX * 10);
-    ui->forestVisualizationEyeYSlider->setRange(-50, 50);
+    ui->forestVisualizationEyeYSlider->setRange(-vizEyeRange, vizEyeRange);
     ui->forestVisualizationEyeYSlider->setValue(settings.visualizeForestVoxelGridEyeY * 10);
-    ui->forestVisualizationEyeZSlider->setRange(-50, 50);
+    ui->forestVisualizationEyeZSlider->setRange(-vizEyeRange, vizEyeRange);
     ui->forestVisualizationEyeZSlider->setValue(settings.visualizeForestVoxelGridEyeZ * 10);
     ui->forestVisualizationEyeRSlider->setRange(0, 30);
     ui->forestVisualizationEyeRSlider->setValue(settings.visualizeForestVoxelGridEyeRadius * 10);
+
     ui->visualizationTemperatureRangeSlider->setRange(-10, 150);
     ui->visualizationTemperatureRangeSlider->setValues(settings.visualizeForestVoxelGridMinTemp * 10, settings.visualizeForestVoxelGridMaxTemp * 10);
 
@@ -74,11 +76,17 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->CUDAwarning->hide();
     #endif
 
+    //The range for global wind can't be too large:
+    //large wind can cause the simulation to explode (for a number of reasons)
+    //large numbers are never great for basic simulations like this, but we also suspect
+    //that the affect of lack on conservation of energy becuase of constant temperature from outside the
+    //bounds of the voxel vield may also affect the simulation if its effects are exacerbated by strong wind
+    int windFieldRange = 60; //10 will actually map to 0.1 in (for example) on_WindFieldZSlider_valueChanged
     ui->WindFieldEditParent->show();
     ui->WindFieldResetButtonParent->show();
-    ui->WindFieldYSlider->setRange(-50, 50);
-    ui->WindFieldZSlider->setRange(-50, 50);
-    ui->WindFieldXSlider->setRange(-50, 50);
+    ui->WindFieldYSlider->setRange(-windFieldRange, windFieldRange);
+    ui->WindFieldZSlider->setRange(-windFieldRange, windFieldRange);
+    ui->WindFieldXSlider->setRange(-windFieldRange, windFieldRange);
 
     #ifdef QT_DEBUG
         ui->DebugBuildWarning->show();
@@ -367,24 +375,27 @@ void MainWindow::on_hideCurrentModuleHighlight_stateChanged(int state)
 
 void MainWindow::on_WindFieldXSlider_valueChanged(int value)
 {
-    ui->WindFieldXValue->setText(QString::number(value / 10.0));
-    vec3 newF = vec3(value / 10.0, ui->WindFieldYSlider->value() / 10.0, ui->WindFieldZSlider->value() / 10.0);
+    double divider = 100.0;
+    ui->WindFieldXValue->setText(QString::number(value / divider));
+    vec3 newF = vec3(value / divider, ui->WindFieldYSlider->value() / divider, ui->WindFieldZSlider->value() / divider);
     m_canvas3D->getForestScene()->getVoxelGrid()->setGlobalFField(newF);
 }
 
 
 void MainWindow::on_WindFieldYSlider_valueChanged(int value)
 {
-    ui->WindFieldYValue->setText(QString::number(value / 10.0));
-    vec3 newF = vec3(ui->WindFieldXSlider->value() / 10.0, value / 10.0, ui->WindFieldZSlider->value() / 10.0);
+    double divider = 100.0;
+    ui->WindFieldYValue->setText(QString::number(value / divider));
+    vec3 newF = vec3(ui->WindFieldXSlider->value() / divider, value / divider, ui->WindFieldZSlider->value() / divider);
     m_canvas3D->getForestScene()->getVoxelGrid()->setGlobalFField(newF);
 }
 
 
 void MainWindow::on_WindFieldZSlider_valueChanged(int value)
 {
-    ui->WindFieldZValue->setText(QString::number(value / 10.0));
-    vec3 newF = vec3(ui->WindFieldXSlider->value() / 10.0, ui->WindFieldYSlider->value() / 10.0, value / 10.0);
+    double divider = 100.0;
+    ui->WindFieldZValue->setText(QString::number(value / divider));
+    vec3 newF = vec3(ui->WindFieldXSlider->value() / divider, ui->WindFieldYSlider->value() / divider, value / divider);
     m_canvas3D->getForestScene()->getVoxelGrid()->setGlobalFField(newF);
 }
 
