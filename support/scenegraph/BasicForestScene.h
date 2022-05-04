@@ -14,10 +14,9 @@
 #include "simulation/simulator.h"
 #include <unordered_map>
 
-
 const float fireSize = 1.0;
 const int gridBuffer = 3; // make grid slightly larger than forest
-const int numTrees = 20;
+const int numTrees = 30;
 const float forestHeight = 10;
 const float forestWidth = 10;
 

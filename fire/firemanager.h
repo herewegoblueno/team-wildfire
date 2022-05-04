@@ -16,11 +16,17 @@
 #include "smoke.h"
 #include "trees/module.h"
 
+inline int densityFromSize(float size) {
+    return size*size*1000;
+}
+
 class FireManager
 {
 public:
     FireManager(VoxelGrid *grid);
     void addFire(Module *m, glm::vec3 pos, float size);
+    double massChangeRateToFireSize(double massChangeRate);
+    void setModuleFireSizes(Module *m, float size);
     void removeFires(Module *m);
     void drawFires(bool smoke=true);
 

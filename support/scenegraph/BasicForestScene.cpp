@@ -55,13 +55,19 @@ BasicForestScene::~BasicForestScene()
 void BasicForestScene::updateFires() {
     for (Module *m : _forest->getModules()) {
         bool burningLastFrame = _lastFrameModuleBurnState[m];
-        bool burningThisFrame = m->getCurrentState()->massChangeRateFromLastFrame < 0.0;
+        double massChangeRate = m->getCurrentState()->massChangeRateFromLastFrame;
+        bool burningThisFrame = massChangeRate < 0.0;
         if (burningThisFrame && !burningLastFrame) {
             for (vec3 &fireSpawnPos : m->_fireSpawnPoints) {
                 _fireManager.addFire(m, fireSpawnPos, fireSize);
             }
         } else if (burningLastFrame && !burningThisFrame) {
             _fireManager.removeFires(m);
+        }
+        // Adjust size of fire based on mass change rate
+        if (burningThisFrame) {
+            float fireSize = _fireManager.massChangeRateToFireSize(massChangeRate);
+            _fireManager.setModuleFireSizes(m, fireSize);
         }
         _lastFrameModuleBurnState[m] = burningThisFrame;
     }

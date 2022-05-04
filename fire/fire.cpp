@@ -62,6 +62,9 @@ Fire::~Fire()
 {
 }
 
+void Fire::setSize(float size) {
+    m_size = size;
+}
 
 void Fire::update_particles()
 {

@@ -7,6 +7,7 @@
 #include "voxels/voxelgrid.h"
 #include "utils/Random.h"
 
+const int numFireSpawnPointsPerBranch = 2;
 const float branchWidthDecay = 0.7; // Amount to scale x, z size of each successive iteration
 
 // Object space values based off of Trunk.cpp
@@ -74,6 +75,7 @@ public:
     // pre-computed points for fire particles to spawn during combustion
     std::vector<glm::vec3> _fireSpawnPoints;
 
+    static double sigmoidFunc(double x);
     glm::dvec3 getCenterOfMass() const;
     void initPropertiesFromBranches();
     void updateMassAndAreaViaBurning(double deltaTimeInMs, VoxelSet &voxels);
@@ -97,7 +99,6 @@ private:
     glm::vec3 sampleFromBranchCenter(Branch *branch) const;
 
     double getReactionRateFromPreviousFrame(double windSpeed);
-    double sigmoidFunc(double x);
     double getMassChangeDueToBurning(double deltaTimeInMs, VoxelSet &voxels);
     void updateRadiiToReflectMassLoss(double massLoss);
 };

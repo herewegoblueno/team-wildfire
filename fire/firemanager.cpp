@@ -58,9 +58,22 @@ FireManager::FireManager(VoxelGrid *grid) :
 
 void FireManager::addFire(Module *m, glm::vec3 pos, float size)
 {
-    int density = size*size*1000;
+    int density = densityFromSize(size);
     std::shared_ptr<Fire> fire = std::make_shared<Fire>(density, pos, size, m_grid);
     m_fires.insert({m, fire});
+}
+
+void FireManager::setModuleFireSizes(Module *m, float size)
+{
+    auto equalRange = m_fires.equal_range(m);
+    int count = std::distance(equalRange.first, equalRange.second);
+    if (count == 0) {
+        return;
+    }
+    for (auto it = equalRange.first; it != equalRange.second; it++) {
+        auto fire = it->second;
+        fire->setSize(size);
+    }
 }
 
 void FireManager::removeFires(Module *m)
@@ -121,6 +134,22 @@ void FireManager::drawFires(bool smoke)
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_BLEND);
+}
+
+
+/** Return size of fire based on the mass change rate */
+double FireManager::massChangeRateToFireSize(double massChangeRate) {
+    double massLossRate = -massChangeRate;
+    double minFireSize = 0.4;
+    double maxFireSize = 1.0;
+    double minMassLossRate = 0.1;
+    double maxMassLossRate = 0.7;
+    double massLossRateDiff = maxMassLossRate - minMassLossRate;
+    if (massLossRate < minMassLossRate) return minFireSize;
+    if (massLossRate > maxMassLossRate) return maxFireSize;
+    double massLossRatio = (massLossRate - minMassLossRate) / massLossRateDiff;
+    double normalizedFireSize = Module::sigmoidFunc(massLossRatio);
+    return minFireSize + massLossRateDiff * normalizedFireSize;
 }
 
 
