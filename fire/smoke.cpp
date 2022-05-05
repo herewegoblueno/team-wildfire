@@ -54,16 +54,16 @@ void Smoke::update_particles()
             glm::vec3 u = vec3(vox->u);
             float ambient_T = vox->temperature;
 
-            float b_factor = 0.3;
+            float b_factor = 0.5;
             #ifdef CUDA_FLUID
-            b_factor = 0.1;
+            b_factor = 0.2;
             #else
             p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
             #endif
-            glm::vec3 b = glm::vec3(0, gravity_acceleration*thermal_expansion*b_factor, 0)*
-                    (float)(simTempToWorldTemp(p.Temp) - simTempToWorldTemp(ambient_T)); // Buoyancy
-
-            p.Position += (b + u) * m_frame_rate*0.5f;
+            float b = gravity_acceleration*thermal_expansion*b_factor*
+                    (float)std::max(simTempToWorldTemp(p.Temp) - simTempToWorldTemp(ambient_T), 0.); // Buoyancy
+            u.y += b;
+            p.Position += u * m_frame_rate;
 
             p.Position += (b+u+p.Velocity) * m_frame_rate;
             p.Temp = alpha_temp*p.Temp + beta_temp*(ambient_T);

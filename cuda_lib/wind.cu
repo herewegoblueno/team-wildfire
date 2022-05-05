@@ -34,10 +34,10 @@ void buoyancyKernel(double* grid_temp, double* grid_q_v, double* grid_h, double*
     {
         double* src_u = su_xyz + idx*3;
 
-        double T_th = grid_temp[idx];
+        double T_th = 10*grid_temp[idx] + 273.15;
         double X_v = grid_q_v[idx]/(1+grid_q_v[idx]);
         double M_th = 18.02*X_v + 28.96*(1-X_v);
-        double T_air = 3.5-grid_h[idx]*0.3;
+        double T_air = 35-grid_h[idx]*3 + 273.15;
         double buoyancy =   0.3*(28.96*T_th/(M_th*T_air) - 1);
 
         src_u[1] += buoyancy*dt;
@@ -256,8 +256,7 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
                     int resolution, double cell_size, float dt)
 {
     double air_density = 1.225;
-    double viscosity = 1;
-    cell_size = cell_size*10;
+    double viscosity = 0.2;
     cudaError err;
 
     auto t1 = now();
@@ -280,7 +279,7 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
     cudaMemcpy(d_id,    id_xyz,    cell_num * sizeof(int) * 3, cudaMemcpyHostToDevice);
     cudaMemcpy(d_f,     f,         sizeof(double) * 3, cudaMemcpyHostToDevice);
 
-    int blockSize = 512;
+    int blockSize = 128;
     int numBlocks = (cell_num - 1) / blockSize + 1;
     // advection
     auto t2 = now();
@@ -292,6 +291,7 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
     cudaDeviceSynchronize();
     // vorticity confinement
     auto t4 = now();
+    cudaMemcpy(d_u2,    d_u,     cell_num * sizeof(double) * 3, cudaMemcpyDeviceToDevice);
 //    double *vorticity, *vorticity_len;
 //    cudaMalloc(&vorticity,      cell_num * sizeof(double) * 3);
 //    cudaMalloc(&vorticity_len,  cell_num * sizeof(double));
