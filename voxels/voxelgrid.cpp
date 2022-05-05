@@ -1,4 +1,5 @@
 #include "voxelgrid.h"
+#include "simulation/physics.h"
 
 VoxelGrid::VoxelGrid(int axisSize, vec3 offset, int resolution) :
     resolution(resolution),
@@ -43,6 +44,12 @@ int VoxelGrid::getResolution(){
 
 double VoxelGrid::cellSideLength(){
     return axisSize * (1.0 / resolution);
+}
+
+//When calculating gradients, we act as if the cells are larger than they actually are for better
+//simulation stability
+double VoxelGrid::cellSideLengthForGradients(){
+    return cellSideLength() * voxelSizeMultiplierForGradients;
 }
 
 Voxel *VoxelGrid::getVoxel(int xIndex, int yIndex, int zIndex){

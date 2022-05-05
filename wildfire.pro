@@ -29,7 +29,6 @@ SOURCES += ui/mainwindow.cpp \
     simulation/physics.cpp \
     simulation/simulationheattransfer.cpp \
     simulation/simulationwaterphysics.cpp \
-    simulation/simulationwindfield.cpp \
     simulation/simulator.cpp \
     support/Settings.cpp \
     support/camera/CamtransCamera.cpp \

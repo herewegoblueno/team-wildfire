@@ -28,6 +28,7 @@ public:
     VoxelGridLine *getVisualization();
     double getVolumePerCell();
     double cellSideLength();
+    double cellSideLengthForGradients();
 
     bool isGoodIndex(int i);
     int getClampedIndex(int i);

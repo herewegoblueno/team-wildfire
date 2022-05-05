@@ -75,7 +75,7 @@ double Voxel::getNeighbourTemperature(int xOffset, int yOffset, int zOffset){
     double temperatureBack = getNeighbourTemperature(0, 0, -1); // -z
     double temperatureMiddle = lastFramePhysicalState.temperature;
 
-    double cellSize = grid->cellSideLength()*10;
+    double cellSize = grid->cellSideLengthForGradients();
 
     //calculating the ∇T (gradient)
     double yGradient = (temperatureTop - temperatureBottom) / (cellSize * 2);
@@ -136,7 +136,7 @@ dvec3 Voxel::getGradient(double (*func)(Voxel *))
     vox = getVoxelWithIndexOffset(vec3(0,0,-1));
     double temperatureBack = vox == nullptr ? 0 : func(vox);
 
-    float cellSize = grid->cellSideLength();
+    float cellSize = grid->cellSideLengthForGradients();
 
     double yGradient = (temperatureTop - temperatureBottom) / (cellSize * 2);
     double xGradient = (temperatureRight - temperatureLeft) / (cellSize * 2);
@@ -158,7 +158,7 @@ dvec3 Voxel::getVelGradient() // this function uses the current state
     double Forward = this->ZIndex == resolution-1 ? 0 : get_uz(this);
     double Back = this->ZIndex == 0 ? 0 : get_uz(getVoxelWithIndexOffset(vec3(0,0,-1)));
 
-    float cellSize = grid->cellSideLength();
+    float cellSize = grid->cellSideLengthForGradients();
 
     double yGradient = (Top - Bottom) / cellSize;
     double xGradient = (Right - Left) / cellSize;
@@ -182,7 +182,7 @@ dvec3 Voxel::getVelLaplace() // this function uses the lastframe state
     double Left    = this->grid->getVel(x-1, y, z, 0);
     double Back    = this->grid->getVel(x, y, z-1, 2);
 
-    float cellSize = grid->cellSideLength();
+    float cellSize = grid->cellSideLengthForGradients();
 
     double rateOfChangeOfYGradient = (Top - Middle.y) - (Middle.y - Bottom);
     rateOfChangeOfYGradient /= pow(cellSize, 2);
@@ -210,7 +210,7 @@ double Voxel::getLaplace(double (*func)(Voxel *))
     double temperatureBack = vox == nullptr ? 0 : func(vox);
     double temperatureMiddle = func(this);
 
-    float cellSize = grid->cellSideLength();
+    float cellSize = grid->cellSideLengthForGradients();
 
     double rateOfChangeOfYGradient = (temperatureTop - temperatureMiddle) - (temperatureMiddle - temperatureBottom);
     rateOfChangeOfYGradient /= pow(cellSize, 2);

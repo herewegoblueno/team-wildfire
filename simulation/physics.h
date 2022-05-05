@@ -37,6 +37,9 @@ const double reation_rate_multiplier = 1.0; //Not in paper, added by us
 
 //Voxels
 double ambientTemperatureFunc(glm::dvec3 point);
+//When calculating gradients, we act as if the cells are larger than they actually are for better
+//simulation stability
+double voxelSizeMultiplierForGradients = 10.0;
 
 // trees
 const double woodDensity = 40;

@@ -23,12 +23,8 @@ double get_vorticity_len(Voxel* v);
 double calc_density_term(double cell_size, double deltaTime);
 
 // wind related equation
-glm::dvec3 vorticity_confinement(glm::dvec3 u, Voxel* v, double time);
 void pressure_projection_Jacobi_cuda(double* diag, double* rhs, int* id_xyz, int N, int Ni, int iter);
-void fill_jacobi_rhs(Voxel* v, int resolution, int index, double density_term,
-                     double* diag_A, double* rhs, int* id_xyz);
-glm::dvec3 calc_pressure_effect(int x, int y, int z, int resolution,
-                                double* pressure, double time, double cell_size);
+
 
 
 #endif // FLUID_H
