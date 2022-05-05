@@ -23,16 +23,16 @@ BasicFireScene::BasicFireScene():
      fireManager(&voxelGrid)
 {
 
-    Voxel* v = voxelGrids.getVoxel(14, 18, 18);
+    Voxel* v = voxelGrid.getVoxel(14, 18, 18);
     glm::dvec3 c = v->centerInWorldSpace;
-    fire_mngr.addFire(v, vec3(v->centerInWorldSpace), 4);
+    fireManager.addFire(0, vec3(v->centerInWorldSpace), 4);
 
-    v = voxelGrids.getVoxel(22, 18, 18);
+    v = voxelGrid.getVoxel(22, 18, 18);
     c = v->centerInWorldSpace;
-    fire_mngr.addFire(v, vec3(v->centerInWorldSpace), 4);
+    fireManager.addFire((Module*)1, vec3(v->centerInWorldSpace), 4);
 
 
-    voxelGrids.getVisualization()->toggle(true, true);
+    voxelGrid.getVisualization()->toggle(true, true);
 
     simulator.init();
     constructShaders();
@@ -53,8 +53,8 @@ std::vector<std::unique_ptr<CS123Shader>> *BasicFireScene::getShaderPrograms(){
 void BasicFireScene::render(SupportCanvas3D *context) {
     Voxel* v = voxelGrid.getVoxel(18, 18, 18);
     v->getLastFrameState()->temperature = 15;
-    voxelGrids.getVisualization()->updateValuesFromSettings();
-    simulator.linear_step(&voxelGrids);
+    voxelGrid.getVisualization()->updateValuesFromSettings();
+    simulator.linear_step(&voxelGrid);
 
     glClearColor(0.2, 0.2, 0.2, 0.3);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
