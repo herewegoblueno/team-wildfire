@@ -7,13 +7,17 @@ using namespace glm;
 
 Forest::Forest(VoxelGrid *grid, FireManager *fireManager,
                int numTrees, float forestWidth, float forestHeight) :
+    _numTrees(numTrees),
+    _forestWidth(forestWidth),
+    _forestHeight(forestHeight),
     _fireManager(fireManager),
     _grid(grid),
     _treeGenerator(nullptr)
 {
     initializeTrunkPrimitive();
     initializeLeafPrimitive();
-    createTrees(numTrees, forestWidth, forestHeight);
+    initializeGroundPrimitive();
+    createTrees();
     initModuleProperties();
     initializeModuleVoxelMapping(); // depends on module mass
     initMassOfVoxels(); // depends on voxel mapping
@@ -32,6 +36,8 @@ Forest::~Forest() {
 /** Update primitives based on branches */
 void Forest::recalculatePrimitives() {
     _primitives.clear();
+    PrimitiveBundle groundPrimitive(*_ground, _groundModel);
+    _primitives.push_back(groundPrimitive);
     for (Branch *branch : _branches) {
         Module *m = getModuleFromId(branch->moduleID);
         mat4 model = branch->model * glm::scale(glm::vec3(m->getCurrentState()->radiusRatio,
@@ -49,19 +55,19 @@ void Forest::recalculatePrimitives() {
 }
 
 /** Generate trees, add their modules and branches to state */
-void Forest::createTrees(int numTrees, float forestWidth, float forestHeight) {
+void Forest::createTrees() {
     _treeGenerator = std::make_unique<TreeGenerator>();
     int totalModules = 0;
-    for (int i = 0; i < numTrees; i++) {
-        float x = randomFloat() * forestWidth - forestWidth / 2;
-        float z = randomFloat() * forestHeight - forestHeight / 2;
+    for (int i = 0; i < _numTrees; i++) {
+        float x = randomFloat() * _forestWidth - _forestWidth / 2;
+        float z = randomFloat() * _forestHeight - _forestHeight / 2;
         mat4 trans = translate(vec3(x, 0, z));
         _treeGenerator->generateTree();
         ModuleTree moduleTree = _treeGenerator->getModuleTree();
         addTreeToForest(moduleTree.modules, trans);
         totalModules += moduleTree.modules.size();
     }
-    std::cout << (float)totalModules/(float)numTrees << " modules per tree" << std::endl;
+    std::cout << (float)totalModules/(float)_numTrees << " modules per tree" << std::endl;
 }
 
 /**
@@ -285,39 +291,6 @@ std::vector<PrimitiveBundle> Forest::getPrimitives() {
     return _primitives;
 }
 
-/** Initialize the cylinder building block of our tree trunk/branches */
-void Forest::initializeTrunkPrimitive() {
-    // Initialize brownish material for trunk
-    std::unique_ptr<CS123SceneMaterial> material = std::make_unique<CS123SceneMaterial>();
-    material->clear();
-    material->cAmbient.r = 0.2f;
-    material->cAmbient.g = 0.2f;
-    material->cAmbient.b = 0.2f;
-    material->cDiffuse.r = 0.4f;
-    material->cDiffuse.g = 0.2f;
-    material->cDiffuse.b = 0.2f;
-    // Create primitive object
-    _trunk = std::make_unique<CS123ScenePrimitive>(
-                PrimitiveType::PRIMITIVE_TRUNK, *material);
-}
-
-
-/** Initialize the leaf primitive */
-void Forest::initializeLeafPrimitive() {
-    // Initialize green material for leaves
-    std::unique_ptr<CS123SceneMaterial> material = std::make_unique<CS123SceneMaterial>();
-    material->clear();
-    material->cAmbient.r = 0.20f;
-    material->cAmbient.g = 0.5f;
-    material->cAmbient.b = 0.02f;
-    material->cDiffuse.r = 0.20f;
-    material->cDiffuse.g = 0.5f;
-    material->cDiffuse.b = 0.02f;
-    // Create primitive object
-    _leaf = std::make_unique<CS123ScenePrimitive>(PrimitiveType::PRIMITIVE_LEAF, *material);
-}
-
-
 VoxelSet Forest::getVoxelsMappedToModule(Module *m){
     return _moduleToVoxels[m];
 }
@@ -383,4 +356,56 @@ void Forest::deleteDeadModules(){
            return deleteDeadModules();
        }
     }
+}
+
+
+/** Initialize the cylinder building block of our tree trunk/branches */
+void Forest::initializeTrunkPrimitive() {
+    // Initialize brownish material for trunk
+    std::unique_ptr<CS123SceneMaterial> material = std::make_unique<CS123SceneMaterial>();
+    material->clear();
+    material->cAmbient.r = 0.2f;
+    material->cAmbient.g = 0.2f;
+    material->cAmbient.b = 0.2f;
+    material->cDiffuse.r = 0.4f;
+    material->cDiffuse.g = 0.2f;
+    material->cDiffuse.b = 0.2f;
+    // Create primitive object
+    _trunk = std::make_unique<CS123ScenePrimitive>(
+                PrimitiveType::PRIMITIVE_TRUNK, *material);
+}
+
+
+/** Initialize the leaf primitive */
+void Forest::initializeLeafPrimitive() {
+    // Initialize dark green material for leaves
+    std::unique_ptr<CS123SceneMaterial> material = std::make_unique<CS123SceneMaterial>();
+    material->clear();
+    material->cAmbient.r = 0.0f;
+    material->cAmbient.g = 0.4f;
+    material->cAmbient.b = 0.2f;
+    material->cDiffuse.r = 0.0f;
+    material->cDiffuse.g = 0.4f;
+    material->cDiffuse.b = 0.2f;
+    // Create primitive object
+    _leaf = std::make_unique<CS123ScenePrimitive>(PrimitiveType::PRIMITIVE_LEAF, *material);
+}
+
+
+/** Initialize the ground primitive */
+void Forest::initializeGroundPrimitive() {
+    // Initialize ground model
+    _groundModel = glm::scale(glm::vec3(_forestWidth + gridBuffer, 0,
+                                        _forestHeight + gridBuffer));
+    // Initialize light green material for ground
+    std::unique_ptr<CS123SceneMaterial> material = std::make_unique<CS123SceneMaterial>();
+    material->clear();
+    material->cAmbient.r = 0.6f;
+    material->cAmbient.g = 1.0f;
+    material->cAmbient.b = 0.6f;
+    material->cDiffuse.r = 0.6f * 0.73f;
+    material->cDiffuse.g = 1.0f * 0.62f;
+    material->cDiffuse.b = 0.6f * 0.51f;
+    // Create primitive object
+    _ground = std::make_unique<CS123ScenePrimitive>(PrimitiveType::PRIMITIVE_GROUND, *material);
 }

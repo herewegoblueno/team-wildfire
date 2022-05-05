@@ -6,6 +6,7 @@
 #include "unordered_map"
 #include "fire/firemanager.h"
 
+const int gridBuffer = 3; // make grid slightly larger than forest
 // Size of grid to search beyond center voxel when finding voxels
 // that overlap a module
 const int voxelSearchRadius = 25;
@@ -35,11 +36,15 @@ public:
     void deleteDeadModules();
 
 private:
-    void createTrees(int numTrees, float forestWidth, float forestHeight);
+    void createTrees();
     void addTreeToForest(const ModuleSet &modules, glm::mat4 trans);
     void initializeTrunkPrimitive();
     void initializeLeafPrimitive();
+    void initializeGroundPrimitive();
 
+    int _numTrees;
+    float _forestWidth;
+    float _forestHeight;
     FireManager *_fireManager;
     VoxelGrid *_grid;
     BranchSet _branches;
@@ -48,6 +53,8 @@ private:
     std::unique_ptr<TreeGenerator> _treeGenerator;
     std::unique_ptr<CS123ScenePrimitive> _trunk;
     std::unique_ptr<CS123ScenePrimitive> _leaf;
+    std::unique_ptr<CS123ScenePrimitive> _ground;
+    glm::mat4 _groundModel;
 
     bool checkModuleVoxelOverlap(Module *module, Voxel *voxel, double cellSideLength);
     void initializeModuleVoxelMapping();

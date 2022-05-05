@@ -686,7 +686,7 @@ bool CS123XmlSceneParser::parsePrimitive(const QDomElement &prim, CS123SceneNode
     CS123ScenePrimitive* primitive = new CS123ScenePrimitive();
     CS123SceneMaterial& mat = primitive->material;
     mat.clear();
-    primitive->type = PrimitiveType::PRIMITIVE_CUBE;
+    primitive->type = PrimitiveType::PRIMITIVE_SPHERE;
     mat.textureMap.isUsed = false;
     mat.bumpMap.isUsed = false;
     mat.cDiffuse.r = mat.cDiffuse.g = mat.cDiffuse.b = 1;
@@ -695,7 +695,6 @@ bool CS123XmlSceneParser::parsePrimitive(const QDomElement &prim, CS123SceneNode
     // Parse primitive type
     std::string primType = prim.attribute("name").toStdString();
     if (primType == "sphere") primitive->type = PrimitiveType::PRIMITIVE_SPHERE;
-    else if (primType == "cube") primitive->type = PrimitiveType::PRIMITIVE_CUBE;
     else if (primType == "cylinder") primitive->type = PrimitiveType::PRIMITIVE_CYLINDER;
     else if (primType == "cone") primitive->type = PrimitiveType::PRIMITIVE_CONE;
     else if (primType == "mesh") {

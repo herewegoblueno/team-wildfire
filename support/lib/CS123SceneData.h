@@ -19,7 +19,7 @@ enum class LightType {
 enum class PrimitiveType {
     PRIMITIVE_TRUNK,
     PRIMITIVE_LEAF,
-    PRIMITIVE_CUBE,
+    PRIMITIVE_GROUND,
     PRIMITIVE_CONE,
     PRIMITIVE_CYLINDER,
     PRIMITIVE_SPHERE,
@@ -161,6 +161,12 @@ struct PrimitiveBundle {
    PrimitiveBundle(CS123ScenePrimitive primitive, glm::mat4 model) :
        primitive(primitive),
        model(model),
+       moduleID(0)
+   {
+   }
+   PrimitiveBundle() :
+       primitive(CS123ScenePrimitive()),
+       model(glm::mat4(0)),
        moduleID(0)
    {
    }

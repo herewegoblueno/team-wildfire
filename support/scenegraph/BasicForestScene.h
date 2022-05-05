@@ -7,19 +7,17 @@
 #include <map>
 #include <memory>
 #include <vector>
-#include "support/shapes/Shape.h"
 #include "trees/forest.h"
+#include "support/shapes/Shape.h"
 #include "support/shapes/Trunk.h"
 #include "support/shapes/Leaf.h"
+#include "support/shapes/Ground.h"
 #include "simulation/simulator.h"
 #include <unordered_map>
 
-const float fireSize = 1.0;
-const int gridBuffer = 3; // make grid slightly larger than forest
 const int numTrees = 30;
 const float forestHeight = 10;
 const float forestWidth = 10;
-
 
 class BasicForestScene : public OpenGLScene {
 public:
@@ -39,6 +37,7 @@ private:
     void renderTrunksVisualizedModules();
     void renderTrunks();
     void renderLeaves();
+    void renderGround();
     void renderGeometry();
     void loadShaders();
     void tessellateShapes();
@@ -57,8 +56,10 @@ private:
     std::unique_ptr<Forest> _forest;
     std::unique_ptr<Trunk> _trunk;
     std::unique_ptr<Leaf> _leaf;
-    std::vector<PrimitiveBundle> _trunks;
-    std::vector<PrimitiveBundle> _leaves;
+    std::unique_ptr<Ground> _ground;
+    std::vector<PrimitiveBundle> _trunkBundles;
+    std::vector<PrimitiveBundle> _leafBundles;
+    PrimitiveBundle _groundBundle;
     std::unordered_map<int, CS123SceneMaterial> _moduleIDToMat;
     Simulator _simulator;
     FireManager _fireManager;

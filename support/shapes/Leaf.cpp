@@ -1,5 +1,6 @@
 #include "Leaf.h"
 
+/** Leaf made of 4 triangles, bounded horizontally by (0, 0, 0) and (1, 0, 0) */
 Leaf::Leaf()
 {
     Leaf::initializeVertexData();

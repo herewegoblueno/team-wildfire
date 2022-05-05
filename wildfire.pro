@@ -59,9 +59,8 @@ SOURCES += ui/mainwindow.cpp \
     support/scenegraph/SupportCanvas3D.cpp \
     support/shapes/CircleBase.cpp \
     support/shapes/Cone.cpp \
-    support/shapes/Cube.cpp \
     support/shapes/Cylinder.cpp \
-    support/shapes/Fruit.cpp \
+    support/shapes/Ground.cpp \
     support/shapes/Leaf.cpp \
     support/shapes/OpenGLShape.cpp \
     support/shapes/Shape.cpp \
@@ -72,7 +71,6 @@ SOURCES += ui/mainwindow.cpp \
     trees/TreeGenerator.cpp \
     trees/forest.cpp \
     trees/module.cpp \
-    trees/terrain.cpp \
     fire/fire.cpp \
     ui/extrawidgets/ctkrangeslider.cpp \
     voxels/voxel.cpp \
@@ -120,9 +118,8 @@ HEADERS += ui/mainwindow.h \
     support/scenegraph/SupportCanvas3D.h \
     support/shapes/CircleBase.h \
     support/shapes/Cone.h \
-    support/shapes/Cube.h \
     support/shapes/Cylinder.h \
-    support/shapes/Fruit.h \
+    support/shapes/Ground.h \
     support/shapes/Leaf.h \
     support/shapes/OpenGLShape.h \
     support/shapes/Shape.h \
@@ -135,7 +132,6 @@ HEADERS += ui/mainwindow.h \
     utils/Random.h \
     trees/forest.h \
     trees/module.h \
-    trees/terrain.h \
     ui/extrawidgets/ctkrangeslider.h \
     ui_mainwindow.h \
     glew-1.10.0/include/GL/glew.h \

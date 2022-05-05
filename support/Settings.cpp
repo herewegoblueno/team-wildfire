@@ -32,7 +32,7 @@ void Settings::loadSettingsOrDefaults() {
 
     // Forest
     leafDensity = s.value("leafDensity", 1.0).toDouble();
-    branchStochasticity = s.value("branchStochasticity", 0.5).toDouble();
+    branchStochasticity = s.value("branchStochasticity", 0.6).toDouble();
 
     //Forest Visualization (some of these are not saved)
     visualizeForestVoxelGrid = s.value("visualizeForestVoxelGrid", false).toBool();

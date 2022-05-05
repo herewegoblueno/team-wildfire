@@ -57,17 +57,18 @@ void BasicForestScene::updateFires() {
         bool burningLastFrame = _lastFrameModuleBurnState[m];
         double massChangeRate = m->getCurrentState()->massChangeRateFromLastFrame;
         bool burningThisFrame = massChangeRate < 0.0;
-        if (burningThisFrame && !burningLastFrame) {
-            for (vec3 &fireSpawnPos : m->_fireSpawnPoints) {
-                _fireManager.addFire(m, fireSpawnPos, fireSize);
-            }
-        } else if (burningLastFrame && !burningThisFrame) {
-            _fireManager.removeFires(m);
-        }
-        // Adjust size of fire based on mass change rate
         if (burningThisFrame) {
+            // Adjust size of fire based on mass change rate
             float fireSize = _fireManager.massChangeRateToFireSize(massChangeRate);
-            _fireManager.setModuleFireSizes(m, fireSize);
+            if (!burningLastFrame) {
+                for (vec3 &fireSpawnPos : m->_fireSpawnPoints) {
+                    _fireManager.addFire(m, fireSpawnPos, fireSize);
+                }
+            } else {
+                _fireManager.setModuleFireSizes(m, fireSize);
+            }
+        } else if (burningLastFrame) {
+            _fireManager.removeFires(m);
         }
         _lastFrameModuleBurnState[m] = burningThisFrame;
     }
@@ -75,17 +76,19 @@ void BasicForestScene::updateFires() {
 
 /** Update scene primitives based on the new state of the forest */
 void BasicForestScene::updatePrimitivesFromForest() {
-    _leaves.clear();
-    _trunks.clear();
+    _leafBundles.clear();
+    _trunkBundles.clear();
     _forest->recalculatePrimitives();
     std::vector<PrimitiveBundle> forestPrimitives = _forest->getPrimitives();
     PrimitiveType type;
     for (PrimitiveBundle &bundle : forestPrimitives) {
         type = bundle.primitive.type;
         if (type == PrimitiveType::PRIMITIVE_TRUNK) {
-            _trunks.push_back(bundle);
+            _trunkBundles.push_back(bundle);
         } else if (type == PrimitiveType::PRIMITIVE_LEAF) {
-            _leaves.push_back(bundle);
+            _leafBundles.push_back(bundle);
+        } else if (type == PrimitiveType::PRIMITIVE_GROUND) {
+            _groundBundle = bundle;
         }
     }
 }
@@ -144,11 +147,13 @@ void BasicForestScene::render(SupportCanvas3D *context) {
 void BasicForestScene::tessellateShapes() {
     _leaf = std::make_unique<Leaf>();
     _trunk = std::make_unique<Trunk>(1, 1);
+    _ground = std::make_unique<Ground>();
 }
 
 /** Render each primitive's shape */
 void BasicForestScene::renderGeometry() {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    renderGround();
     if (settings.seeBranchModules) {
         renderTrunksVisualizedModules();
     } else {
@@ -160,7 +165,7 @@ void BasicForestScene::renderGeometry() {
 /** Color each branch based on the module it's in */
 void BasicForestScene::renderTrunksVisualizedModules() {
     _trunk->bindVAO();
-    for (PrimitiveBundle &bundle : _trunks) {
+    for (PrimitiveBundle &bundle : _trunkBundles) {
         int moduleID = bundle.moduleID;
         Module *module = _forest->getModuleFromId(moduleID);
 
@@ -202,7 +207,7 @@ void BasicForestScene::renderTrunksVisualizedModules() {
 
 void BasicForestScene::renderTrunks() {
     _trunk->bindVAO();
-    for (PrimitiveBundle &bundle : _trunks) {
+    for (PrimitiveBundle &bundle : _trunkBundles) {
         _phongShader->setUniform("m",  bundle.model);
         _phongShader->applyMaterial(bundle.primitive.material);
         _trunk->drawVAO();
@@ -212,12 +217,20 @@ void BasicForestScene::renderTrunks() {
 
 void BasicForestScene::renderLeaves() {
     _leaf->bindVAO();
-    for (PrimitiveBundle &bundle : _leaves) {
+    for (PrimitiveBundle &bundle : _leafBundles) {
         _phongShader->setUniform("m",  bundle.model);
         _phongShader->applyMaterial(bundle.primitive.material);
         _leaf->drawVAO();
     }
     _leaf->unbindVAO();
+}
+
+void BasicForestScene::renderGround() {
+    _ground->bindVAO();
+    _phongShader->setUniform("m",  _groundBundle.model);
+    _phongShader->applyMaterial(_groundBundle.primitive.material);
+    _ground->drawVAO();
+    _ground->unbindVAO();
 }
 
 void BasicForestScene::defineLights() {
