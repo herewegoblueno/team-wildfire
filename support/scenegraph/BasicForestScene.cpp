@@ -35,14 +35,6 @@ BasicForestScene::BasicForestScene(MainWindow *mainWindow):
     _simulator.init();
     _voxelGrid.getVisualization()->setForestReference(_forest.get());
     mainWindow->updateModuleSelectionOptions(_forest->getAllModuleIDs());
-
-//    //Fire stress test (TODO: remove)
-//    std::default_random_engine generator;
-//    std::uniform_real_distribution<double> distribution(-10.0, 10.0);
-//    for (int i = 0; i < 400; i++){
-//        vec3 fire_center(distribution(generator), distribution(generator), distribution(generator));
-//        _fireManager.addFire(nullptr, fire_center, 0.8);
-//    }
 }
 
 BasicForestScene::~BasicForestScene()

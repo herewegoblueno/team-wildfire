@@ -3,7 +3,7 @@
 #include <iostream>
 
 //eq 21 in Fire in Paradise paper
-//TODO: add in last 2 terms
+//TODO: add in water term
 void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int deltaTimeInMs){
     VoxelTemperatureGradientInfo tempGradientInfo = v->getTemperatureGradientInfoFromPreviousFrame();
     v->getCurrentState()->tempGradientFromPrevState = tempGradientInfo.gradient;

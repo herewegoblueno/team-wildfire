@@ -54,7 +54,6 @@ double VoxelGrid::cellSideLengthForGradients(){
 Voxel *VoxelGrid::getVoxel(int xIndex, int yIndex, int zIndex){
     if (zIndex >= resolution || yIndex >= resolution || xIndex >= resolution) return nullptr;
     if (zIndex < 0 || yIndex < 0 || xIndex < 0) return nullptr;
-    //TODO: hopefully this is not copying allhe intermediate vectors as its accessing the voxel
     return voxels[xIndex][yIndex][zIndex].get();
 }
 

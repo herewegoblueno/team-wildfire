@@ -207,7 +207,7 @@ void VoxelGridLine::renderVoxel(Voxel *vox, bool renderingInEyeMode){
 
     if (voxelsGridEnabled){
         //Drawing the cube of the voxel itself...
-        //TODO: improve this, still too tightly coupled with temperature ranges
+        //Still pretty tightly coupled with temperature ranges, even if not using TEMPERATURE
         if (voxelMode == TEMP_LAPLACE){
             shader->setUniform("prop", (float)vox->getCurrentState()->tempLaplaceFromPrevState);
         }else if (voxelMode == TEMPERATURE){

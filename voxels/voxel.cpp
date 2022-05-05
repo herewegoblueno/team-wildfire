@@ -27,9 +27,6 @@ Voxel::Voxel(VoxelGrid *grid, int XIndex, int YIndex, int ZIndex, vec3 center) :
     }
 }
 
-//TODO: consider memoization for immediate neighbours
-//maybe use an array like Voxel *immediateNeighbours[9] = {[0 ... 8] = nullptr};
-//and initialize it for every voxel after each voxel has been made once
 Voxel *Voxel::getVoxelWithIndexOffset(vec3 offset){
     return grid->getVoxel(XIndex + offset.x, YIndex + offset.y, ZIndex + offset.z);
 }

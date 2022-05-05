@@ -325,7 +325,6 @@ ModuleSet Forest::getModules() {
 
 void Forest::deleteModuleAndChildren(Module *m){
     //First remove it from all the necessary maps
-    //TODO: there might be a tiny amount of mass left from that module in the associated voxels, maybe we should eventually clean that up
     _moduleIDs.erase(m->ID);
     // Clean up fires
     _fireManager->removeFires(m);
