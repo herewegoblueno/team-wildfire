@@ -10,7 +10,9 @@
 #include "trees/forest.h"
 #include "trees/module.h"
 
+const int pointsReservedForVoxels = 24;
 const int pointsReservedForVectorRendering = 4;
+const int pointsReservedForVoxelGridBoundry = 24;
 
 //Modified from https://stackoverflow.com/questions/14486291/how-to-draw-line-in-opengl
 void VoxelGridLine::init(VoxelGrid *grid)
@@ -58,6 +60,7 @@ void VoxelGridLine::draw(SupportCanvas3D *) {
     shader->setUniform("propMin", temperatureThreshold);
     shader->setUniform("propMax", temperatureMax);
     shader->setUniform("propType", voxelMode);
+    shader->setUniform("renderingGridBoundary", false);
 
     Voxel *eyeVoxel = grid->getVoxelClosestToPoint(eyeCenter);
     int eyeRadiusInVoxels = (int)ceil(eyeRadius / grid->cellSideLength());
@@ -84,7 +87,11 @@ void VoxelGridLine::draw(SupportCanvas3D *) {
         }
     }
 
-
+    //Drawing the grid boundary as well
+    shader->setUniform("m", vec3(0,0,0));
+    shader->setUniform("renderingGridBoundary", true);
+    shader->setUniform("propType", -1);
+    glDrawArrays(GL_LINES, pointsReservedForVoxels + pointsReservedForVectorRendering, pointsReservedForVoxelGridBoundry);
 
     glDisable(GL_BLEND);
 }
@@ -108,6 +115,7 @@ void VoxelGridLine::updateValuesFromSettings(){
 
 void VoxelGridLine::generateGridVertices(VoxelGrid *grid){
 
+    //Adding points for the voxels
     float halfCellLength = (grid->cellSideLength() / 2.0) * 0.8;
     vec3 offsets [] = {
         vec3(-halfCellLength, -halfCellLength, -halfCellLength), //(0, 0, 0)
@@ -119,7 +127,6 @@ void VoxelGridLine::generateGridVertices(VoxelGrid *grid){
         vec3(halfCellLength, halfCellLength, halfCellLength), //(1, 1, 1)
         vec3(-halfCellLength, halfCellLength, halfCellLength) //(0, 1, 1)
     };
-
     vec2 lines [] = {
         vec2(4, 7),
         vec2(6, 7),
@@ -141,8 +148,8 @@ void VoxelGridLine::generateGridVertices(VoxelGrid *grid){
                             offsets[(int)lines[line].x].x, offsets[(int)lines[line].x].y, offsets[(int)lines[line].x].z,
                             offsets[(int)lines[line].y].x, offsets[(int)lines[line].y].y, offsets[(int)lines[line].y].z,
                         });
-
     }
+
 
     //Add two more points that we'll use for drawing vector fields
     float scale = 1.3;
@@ -152,6 +159,30 @@ void VoxelGridLine::generateGridVertices(VoxelGrid *grid){
                         0, scale * halfCellLength, 0,
                         -0.3f * halfCellLength, 0.6f * scale * halfCellLength, 0,
                     });
+
+    //Adding points for the boundary
+    vec3 gridMin = grid->getMinXYZ();
+    int gridSize = grid->getAxisSize();
+    vec3 gridMax = gridMin + vec3(gridSize, gridSize, gridSize);
+
+    vec3 offsetsForBoundry [] = {
+        vec3(gridMin.x, gridMin.y, gridMin.z), //(0, 0, 0)
+        vec3(gridMax.x, gridMin.y, gridMin.z), //(1, 0, 0)
+        vec3(gridMax.x, gridMax.y, gridMin.z), //(1, 1, 0)
+        vec3(gridMin.x, gridMax.y, gridMin.z), //(0, 1, 0)
+        vec3(gridMin.x, gridMin.y, gridMax.z), //(0, 0, 1)
+        vec3(gridMax.x, gridMin.y, gridMax.z), //(1, 0, 1)
+        vec3(gridMax.x, gridMax.y, gridMax.z), //(1, 1, 1)
+        vec3(gridMin.x, gridMax.y, gridMax.z) //(0, 1, 1)
+    };
+
+    for (int line = 0; line < 12; line++){
+        vertices.insert(vertices.end(), {
+                            offsetsForBoundry[(int)lines[line].x].x, offsetsForBoundry[(int)lines[line].x].y, offsetsForBoundry[(int)lines[line].x].z,
+                            offsetsForBoundry[(int)lines[line].y].x, offsetsForBoundry[(int)lines[line].y].y, offsetsForBoundry[(int)lines[line].y].z,
+                        });
+    }
+
 }
 
 void VoxelGridLine::renderVoxel(Voxel *vox, bool renderingInEyeMode){
@@ -187,7 +218,7 @@ void VoxelGridLine::renderVoxel(Voxel *vox, bool renderingInEyeMode){
             shader->setUniform("secondProp", (float)vox->getCurrentState()->q_c);
         }
         shader->setUniform("renderingVectorField", false);
-        glDrawArrays(GL_LINES, 0, vertices.size() / 3 - pointsReservedForVectorRendering);
+        glDrawArrays(GL_LINES, 0, pointsReservedForVoxels);
     }
 
     if (vectorFieldEnabled){
@@ -200,7 +231,7 @@ void VoxelGridLine::renderVoxel(Voxel *vox, bool renderingInEyeMode){
             shader->setUniform("u", vec3(vox->getCurrentState()->tempGradientFromPrevState));
         }
         shader->setUniform("renderingVectorField", true);
-        glDrawArrays(GL_LINES,  (vertices.size() / 3) - pointsReservedForVectorRendering, pointsReservedForVectorRendering);
+        glDrawArrays(GL_LINES, pointsReservedForVoxels, pointsReservedForVectorRendering);
     }
 }
 

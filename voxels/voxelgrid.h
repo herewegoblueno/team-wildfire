@@ -6,6 +6,7 @@
 #include "voxelgridline.h"
 #include "voxel.h"
 #include <unordered_set>
+#include "simulation/physics.h"
 
 using namespace glm;
 using namespace std;
@@ -35,6 +36,9 @@ public:
 
     void setGlobalFField(vec3 f);
     dvec3 getGlobalFField();
+
+    vec3 getMinXYZ();
+    int getAxisSize();
 
 private:
     VoxelGridLine gridlines;

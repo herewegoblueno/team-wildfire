@@ -1,5 +1,4 @@
 #include "voxelgrid.h"
-#include "simulation/physics.h"
 
 VoxelGrid::VoxelGrid(int axisSize, vec3 offset, int resolution) :
     resolution(resolution),
@@ -136,6 +135,13 @@ double VoxelGrid::getVolumePerCell(){
     return cellVolume;
 }
 
+vec3 VoxelGrid::getMinXYZ(){
+    return minXYZ;
+}
+
+int VoxelGrid::getAxisSize(){
+    return axisSize;
+}
 
 bool VoxelGrid::isGoodIndex(int i){
     return i >= 0 && i < resolution;

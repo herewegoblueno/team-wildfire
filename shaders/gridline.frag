@@ -10,6 +10,7 @@ uniform float propMin;
 uniform float propMax;
 uniform bool renderingVectorField;
 uniform bool selectedVoxel;
+uniform bool renderingGridBoundary;
 
 void main()
 {
@@ -40,6 +41,7 @@ void main()
             }
         }
 
+    if (renderingGridBoundary) FragColor = vec4(1, 1, 1, 1); //white
     if (renderingVectorField) FragColor = vec4(0, 1, 1, alpha); //cyan
     if (selectedVoxel) FragColor = vec4(0.22, 1, 0.1, 1); //neon green
 
