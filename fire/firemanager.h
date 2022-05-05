@@ -17,6 +17,9 @@
 #include "trees/module.h"
 
 inline int densityFromSize(float size) {
+#ifdef CUDA_FLUID
+    return 200;
+#endif
     return size*size*1000;
 }
 

@@ -83,7 +83,7 @@ void Fire::update_particles()
         Particle &p = m_particles[i];
 //        p.Life -= fire_frame_rate*p.Temp*burn_coef;
         #ifdef CUDA_FLUID
-        p.Life -= fire_frame_rate*0.01;
+        p.Life -= fire_frame_rate*0.05;
         #else
         p.Life -= fire_frame_rate;
         #endif
@@ -99,8 +99,8 @@ void Fire::update_particles()
             float b_factor = 0.15;
             glm::vec3 u = vec3(vox->u);
             #ifdef CUDA_FLUID
-            b_factor = 0.03;
-            p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
+            b_factor = 0.00;
+//            p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
             #else
             p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
             #endif
@@ -111,7 +111,9 @@ void Fire::update_particles()
 
             if(p.Life < fire_frame_rate*1.5 || p.Temp < 10)
             {
+                #ifndef CUDA_FLUID
                 m_smoke->RespawnParticle(i, p);
+                #endif
                 p.Life = 0;
             }
         }
