@@ -104,10 +104,10 @@ void Fire::update_particles()
             #else
             p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
             #endif
-            glm::vec3 b = glm::vec3(0, gravity_acceleration*thermal_expansion*b_factor, 0)*
-                    (float)(simTempToWorldTemp(p.Temp) - simTempToWorldTemp(ambient_T)); // Buoyancy
-
-            p.Position += (b + u) * fire_frame_rate*0.5f;
+            float b = gravity_acceleration*thermal_expansion*b_factor*
+                    (float)std::max(simTempToWorldTemp(p.Temp) - simTempToWorldTemp(ambient_T), 0.); // Buoyancy
+            u.y += b;
+            p.Position += u * fire_frame_rate*0.5f;
 
             if(p.Life < fire_frame_rate*1.5 || p.Temp < 10)
             {
