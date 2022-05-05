@@ -83,7 +83,7 @@ void Fire::update_particles()
         Particle &p = m_particles[i];
 //        p.Life -= fire_frame_rate*p.Temp*burn_coef;
         #ifdef CUDA_FLUID
-        p.Life -= fire_frame_rate*0.01;
+        p.Life -= fire_frame_rate;
         #else
         p.Life -= fire_frame_rate;
         #endif
@@ -94,13 +94,13 @@ void Fire::update_particles()
             voxel = m_grid->getStateInterpolatePoint(p.Position);
             VoxelPhysicalData* vox = &voxel;
             float ambient_T = vox->temperature;
-            if(std::isnan(ambient_T)) ambient_T = 0;
+            if(std::isnan(ambient_T)) ambient_T = p.Temp;
 
             float b_factor = 0.15;
-
             glm::vec3 u = vec3(vox->u);
             #ifdef CUDA_FLUID
-            b_factor = 0.0;
+            b_factor = 0.03;
+            p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
             #else
             p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
             #endif
@@ -111,7 +111,7 @@ void Fire::update_particles()
 
             if(p.Life < fire_frame_rate*1.5 || p.Temp < 10)
             {
-//                m_smoke->RespawnParticle(i, p);
+                m_smoke->RespawnParticle(i, p);
                 p.Life = 0;
             }
         }

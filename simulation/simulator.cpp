@@ -27,7 +27,7 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
     assert(gridResolution % NUMBER_OF_SIMULATION_THREADS == 0);
     int jumpPerThread = gridResolution / NUMBER_OF_SIMULATION_THREADS;
 
-
+    mallocHost2cuda(grid);
     if (forest != nullptr){ //Forest is optional
         forest->updateMassAndAreaOfModulesViaBurning(deltaTime);
         //TODO: refactor a bit (better encapsulation maybe)
@@ -44,6 +44,15 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
         threads.emplace_back(&Simulator::stepThreadHandler, this, grid, forest, deltaTime, gridResolution, x, x + jumpPerThread);
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
 
+#ifdef CUDA_FLUID
+    processWindGPU(host2cuda.grid_temp, host2cuda.grid_q_v, host2cuda.grid_h, host2cuda.u_xyz, host2cuda.id_xyz,
+                   20, gridResolution, grid->cellSideLength(), deltaTime/1000.);
+    threads.clear();
+    for (int x = 0; x < gridResolution; x += jumpPerThread)
+        threads.emplace_back(&Simulator::stepCuda2hostThreadHandler, this, grid, forest, deltaTime, gridResolution, x, x + jumpPerThread);
+    for (auto& th : threads) th.join();  //Wait for all the threads to terminate
+#endif
+
     if (forest != nullptr){ //Forest is optional
         //This should be the last step of the simulation
         //We want the actual step to be based on last frame's mapping, but we want the scene's rendering
@@ -51,53 +60,10 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
         //(so the users see the most up to date state)
         forest->updateModuleVoxelMapping();
     }
+    freeHost2cuda();
 }
 
-//TODO: eventually clean up, this is just here for testing
-void Simulator::linear_step(VoxelGrid *grid, Forest *forest)
-{
-    milliseconds currentTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-    double deltaTime = (currentTime - timeLastFrame).count();
-    if (deltaTime > 100) deltaTime = 100;
 
-    deltaTime = 10;
-    timeLastFrame = currentTime;
-    if (deltaTime == 0) return; //Don't bother doing anything
-
-
-    int gridResolution = grid->getResolution();
-    int face_num = gridResolution*gridResolution;
-    assert(gridResolution % NUMBER_OF_SIMULATION_THREADS == 0);
-    int jumpPerThread = gridResolution / NUMBER_OF_SIMULATION_THREADS;
-
-    int cell_num = gridResolution*gridResolution*gridResolution;
-    double* grid_temp = (double *) malloc(cell_num*sizeof(double));
-    double* grid_q_v = (double *) malloc(cell_num*sizeof(double));
-    double* grid_h = (double *) malloc(cell_num*sizeof(double));
-    double* u_xyz = (double *) malloc(cell_num*sizeof(double)*3);
-    int* id_xyz = (int *) malloc(cell_num*sizeof(int)*3);
-
-    //(lines 7-12 in Algorithm 1 of paper)
-    std::vector<std::thread> threads;
-    for (int x = 0; x < gridResolution; x += jumpPerThread)
-        threads.emplace_back(&Simulator::stepThreadHandlerWind, this, grid, forest, deltaTime, gridResolution,
-                             x, x + jumpPerThread, grid_temp, grid_q_v, grid_h , u_xyz, id_xyz);
-    for (auto& th : threads) th.join();  //Wait for all the threads to terminate
-
-#ifdef CUDA_FLUID
-    processWindGPU(grid_temp, grid_q_v, grid_h, u_xyz, id_xyz, 20,
-                   gridResolution, grid->cellSideLength(), deltaTime/1000.);
-#endif
-
-    threads.clear();
-    for (int x = 0; x < gridResolution; x += jumpPerThread)
-        threads.emplace_back(&Simulator::stepThreadHandlerWater, this, grid, forest, deltaTime,
-                             gridResolution, x, x + jumpPerThread, u_xyz);
-    for (auto& th : threads) th.join();  //Wait for all the threads to terminate
-
-    free(grid_temp);free(grid_q_v);free(grid_h);free(u_xyz);free(id_xyz);
-
-}
 
 void Simulator::stepThreadHandler(VoxelGrid *grid ,Forest * forest, int deltaTime, int resolution, int minXInclusive, int maxXExclusive){
     for (int x = minXInclusive; x < maxXExclusive; x++){
@@ -107,64 +73,28 @@ void Simulator::stepThreadHandler(VoxelGrid *grid ,Forest * forest, int deltaTim
                 Voxel *v = grid->getVoxel(x, y, z);
                 ModuleSet nearbyModules = forest == nullptr ? ModuleSet() : forest->getModulesMappedToVoxel(v);
                 stepVoxelHeatTransfer(v, nearbyModules, deltaTime);
+                writeHost2cudaSpace(v, x*resolution*resolution+y*resolution+z);
             }
         }
     }
 }
 
-void Simulator::stepThreadHandlerWind(VoxelGrid *grid, Forest *forest, double deltaTime, int resolution,
-                                      int minXInclusive, int maxXExclusive,
-                                      double* grid_temp, double* grid_q_v, double* grid_h , double* u_xyz, int* id_xyz)
-{
-//    double cell_size = grid->cellSideLength();
-//    double density_term = calc_density_term(cell_size, deltaTime);
-    int index, face_num = resolution*resolution;
-//    int cell_num = face_num*resolution;
-    for (int x = minXInclusive; x < maxXExclusive; x++){
-        index = x*face_num;
-        for (int y = 0; y < resolution; y++){
-            for (int z = 0; z < resolution; z++){
-                Voxel *v = grid->getVoxel(x, y, z);
-                ModuleSet nearbyModules = forest == nullptr ? ModuleSet() : forest->getModulesMappedToVoxel(v);
-                stepVoxelHeatTransfer(v, nearbyModules, deltaTime);
-
-            #ifdef CUDA_FLUID
-                grid_temp[index] = v->getCurrentState()->temperature;
-                grid_q_v[index] = v->getLastFrameState()->q_v;
-                grid_h[index] = v->centerInWorldSpace.y;
-                u_xyz[index*3+0] = v->getLastFrameState()->u.x;
-                u_xyz[index*3+1] = v->getLastFrameState()->u.y;
-                u_xyz[index*3+2] = v->getLastFrameState()->u.z;
-                id_xyz[index*3+0] = v->XIndex;
-                id_xyz[index*3+1] = v->YIndex;
-                id_xyz[index*3+2] = v->ZIndex;
-            #endif
-                index++;
-            }
-        }
-    }
-}
-
-void Simulator::stepThreadHandlerWater(VoxelGrid *grid ,Forest *, double deltaTime, int resolution,
-                                       int minXInclusive, int maxXExclusive, double* u_new){
-    double cell_size = grid->cellSideLength();
+void Simulator::stepCuda2hostThreadHandler(VoxelGrid *grid ,Forest * forest, int deltaTime, int resolution,
+                                           int minXInclusive, int maxXExclusive){
     int index;
     for (int x = minXInclusive; x < maxXExclusive; x++){
         index = x*resolution*resolution;
         for (int y = 0; y < resolution; y++){
             for (int z = 0; z < resolution; z++){
                 Voxel* vox = grid->getVoxel(x,y,z);
-
-            #ifdef CUDA_FLUID
-                dvec3 u(u_new[index*3], u_new[index*3+1], u_new[index*3+2]);
+                dvec3 u(host2cuda.u_xyz[index*3], host2cuda.u_xyz[index*3+1], host2cuda.u_xyz[index*3+2]);
                 vox->getCurrentState()->u = u;
-            #endif
-//                stepVoxelWater(vox, deltaTime);
                 index++;
             }
         }
     }
 }
+
 
 void Simulator::cleanupForNextStep(VoxelGrid *grid, Forest *forest){
     //No need for asserts here, same asserts as in step()
@@ -192,4 +122,44 @@ void Simulator::stepCleanupThreadHandler(VoxelGrid *grid, Forest *, int resoluti
             }
         }
     }
+}
+
+
+void Simulator::mallocHost2cuda(VoxelGrid *grid)
+{
+#ifdef CUDA_FLUID
+    int gridResolution = grid->getResolution();
+    int cell_num = gridResolution*gridResolution*gridResolution;
+    host2cuda.grid_temp = (double *) malloc(cell_num*sizeof(double));
+    host2cuda.grid_q_v = (double *) malloc(cell_num*sizeof(double));
+    host2cuda.grid_h = (double *) malloc(cell_num*sizeof(double));
+    host2cuda.u_xyz = (double *) malloc(cell_num*sizeof(double)*3);
+    host2cuda.id_xyz = (int *) malloc(cell_num*sizeof(int)*3);
+#endif
+}
+
+void Simulator::writeHost2cudaSpace(Voxel* v, int index)
+{
+#ifdef CUDA_FLUID
+    host2cuda.grid_temp[index] = v->getCurrentState()->temperature;
+    host2cuda.grid_q_v[index] = v->getLastFrameState()->q_v;
+    host2cuda.grid_h[index] = v->centerInWorldSpace.y;
+    host2cuda.u_xyz[index*3+0] = v->getLastFrameState()->u.x;
+    host2cuda.u_xyz[index*3+1] = v->getLastFrameState()->u.y;
+    host2cuda.u_xyz[index*3+2] = v->getLastFrameState()->u.z;
+    host2cuda.id_xyz[index*3+0] = v->XIndex;
+    host2cuda.id_xyz[index*3+1] = v->YIndex;
+    host2cuda.id_xyz[index*3+2] = v->ZIndex;
+#endif
+}
+
+void Simulator::freeHost2cuda()
+{
+#ifdef CUDA_FLUID
+    free(host2cuda.grid_temp);
+    free(host2cuda.grid_q_v);
+    free(host2cuda.grid_h);
+    free(host2cuda.u_xyz);
+    free(host2cuda.id_xyz);
+#endif
 }

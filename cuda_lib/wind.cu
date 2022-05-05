@@ -38,7 +38,7 @@ void bouyancyKernel(double* grid_temp, double* grid_q_v, double* grid_h, double*
         double X_v = grid_q_v[idx]/(1+grid_q_v[idx]);
         double M_th = 18.02*X_v + 28.96*(1-X_v);
         double T_air = 20-0.0065*(grid_h[idx] + 20)*10;
-        double buoyancy = 0.01*(28.96*T_th/(M_th*T_air) - 1);
+        double buoyancy =   0.05*(28.96*T_th/(M_th*T_air) - 1);
 
         src_u[1] += buoyancy*dt;
     }

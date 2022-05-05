@@ -27,17 +27,14 @@ public:
     Simulator();
     void init();
     void step(VoxelGrid *grid, Forest *forest = nullptr);
-    void linear_step(VoxelGrid *grid, Forest *forest = nullptr);
     void cleanupForNextStep(VoxelGrid *grid, Forest *forest = nullptr);
 
 
 private:
     milliseconds timeLastFrame;
     void stepThreadHandler(VoxelGrid *grid, Forest *forest, int deltaTime, int resolution, int minX, int maxX);
-    void stepThreadHandlerWind(VoxelGrid *grid, Forest *forest, double deltaTime, int resolution, int minX, int maxX,
-                               double* grid_temp, double* grid_q_v, double* grid_h , double* u_xyz, int* id_xyz);
-    void stepThreadHandlerWater(VoxelGrid *grid, Forest *forest, double deltaTime, int resolution, int minX, int maxX,
-                                double* u_new);
+    void stepCuda2hostThreadHandler(VoxelGrid *grid ,Forest * forest, int deltaTime, int resolution,
+                                                                       int minXInclusive, int maxXExclusive);
     void stepCleanupThreadHandler(VoxelGrid *grid, Forest *forest, int resolution, int minX, int maxX);
 
     void stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int deltaTimeInMs);
@@ -47,7 +44,9 @@ private:
 
     void stepModuleHeatTransfer(Module *m, VoxelSet surroundingAir, int deltaTimeInMs);
     host2cuda_data host2cuda;
-
+    void mallocHost2cuda(VoxelGrid *grid);
+    void writeHost2cudaSpace(Voxel* v, int index);
+    void freeHost2cuda();
 
 };
 

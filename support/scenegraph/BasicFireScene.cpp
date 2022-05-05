@@ -51,7 +51,7 @@ void BasicFireScene::render(SupportCanvas3D *context) {
     Voxel* v = voxelGrid.getVoxel(18, 18, 18);
     v->getLastFrameState()->temperature = 15;
     voxelGrid.getVisualization()->updateValuesFromSettings();
-    simulator.linear_step(&voxelGrid);
+    simulator.step(&voxelGrid);
 
     glClearColor(0.2, 0.2, 0.2, 0.3);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
