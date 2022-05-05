@@ -23,11 +23,6 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
     //TODO: this should be based on the iterpolated u field (to get the u field in the center),
     //not the u field the voxel is storing (which is relative to its faces)
     dTdt -= glm::dot(tempGradientInfo.gradient, v->getLastFrameState()->u);
-    if(std::abs(dTdt)>20000)
-    {
-        cout<< "dT error";
-    }
-
     
     double dMdt = 0.0;
     for (Module *m : nearbyModules) {
@@ -35,11 +30,6 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
     }
     dTdt -= module_to_air_diffusion * dMdt;
     v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt * deltaTimeInMs / 1000.0;
-    if(std::abs(v->getCurrentState()->temperature)>20000)
-    {
-        cout<< "accum error";
-    }
-    if (v->XIndex==18 && v->YIndex==18 && v->ZIndex==18) v->getCurrentState()->temperature=15;
 };
 
 /** Equation 25 of Fire in Paradise paper */
