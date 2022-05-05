@@ -26,7 +26,7 @@ __global__ void jacobi(double* x_next, double* A, double* x_now, double* b, int*
 
 __global__
 void bouyancyKernel(double* grid_temp, double* grid_q_v, double* grid_h, double* su_xyz,
-                    int resolution, double dt)
+                    double* f, int resolution, double dt)
 {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -40,7 +40,9 @@ void bouyancyKernel(double* grid_temp, double* grid_q_v, double* grid_h, double*
         double T_air = 20-0.0065*(grid_h[idx] + 20)*10;
         double buoyancy =   0.05*(28.96*T_th/(M_th*T_air) - 1);
 
-        src_u[1] += buoyancy*dt;
+        src_u[0] += f[0]*dt;
+        src_u[1] += (f[1]+buoyancy)*dt;
+        src_u[2] += f[2]*dt;
     }
 }
 
@@ -227,7 +229,6 @@ void pressureKernel(double* su_xyz, int* id_xyz, double* tu_xyz, double* pressur
         int x=this_xyz[0], y=this_xyz[1], z=this_xyz[2];
         double dP;
 
-        int face_num = resolution*resolution;
         if(x<resolution-1) dP = safe_get(x+1,y,z,pressure,resolution) - safe_get(x,y,z,pressure,resolution);
         else dP = 0;
         dst_u[0] = src_u[0] - dP*dt/(cell_size*density);
@@ -247,16 +248,16 @@ void pressureKernel(double* su_xyz, int* id_xyz, double* tu_xyz, double* pressur
 
 extern "C"
 void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
-                    double* u_xyz, int* id_xyz, int jacobi_iter,
+                    double* u_xyz, int* id_xyz, int jacobi_iter, double f[3],
                     int resolution, double cell_size, float dt)
 {
     double air_density = 1.225;
-    double viscosity = 0.1;
+    double viscosity = 5;
     cudaError err;
 
     auto t1 = now();
     int cell_num = resolution*resolution*resolution;
-    double *d_temp, *d_q_v, *d_h, *d_u, *d_u2;
+    double *d_temp, *d_q_v, *d_h, *d_u, *d_u2, *d_f;
     int *d_id;
     cudaMalloc(&d_temp, cell_num * sizeof(double)); // temperature
     cudaMalloc(&d_q_v,  cell_num * sizeof(double)); // q_v
@@ -264,6 +265,7 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
     cudaMalloc(&d_u,    cell_num * sizeof(double) * 3); // vel 1
     cudaMalloc(&d_u2,   cell_num * sizeof(double) * 3); // vel 2(for switching values)
     cudaMalloc(&d_id,   cell_num * sizeof(int) * 3); // temperature
+    cudaMalloc(&d_f,    sizeof(double) * 3); // temperature
 
     cudaMemcpy(d_temp,  grid_temp, cell_num * sizeof(double), cudaMemcpyHostToDevice);
     cudaMemcpy(d_q_v,   grid_q_v,  cell_num * sizeof(double), cudaMemcpyHostToDevice);
@@ -271,8 +273,9 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
     cudaMemcpy(d_u,     u_xyz,     cell_num * sizeof(double) * 3, cudaMemcpyHostToDevice);
     cudaMemcpy(d_u2,    u_xyz,     cell_num * sizeof(double) * 3, cudaMemcpyHostToDevice);
     cudaMemcpy(d_id,    id_xyz,    cell_num * sizeof(int) * 3, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_f,     f,         sizeof(double) * 3, cudaMemcpyHostToDevice);
 
-    int blockSize = 256;
+    int blockSize = 512;
     int numBlocks = (cell_num - 1) / blockSize + 1;
     // advection
     auto t2 = now();
@@ -294,7 +297,7 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
 //    cudaFree(vorticity);  cudaFree(vorticity_len);
     // buoyancy
     auto t5 = now();
-    bouyancyKernel <<<numBlocks, blockSize>>> (d_temp, d_q_v, d_h, d_u2, resolution, dt);
+    bouyancyKernel <<<numBlocks, blockSize>>> (d_temp, d_q_v, d_h, d_u2, d_f, resolution, dt);
     cudaDeviceSynchronize();
 
     err = cudaGetLastError();

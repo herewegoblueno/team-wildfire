@@ -5,7 +5,7 @@
 
 #ifdef CUDA_FLUID
 extern "C" void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
-                    double* u_xyz, int* id_xyz, int jacobi_iter,
+                    double* u_xyz, int* id_xyz, int jacobi_iter, double f[3],
                     int resolution, double cell_size, float dt);
 #endif
 

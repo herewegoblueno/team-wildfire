@@ -45,8 +45,10 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
 
 #ifdef CUDA_FLUID
+    dvec3 g_w = grid->getGlobalFField();
+    double g_w3[3] = {g_w.x, g_w.y, g_w.z};
     processWindGPU(host2cuda.grid_temp, host2cuda.grid_q_v, host2cuda.grid_h, host2cuda.u_xyz, host2cuda.id_xyz,
-                   20, gridResolution, grid->cellSideLength(), deltaTime/1000.);
+                   20, g_w3, gridResolution, grid->cellSideLength(), deltaTime/1000.);
     threads.clear();
     for (int x = 0; x < gridResolution; x += jumpPerThread)
         threads.emplace_back(&Simulator::stepCuda2hostThreadHandler, this, grid, forest, deltaTime, gridResolution, x, x + jumpPerThread);
