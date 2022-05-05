@@ -75,7 +75,7 @@ double Voxel::getNeighbourTemperature(int xOffset, int yOffset, int zOffset){
     double temperatureBack = getNeighbourTemperature(0, 0, -1); // -z
     double temperatureMiddle = lastFramePhysicalState.temperature;
 
-    double cellSize = grid->cellSideLength();
+    double cellSize = grid->cellSideLength()*10;
 
     //calculating the ∇T (gradient)
     double yGradient = (temperatureTop - temperatureBottom) / (cellSize * 2);
