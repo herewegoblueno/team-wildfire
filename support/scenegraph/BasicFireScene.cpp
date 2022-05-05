@@ -24,13 +24,10 @@ BasicFireScene::BasicFireScene():
 {
 
     Voxel* v = voxelGrid.getVoxel(14, 18, 18);
-    glm::dvec3 c = v->centerInWorldSpace;
-    fireManager.addFire(0, vec3(v->centerInWorldSpace), 4);
+    fireManager.addFire(nullptr, vec3(v->centerInWorldSpace), 4);
 
     v = voxelGrid.getVoxel(22, 18, 18);
-    c = v->centerInWorldSpace;
-    fireManager.addFire((Module*)1, vec3(v->centerInWorldSpace), 4);
-
+    fireManager.addFire(nullptr, vec3(v->centerInWorldSpace), 4);
 
     voxelGrid.getVisualization()->toggle(true, true);
 
