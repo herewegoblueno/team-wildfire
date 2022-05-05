@@ -82,6 +82,16 @@ double Voxel::getNeighbourTemperature(int xOffset, int yOffset, int zOffset){
     double xGradient = (temperatureRight - temperatureLeft) / (cellSize * 2);
     double zGradient = (temperatureForward - temperatureBack) / (cellSize * 2);
     dvec3 gradient = dvec3(xGradient, yGradient, zGradient);
+    //calculating the ∇T (gradient) on positive faces
+    yGradient = (temperatureTop - temperatureMiddle) / cellSize;
+    xGradient = (temperatureRight - temperatureMiddle) / cellSize;
+    zGradient = (temperatureForward - temperatureMiddle) / cellSize;
+    dvec3 gradient_pos = dvec3(xGradient, yGradient, zGradient);
+    //calculating the ∇T (gradient) on negative faces
+    yGradient = (temperatureMiddle - temperatureBottom) / cellSize;
+    xGradient = (temperatureMiddle - temperatureLeft) / cellSize;
+    zGradient = (temperatureMiddle - temperatureBack) / cellSize;
+    dvec3 gradient_neg = dvec3(xGradient, yGradient, zGradient);
 
     //calculating the ∇^2T (laplace)
     double rateOfChangeOfYGradient = (temperatureTop - temperatureMiddle) - (temperatureMiddle - temperatureBottom);
@@ -92,9 +102,22 @@ double Voxel::getNeighbourTemperature(int xOffset, int yOffset, int zOffset){
     rateOfChangeOfXGradient /= pow(cellSize, 2) * 2;
     double laplace = rateOfChangeOfYGradient + rateOfChangeOfZGradient + rateOfChangeOfXGradient;
 
-    return {gradient, laplace};
+    return {gradient, gradient_pos, gradient_neg, laplace};
 }
 
+
+dvec3 Voxel::getNegfaceVel()
+{
+    dvec3 vel;
+    Voxel* v;
+    v = grid->getVoxel(XIndex-1, YIndex, ZIndex);
+    vel.x = v==nullptr ? 0:v->getLastFrameState()->u.x;
+    v = grid->getVoxel(XIndex, YIndex-1, ZIndex);
+    vel.y = v==nullptr ? 0:v->getLastFrameState()->u.y;
+    v = grid->getVoxel(XIndex, YIndex, ZIndex-1);
+    vel.z = v==nullptr ? 0:v->getLastFrameState()->u.z;
+    return vel;
+}
 
 dvec3 Voxel::getGradient(double (*func)(Voxel *))
 {

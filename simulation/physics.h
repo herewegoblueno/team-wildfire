@@ -22,7 +22,7 @@ const double gravity_acceleration = 1;
 const double air_density = 1.225;
 
 // heat transfer
-const double HEAT_DIFFUSION_INTENSITY_TERM = 0.2; //alpha
+const double HEAT_DIFFUSION_INTENSITY_TERM = 0.6; //alpha
 const double RADIATIVE_COOLING_TERM = 0.002; //gamma
 const double adjacent_module_diffusion = 0.08; // alpha_M
 const double air_to_module_diffusion = 0.75; // b

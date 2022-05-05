@@ -54,6 +54,8 @@ struct VoxelPhysicalData {
 
 struct VoxelTemperatureGradientInfo {
     dvec3 gradient; // ∇T
+    dvec3 gradient_pos; // ∇T
+    dvec3 gradient_neg; // ∇T
     double laplace; // ∇^2T
 };
 
@@ -84,6 +86,7 @@ public:
     dvec3 getVelGradient();
     dvec3 getVelLaplace();
     dvec3 getVorticity();
+    dvec3 getNegfaceVel();
 
 private:
     //Set and changed over the course of simulation

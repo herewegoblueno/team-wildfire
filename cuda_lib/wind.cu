@@ -25,7 +25,7 @@ __global__ void jacobi(double* x_next, double* A, double* x_now, double* b, int*
 
 
 __global__
-void bouyancyKernel(double* grid_temp, double* grid_q_v, double* grid_h, double* su_xyz,
+void buoyancyKernel(double* grid_temp, double* grid_q_v, double* grid_h, double* su_xyz,
                     double* f, int resolution, double dt)
 {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -34,15 +34,19 @@ void bouyancyKernel(double* grid_temp, double* grid_q_v, double* grid_h, double*
     {
         double* src_u = su_xyz + idx*3;
 
-        double T_th = (grid_temp[idx]-2)*10+20;
+        double T_th = grid_temp[idx];
         double X_v = grid_q_v[idx]/(1+grid_q_v[idx]);
         double M_th = 18.02*X_v + 28.96*(1-X_v);
-        double T_air = 20-0.0065*(grid_h[idx] + 20)*10;
-        double buoyancy =   0.05*(28.96*T_th/(M_th*T_air) - 1);
+        double T_air = 3.5-grid_h[idx];
+        double buoyancy =   0.3*(28.96*T_th/(M_th*T_air) - 1);
 
-        src_u[0] += f[0]*dt;
-        src_u[1] += (f[1]+buoyancy)*dt;
-        src_u[2] += f[2]*dt;
+        src_u[1] += buoyancy*dt;
+        if(fabs(f[0]*5 - src_u[0]) > 0.3) src_u[0] += (f[0]*5 - src_u[0])/fabs(f[0]*5 - src_u[0])*0.3*dt;
+        else  src_u[0] += (f[0]*5 - src_u[0])*dt;
+        if(fabs(f[1]*5 - src_u[1]) > 0.3) src_u[1] += (f[1]*5 - src_u[1])/fabs(f[1]*5 - src_u[1])*0.3*dt;
+        else  src_u[1] += (f[1]*5 - src_u[1])*dt;
+        if(fabs(f[2]*5 - src_u[2]) > 0.3) src_u[2] += (f[2]*5 - src_u[2])/fabs(f[2]*5 - src_u[2])*0.3*dt;
+        else  src_u[2] += (f[2]*5 - src_u[2])*dt;
     }
 }
 
@@ -60,14 +64,14 @@ void advectKernel(double* su_xyz, int* id_xyz, double* tu_xyz,
         double ua, ub;
 
         ua = getVel(x-1, y, z, su_xyz, resolution, 0);
-        ub = getVel(x,   y, z, su_xyz, resolution, 0);
-        dst_u[0] = src_u[0] - (ub - ua)/cell_size*(ub+ua)/2*dt;
+        ub = getVel(x+1, y, z, su_xyz, resolution, 0);
+        dst_u[0] = src_u[0] - 0.95*(ub - ua)/2/cell_size*src_u[0]*dt;
         ua = getVel(x, y-1, z, su_xyz, resolution, 1);
-        ub = getVel(x, y,   z, su_xyz, resolution, 1);
-        dst_u[1] = src_u[1] - (ub - ua)/cell_size*(ub+ua)/2*dt;
+        ub = getVel(x, y+1, z, su_xyz, resolution, 1);
+        dst_u[1] = src_u[1] - 0.95*(ub - ua)/2/cell_size*src_u[1]*dt;
         ua = getVel(x, y, z-1, su_xyz, resolution, 2);
-        ub = getVel(x, y, z,   su_xyz, resolution, 2);
-        dst_u[2] = src_u[2] - (ub - ua)/cell_size*(ub+ua)/2*dt;
+        ub = getVel(x, y, z+1, su_xyz, resolution, 2);
+        dst_u[2] = src_u[2] - 0.95*(ub - ua)/2/cell_size*src_u[2]*dt;
     }
 }
 
@@ -252,7 +256,7 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
                     int resolution, double cell_size, float dt)
 {
     double air_density = 1.225;
-    double viscosity = 5;
+    double viscosity = 1;
     cudaError err;
 
     auto t1 = now();
@@ -297,7 +301,7 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
 //    cudaFree(vorticity);  cudaFree(vorticity_len);
     // buoyancy
     auto t5 = now();
-    bouyancyKernel <<<numBlocks, blockSize>>> (d_temp, d_q_v, d_h, d_u2, d_f, resolution, dt);
+    buoyancyKernel <<<numBlocks, blockSize>>> (d_temp, d_q_v, d_h, d_u2, d_f, resolution, dt);
     cudaDeviceSynchronize();
 
     err = cudaGetLastError();
@@ -351,6 +355,7 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
     cudaFree(d_u);
     cudaFree(d_u2);
     cudaFree(d_id);
+    cudaFree(d_f);
 
 //    cudaError err;
     err = cudaGetLastError();

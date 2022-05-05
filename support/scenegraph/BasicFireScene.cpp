@@ -24,10 +24,10 @@ BasicFireScene::BasicFireScene():
 {
 
     Voxel* v = voxelGrid.getVoxel(14, 18, 18);
-    fireManager.addFire(nullptr, vec3(v->centerInWorldSpace), 4);
+    fireManager.addFire(nullptr, vec3(v->centerInWorldSpace), 1);
 
     v = voxelGrid.getVoxel(22, 18, 18);
-    fireManager.addFire(nullptr, vec3(v->centerInWorldSpace), 4);
+    fireManager.addFire(nullptr, vec3(v->centerInWorldSpace), 1);
 
     voxelGrid.getVisualization()->toggle(true, true);
 
@@ -49,7 +49,7 @@ std::vector<std::unique_ptr<CS123Shader>> *BasicFireScene::getShaderPrograms(){
 
 void BasicFireScene::render(SupportCanvas3D *context) {
     Voxel* v = voxelGrid.getVoxel(18, 18, 18);
-    v->getLastFrameState()->temperature = 15;
+//    v->getLastFrameState()->temperature = 15;
     voxelGrid.getVisualization()->updateValuesFromSettings();
     simulator.step(&voxelGrid);
 

@@ -83,7 +83,7 @@ void Fire::update_particles()
         Particle &p = m_particles[i];
 //        p.Life -= fire_frame_rate*p.Temp*burn_coef;
         #ifdef CUDA_FLUID
-        p.Life -= fire_frame_rate;
+        p.Life -= fire_frame_rate*0.01;
         #else
         p.Life -= fire_frame_rate;
         #endif
