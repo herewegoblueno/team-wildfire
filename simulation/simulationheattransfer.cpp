@@ -9,7 +9,7 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
     v->getCurrentState()->tempGradientFromPrevState = tempGradientInfo.gradient;
     v->getCurrentState()->tempLaplaceFromPrevState = tempGradientInfo.laplace;
 
-    double dTdt = HEAT_DIFFUSION_INTENSITY_TERM * tempGradientInfo.laplace;
+    double dTdt = heat_diffusion_intensity * tempGradientInfo.laplace;
     double differenceFromAmbienceCap = 50;
     //Clamping this because since we raise it to the power 4, larger values can make the tempertature
     //oscilate between very -ve and very +ve until it explodes, similar to
@@ -18,7 +18,7 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
     double differenceFromAmbience = clamp(
                 v->getLastFrameState()->temperature - v->getAmbientTemperature(),
                 -differenceFromAmbienceCap, differenceFromAmbienceCap);
-    dTdt -= RADIATIVE_COOLING_TERM * pow(differenceFromAmbience, 4) * ((differenceFromAmbience > 0) ? 1 : -1);
+    dTdt -= radiative_cooling * pow(differenceFromAmbience, 4) * ((differenceFromAmbience > 0) ? 1 : -1);
 
     dTdt -= glm::dot(tempGradientInfo.gradient_pos, v->getLastFrameState()->u)*0.5;
     dTdt -= glm::dot(tempGradientInfo.gradient_neg, v->getNegfaceVel())*0.5;

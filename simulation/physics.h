@@ -22,11 +22,11 @@ const double gravity_acceleration = 1;
 const double air_density = 1.225;
 
 // heat transfer
-const double HEAT_DIFFUSION_INTENSITY_TERM = 0.6; //alpha
-const double RADIATIVE_COOLING_TERM = 0.002; //gamma
-const double adjacent_module_diffusion = 0.08; // alpha_M
+const double heat_diffusion_intensity = 0.6; //alpha
+const double radiative_cooling = 0.0002; //gamma
+const double adjacent_module_diffusion = 0.16; // alpha_M
 const double air_to_module_diffusion = 0.75; // b
-const double module_to_air_diffusion = 150; // tau
+const double module_to_air_diffusion = 200; // tau
 
 // combustion
 const double min_combust_temp_cel = 150.0; // T_0
