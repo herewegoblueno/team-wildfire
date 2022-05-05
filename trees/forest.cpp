@@ -378,7 +378,7 @@ void Forest::initializeTrunkPrimitive() {
 
 /** Initialize the leaf primitive */
 void Forest::initializeLeafPrimitive() {
-    // Initialize dark green material for leaves
+    // Initialize green material for leaves
     std::unique_ptr<CS123SceneMaterial> material = std::make_unique<CS123SceneMaterial>();
     material->clear();
     material->cAmbient.r = 0.0f;
@@ -391,21 +391,20 @@ void Forest::initializeLeafPrimitive() {
     _leaf = std::make_unique<CS123ScenePrimitive>(PrimitiveType::PRIMITIVE_LEAF, *material);
 }
 
-
 /** Initialize the ground primitive */
 void Forest::initializeGroundPrimitive() {
     // Initialize ground model
     _groundModel = glm::scale(glm::vec3(_forestWidth + gridBuffer, 0,
                                         _forestHeight + gridBuffer));
-    // Initialize light green material for ground
+    // Initialize green material for ground
     std::unique_ptr<CS123SceneMaterial> material = std::make_unique<CS123SceneMaterial>();
     material->clear();
-    material->cAmbient.r = 0.6f;
-    material->cAmbient.g = 1.0f;
-    material->cAmbient.b = 0.6f;
-    material->cDiffuse.r = 0.6f * 0.73f;
-    material->cDiffuse.g = 1.0f * 0.62f;
-    material->cDiffuse.b = 0.6f * 0.51f;
+    material->cAmbient.r = 0.3f;
+    material->cAmbient.g = 0.5f;
+    material->cAmbient.b = 0.3f;
+    material->cDiffuse.r = 0.1f * 0.73f;
+    material->cDiffuse.g = 0.1f * 0.62f;
+    material->cDiffuse.b = 0.1f * 0.51f;
     // Create primitive object
     _ground = std::make_unique<CS123ScenePrimitive>(PrimitiveType::PRIMITIVE_GROUND, *material);
 }
