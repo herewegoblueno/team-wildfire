@@ -15,7 +15,7 @@
 #include "simulation/simulator.h"
 #include <unordered_map>
 
-const int numTrees = 90;
+const int numTrees = 100;
 const float forestHeight = 10;
 const float forestWidth = 10;
 
