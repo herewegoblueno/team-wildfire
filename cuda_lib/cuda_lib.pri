@@ -6,10 +6,10 @@ CUDA_OBJECTS_DIR = ./
 CUDA_SOURCES += \
     $$PWD/jacobi.cu \
     $$PWD/base_op.cu \
-    $$PWD/info.cu
+    $$PWD/info.cu \
+    $$PWD/wind.cu \
+    $$PWD/info.cuh
 
-HEADERS += \
-    $$PWD/info.h
 
 # MSVCRT link option (static or dynamic, it must be the same with your Qt SDK link option)
 MSVCRT_LINK_FLAG_DEBUG   = "/MDd"
@@ -17,7 +17,7 @@ MSVCRT_LINK_FLAG_RELEASE = "/MD"
 
 win32 {
     CONFIG += console
-#    DEFINES += CUDA_FLUID
+    DEFINES += CUDA_FLUID
 
     # CUDA settings
     CUDA_DIR = "D:/DL Tools/NVIDIA Corporation/NVIDIA GPU Computing Toolkit/CUDA/v11.1"
@@ -79,4 +79,7 @@ win32 {
     }
 
 }
+
+SOURCES +=
+
 

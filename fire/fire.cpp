@@ -79,7 +79,11 @@ void Fire::update_particles()
     {
         Particle &p = m_particles[i];
 //        p.Life -= fire_frame_rate*p.Temp*burn_coef;
+        #ifdef CUDA_FLUID
+        p.Life -= fire_frame_rate*0.01;
+        #else
         p.Life -= fire_frame_rate;
+        #endif
 
         if (p.Life > 0.0f)
         {
@@ -93,13 +97,14 @@ void Fire::update_particles()
 
             glm::vec3 u = vec3(vox->u);
             #ifdef CUDA_FLUID
-            b_factor = 0.03;
+            b_factor = 0.0;
+            #else
+            p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
             #endif
             glm::vec3 b = glm::vec3(0, gravity_acceleration*thermal_expansion*b_factor, 0)*
                     (float)(simTempToWorldTemp(p.Temp) - simTempToWorldTemp(ambient_T)); // Buoyancy
 
-            p.Position += (b + u) * fire_frame_rate;
-            p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
+            p.Position += (b + u) * fire_frame_rate*0.5f;
 
             if(p.Life < fire_frame_rate*1.5 || p.Temp < 10)
             {

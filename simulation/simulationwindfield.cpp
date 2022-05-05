@@ -3,9 +3,6 @@
 #include <Eigen/Cholesky>
 #include <iostream>
 
-#ifdef CUDA_FLUID
-extern "C" void jacobiGPU(double* diag, double* rhs, int* id_xyz, int N, int Ni, int iter);
-#endif
 
 double get_vorticity_len(Voxel* v) {
     return v->getVorticity().length();
@@ -61,7 +58,28 @@ double calc_density_term(double cell_size, double time)
     return time/(air_density*cell_size*cell_size);
 }
 
+void fill_jacobi_rhs(Voxel* v, int resolution, int index, double density_term,
+                     double* diag_A, double* rhs, int* id_xyz)
+{
+    double diag = 6;
+    glm::dvec3 gradient = v->getVelGradient();
+    double this_rhs = -(gradient.x + gradient.y + gradient.z)/density_term;
 
+    if(v->XIndex>resolution-2) diag --;
+    if(v->XIndex<1) diag --;
+    if(v->YIndex>resolution-2) diag --;
+    if(v->YIndex<1) diag --;
+    if(v->ZIndex>resolution-2) diag --;
+    if(v->ZIndex<1) diag --;
+
+    diag_A[0] = diag;
+    id_xyz[0] = v->XIndex;
+    id_xyz[1] = v->YIndex;
+    id_xyz[2] = v->ZIndex;
+
+    assert(!std::isnan(this_rhs));
+    rhs[0] = this_rhs;
+}
 // vorticity confinement origrinated from Steinhoff and Underhill [1994],
 dvec3 vorticity_confinement(glm::dvec3 u, Voxel* v, double time)
 {
@@ -91,34 +109,13 @@ glm::dvec3 advect_vel(dvec3 u, double dt, Voxel* v)
     return u;
 }
 
-void fill_jacobi_rhs(Voxel* v, int resolution, int index, double density_term,
-                     double* diag_A, double* rhs, int* id_xyz)
-{
-    double diag = 6;
-    glm::dvec3 gradient = v->getVelGradient();
-    double this_rhs = -(gradient.x + gradient.y + gradient.z)/density_term;
 
-    if(v->XIndex>resolution-2) diag --;
-    if(v->XIndex<1) diag --;
-    if(v->YIndex>resolution-2) diag --;
-    if(v->YIndex<1) diag --;
-    if(v->ZIndex>resolution-2) diag --;
-    if(v->ZIndex<1) diag --;
-
-    diag_A[0] = diag;
-    id_xyz[0] = v->XIndex;
-    id_xyz[1] = v->YIndex;
-    id_xyz[2] = v->ZIndex;
-
-    assert(!std::isnan(this_rhs));
-    rhs[0] = this_rhs;
-}
 
 void pressure_projection_Jacobi_cuda(double* diag, double* rhs, int* id_xyz, int N, int Ni, int iter)
 {
-    #ifdef CUDA_FLUID
-    jacobiGPU(diag, rhs, id_xyz, N, Ni, iter);
-    #endif
+//    #ifdef CUDA_FLUID
+//    jacobiGPU(diag, rhs, id_xyz, N, Ni, iter);
+//    #endif
 }
 
 

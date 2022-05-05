@@ -28,9 +28,9 @@ private:
     milliseconds timeLastFrame;
     void stepThreadHandler(VoxelGrid *grid, Forest *forest, int deltaTime, int resolution, int minX, int maxX);
     void stepThreadHandlerWind(VoxelGrid *grid, Forest *forest, double deltaTime, int resolution, int minX, int maxX,
-                               double* diag, double* rhs, int* id_xyz);
+                               double* grid_temp, double* grid_q_v, double* grid_h , double* u_xyz, int* id_xyz);
     void stepThreadHandlerWater(VoxelGrid *grid, Forest *forest, double deltaTime, int resolution, int minX, int maxX,
-                                double* pressure);
+                                double* u_new);
     void stepCleanupThreadHandler(VoxelGrid *grid, Forest *forest, int resolution, int minX, int maxX);
 
     void stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int deltaTimeInMs);

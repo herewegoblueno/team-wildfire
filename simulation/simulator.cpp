@@ -5,6 +5,7 @@
 #include <memory.h>
 #include "support/Settings.h"
 
+
 const int Simulator::NUMBER_OF_SIMULATION_THREADS = 4;
 
 Simulator::Simulator() {}
@@ -59,7 +60,7 @@ void Simulator::linear_step(VoxelGrid *grid, Forest *forest)
     double deltaTime = (currentTime - timeLastFrame).count();
     if (deltaTime > 100) deltaTime = 100;
 
-    deltaTime = 0.001;
+    deltaTime = 10;
     timeLastFrame = currentTime;
     if (deltaTime == 0) return; //Don't bother doing anything
 
@@ -70,35 +71,29 @@ void Simulator::linear_step(VoxelGrid *grid, Forest *forest)
     int jumpPerThread = gridResolution / NUMBER_OF_SIMULATION_THREADS;
 
     int cell_num = gridResolution*gridResolution*gridResolution;
-    double* diag = (double *) malloc(cell_num*sizeof(double));
-    double* rhs = (double *) malloc(cell_num*sizeof(double));
+    double* grid_temp = (double *) malloc(cell_num*sizeof(double));
+    double* grid_q_v = (double *) malloc(cell_num*sizeof(double));
+    double* grid_h = (double *) malloc(cell_num*sizeof(double));
+    double* u_xyz = (double *) malloc(cell_num*sizeof(double)*3);
     int* id_xyz = (int *) malloc(cell_num*sizeof(int)*3);
 
     //(lines 7-12 in Algorithm 1 of paper)
     std::vector<std::thread> threads;
     for (int x = 0; x < gridResolution; x += jumpPerThread)
-        threads.emplace_back(&Simulator::stepThreadHandlerWind, this, grid, forest, deltaTime,
-                             gridResolution, x, x + jumpPerThread, diag, rhs, id_xyz);
+        threads.emplace_back(&Simulator::stepThreadHandlerWind, this, grid, forest, deltaTime, gridResolution,
+                             x, x + jumpPerThread, grid_temp, grid_q_v, grid_h , u_xyz, id_xyz);
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
-    double pressure[10][10][10];
-    for (int x=0;x<10;x++)
-        for (int y=0;y<10;y++)
-            for (int z=0;z<10;z++)
-                pressure[x][y][z] = rhs[x*face_num + y*gridResolution + z];
+
+    processWindGPU(grid_temp, grid_q_v, grid_h, u_xyz, id_xyz, 20,
+                   gridResolution, grid->cellSideLength(), deltaTime/1000.);
 
     threads.clear();
-    pressure_projection_Jacobi_cuda(diag, rhs, id_xyz, gridResolution, cell_num, 20);
-    for (int x=0;x<10;x++)
-        for (int y=0;y<10;y++)
-            for (int z=0;z<10;z++)
-                pressure[x][y][z] = rhs[x*face_num + y*gridResolution + z];
-
     for (int x = 0; x < gridResolution; x += jumpPerThread)
         threads.emplace_back(&Simulator::stepThreadHandlerWater, this, grid, forest, deltaTime,
-                             gridResolution, x, x + jumpPerThread, rhs);
+                             gridResolution, x, x + jumpPerThread, u_xyz);
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
 
-    free(diag);free(rhs);free(id_xyz);
+    free(grid_temp);free(grid_q_v);free(grid_h);free(u_xyz);free(id_xyz);
 
 }
 
@@ -116,10 +111,11 @@ void Simulator::stepThreadHandler(VoxelGrid *grid ,Forest * forest, int deltaTim
 }
 
 void Simulator::stepThreadHandlerWind(VoxelGrid *grid, Forest *forest, double deltaTime, int resolution,
-                                      int minXInclusive, int maxXExclusive, double* diag_A, double* rhs, int* id_xyz)
+                                      int minXInclusive, int maxXExclusive,
+                                      double* grid_temp, double* grid_q_v, double* grid_h , double* u_xyz, int* id_xyz)
 {
-    double cell_size = grid->cellSideLength();
-    double density_term = calc_density_term(cell_size, deltaTime);
+//    double cell_size = grid->cellSideLength();
+//    double density_term = calc_density_term(cell_size, deltaTime);
     int index, face_num = resolution*resolution;
 //    int cell_num = face_num*resolution;
     for (int x = minXInclusive; x < maxXExclusive; x++){
@@ -129,11 +125,18 @@ void Simulator::stepThreadHandlerWind(VoxelGrid *grid, Forest *forest, double de
                 Voxel *v = grid->getVoxel(x, y, z);
                 ModuleSet nearbyModules = forest == nullptr ? ModuleSet() : forest->getModulesMappedToVoxel(v);
                 stepVoxelHeatTransfer(v, nearbyModules, deltaTime);
-                stepVoxelWind(grid->getVoxel(x, y, z), deltaTime);
+//                stepVoxelWind(grid->getVoxel(x, y, z), deltaTime);
 
             #ifdef CUDA_FLUID
-                fill_jacobi_rhs(grid->getVoxel(x,y,z), resolution, index, density_term,
-                                     diag_A+index, rhs+index, id_xyz+index*3);
+                grid_temp[index] = v->getCurrentState()->temperature;
+                grid_q_v[index] = v->getLastFrameState()->q_v;
+                grid_h[index] = v->centerInWorldSpace.y;
+                u_xyz[index*3+0] = v->getLastFrameState()->u.x;
+                u_xyz[index*3+1] = v->getLastFrameState()->u.y;
+                u_xyz[index*3+2] = v->getLastFrameState()->u.z;
+                id_xyz[index*3+0] = v->XIndex;
+                id_xyz[index*3+1] = v->YIndex;
+                id_xyz[index*3+2] = v->ZIndex;
             #endif
                 index++;
             }
@@ -142,20 +145,21 @@ void Simulator::stepThreadHandlerWind(VoxelGrid *grid, Forest *forest, double de
 }
 
 void Simulator::stepThreadHandlerWater(VoxelGrid *grid ,Forest *, double deltaTime, int resolution,
-                                       int minXInclusive, int maxXExclusive, double* pressure){
+                                       int minXInclusive, int maxXExclusive, double* u_new){
     double cell_size = grid->cellSideLength();
+    int index;
     for (int x = minXInclusive; x < maxXExclusive; x++){
+        index = x*resolution*resolution;
         for (int y = 0; y < resolution; y++){
             for (int z = 0; z < resolution; z++){
                 Voxel* vox = grid->getVoxel(x,y,z);
 
             #ifdef CUDA_FLUID
-                dvec3 d_u = calc_pressure_effect(x, y, z, resolution, pressure, deltaTime, cell_size);
-                dvec3 o_u = vox->getCurrentState()->u;
-
-                vox->getCurrentState()->u = o_u - d_u;
+                dvec3 u(u_new[index*3], u_new[index*3+1], u_new[index*3+2]);
+                vox->getCurrentState()->u = u;
             #endif
 //                stepVoxelWater(vox, deltaTime);
+                index++;
             }
         }
     }

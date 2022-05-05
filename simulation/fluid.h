@@ -3,6 +3,12 @@
 #include "voxels/voxelgrid.h"
 #include "physics.h"
 
+#ifdef CUDA_FLUID
+extern "C" void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
+                    double* u_xyz, int* id_xyz, int jacobi_iter,
+                    int resolution, double cell_size, float dt);
+#endif
+
 // water particle related equation
 double advect(double (*func)(Voxel *), glm::dvec3 vel, double dt, Voxel* v);
 dvec3  advect_vel(dvec3 u, double dt, Voxel* v);

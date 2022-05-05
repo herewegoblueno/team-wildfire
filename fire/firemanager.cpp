@@ -57,7 +57,7 @@ FireManager::FireManager()
 
 void FireManager::addFire(Voxel* v, glm::vec3 pos, float size)
 {
-    int density = size*size*1000;
+    int density = 200;
     std::shared_ptr<Fire> fire = std::make_shared<Fire>(density, pos, size, v->grid);
     int resolution = v->grid->getResolution();
     int index = v->XIndex*resolution*resolution + v->YIndex*resolution + v->ZIndex;
