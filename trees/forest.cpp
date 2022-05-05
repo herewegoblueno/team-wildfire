@@ -54,20 +54,35 @@ void Forest::recalculatePrimitives() {
     }
 }
 
-/** Generate trees, add their modules and branches to state */
+/**
+ * Generate trees, add their modules and branches to state.
+ * Use stratified sampling to avoid tree overlap.
+ */
 void Forest::createTrees() {
     _treeGenerator = std::make_unique<TreeGenerator>();
-    int totalModules = 0;
-    for (int i = 0; i < _numTrees; i++) {
-        float x = randomFloat() * _forestWidth - _forestWidth / 2;
-        float z = randomFloat() * _forestHeight - _forestHeight / 2;
-        mat4 trans = translate(vec3(x, 0, z));
-        _treeGenerator->generateTree();
-        ModuleTree moduleTree = _treeGenerator->getModuleTree();
-        addTreeToForest(moduleTree.modules, trans);
-        totalModules += moduleTree.modules.size();
+    int xStrata = std::max(static_cast<int>(std::sqrt(_numTrees)), 1);
+    int zStrata = _numTrees / xStrata;
+    std::cout << "Tree position stratified sampling:" << std::endl;
+    std::cout << xStrata << " horizontal strata" << std::endl;
+    std::cout << zStrata << " vertical strata" << std::endl;
+    float strataWidth = _forestWidth / static_cast<float>(xStrata);
+    float strataHeight = _forestHeight / static_cast<float>(zStrata);
+    for (int zStep = 0; zStep < zStrata; zStep++) {
+        for (int xStep = 0; xStep < xStrata; xStep++) {
+            // Sample a point in unit square
+            float xSample = randomFloat();
+            float zSample = randomFloat();
+            // Map to a point on the current strata
+            float x = (xStep + xSample) * strataWidth;
+            float z = (zStep + zSample) * strataHeight;
+            x = x - _forestWidth / 2.f;
+            z = z - _forestHeight / 2.f;
+            mat4 trans = translate(vec3(x, 0, z));
+            _treeGenerator->generateTree();
+            ModuleTree moduleTree = _treeGenerator->getModuleTree();
+            addTreeToForest(moduleTree.modules, trans);
+        }
     }
-    std::cout << (float)totalModules/(float)_numTrees << " modules per tree" << std::endl;
 }
 
 /**
@@ -136,12 +151,6 @@ void Forest::initializeModuleVoxelMapping() {
        }
    }
    std::cout << (float)totalVoxels/(float)_modules.size() << " voxels per module" << std::endl;
-
-   int totalModules = 0;
-   for (auto const& voxelModules : _voxelToModules) {
-       totalModules += voxelModules.second.size();
-   }
-   std::cout << (float)totalModules/(float)(std::pow(resolution,3)) << " modules per voxel" << std::endl;
 }
 
 //Since trees can only shrink over time, we can only ever lose voxels in the mappings...
