@@ -9,7 +9,7 @@
 const int gridBuffer = 3; // make grid slightly larger than forest
 // Size of grid to search beyond center voxel when finding voxels
 // that overlap a module
-const int voxelSearchRadius = 25;
+const int voxelSearchRadius = 6;
 
 class Forest
 {
