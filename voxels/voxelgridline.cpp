@@ -179,9 +179,12 @@ void VoxelGridLine::renderVoxel(Voxel *vox, bool renderingInEyeMode){
         //TODO: improve this, still too tightly coupled with temperature ranges
         if (voxelMode == TEMP_LAPLACE){
             shader->setUniform("prop", (float)vox->getCurrentState()->tempLaplaceFromPrevState);
-        }else{
-            shader->setUniform("selectedVoxel", !isValidTemperature);
+        }else if (voxelMode == TEMPERATURE){
             shader->setUniform("prop", temperature);
+            shader->setUniform("selectedVoxel", !isValidTemperature);
+        }else if (voxelMode == WATER){
+            shader->setUniform("prop", (float)vox->getCurrentState()->q_v);
+            shader->setUniform("secondProp", (float)vox->getCurrentState()->q_c);
         }
         shader->setUniform("renderingVectorField", false);
         glDrawArrays(GL_LINES, 0, vertices.size() / 3 - pointsReservedForVectorRendering);
@@ -242,5 +245,7 @@ std::string VoxelGridLine::getVoxelFieldModeExplanation(VoxelVisualizationModes 
         return "Scale: Yellow (low temp) -> Red (high temp). Green = Invalid Temp";
     case TEMP_LAPLACE:
         return "Scale: Cyan (--) -> Blue (-) -> Red (+) -> Magenta (++)";
+     case WATER:
+        return "Red -> more water vapor. Green -> more condensed water";
     }
 }

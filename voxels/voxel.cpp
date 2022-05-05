@@ -82,11 +82,13 @@ double Voxel::getNeighbourTemperature(int xOffset, int yOffset, int zOffset){
     double xGradient = (temperatureRight - temperatureLeft) / (cellSize * 2);
     double zGradient = (temperatureForward - temperatureBack) / (cellSize * 2);
     dvec3 gradient = dvec3(xGradient, yGradient, zGradient);
+
     //calculating the ∇T (gradient) on positive faces
     yGradient = (temperatureTop - temperatureMiddle) / cellSize;
     xGradient = (temperatureRight - temperatureMiddle) / cellSize;
     zGradient = (temperatureForward - temperatureMiddle) / cellSize;
     dvec3 gradient_pos = dvec3(xGradient, yGradient, zGradient);
+
     //calculating the ∇T (gradient) on negative faces
     yGradient = (temperatureMiddle - temperatureBottom) / cellSize;
     xGradient = (temperatureMiddle - temperatureLeft) / cellSize;

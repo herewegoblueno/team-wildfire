@@ -283,6 +283,11 @@
                   <string>Temperature Laplace</string>
                  </property>
                 </item>
+                <item>
+                 <property name="text">
+                  <string>Water Content</string>
+                 </property>
+                </item>
                </widget>
               </item>
              </layout>
@@ -362,7 +367,7 @@
            <item>
             <widget class="QToolBox" name="forestToolBox">
              <property name="currentIndex">
-              <number>2</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="ForestVisualization">
               <property name="geometry">

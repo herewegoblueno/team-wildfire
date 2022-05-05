@@ -20,16 +20,13 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
                 -differenceFromAmbienceCap, differenceFromAmbienceCap);
     dTdt -= RADIATIVE_COOLING_TERM * pow(differenceFromAmbience, 4) * ((differenceFromAmbience > 0) ? 1 : -1);
 
-    //TODO: this should be based on the iterpolated u field (to get the u field in the center),
-    //not the u field the voxel is storing (which is relative to its faces)
     dTdt -= glm::dot(tempGradientInfo.gradient_pos, v->getLastFrameState()->u)*0.5;
     dTdt -= glm::dot(tempGradientInfo.gradient_neg, v->getNegfaceVel())*0.5;
     
     double dMdt = 0.0;
-    for (Module *m : nearbyModules) {
-        dMdt += m->getCurrentState()->massChangeRateFromLastFrame;
-    }
+    for (Module *m : nearbyModules) dMdt += m->getCurrentState()->massChangeRateFromLastFrame;
     dTdt -= module_to_air_diffusion * dMdt;
+
     v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt * deltaTimeInMs / 1000.0;
     if(std::isnan(v->getCurrentState()->temperature))
     {
