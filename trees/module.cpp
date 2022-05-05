@@ -13,13 +13,20 @@ Module::Module() :
 {
 }
 
-/** Init mass and surface area of module based on branches  */
-void Module::initMassAndArea() {
+/**
+ * Init mass and surface area of module based on branches.
+ * Also pre-compute the points where fire should spawn by randomly sampling
+ * a point along the center axis of each branch.
+ */
+void Module::initPropertiesFromBranches() {
     _currentPhysicalData.mass = 0;
     _lastFramePhysicalData.mass = 0;
     _currentPhysicalData.area = 0;
     _lastFramePhysicalData.area = 0;
     for (Branch *branch : _branches) {
+        for (int i = 0; i < numFireSpawnPointsPerBranch; i++) {
+            _fireSpawnPoints.push_back(sampleFromBranchCenter(branch));
+        }
         double mass = getBranchMass(branch);
         double area = getBranchLateralSurfaceArea(branch);
         _currentPhysicalData.mass += mass;
@@ -172,9 +179,11 @@ double Module::getTemperatureLaplaceFromPreviousFrame() {
 /** Reaction rate based on module temperature */
 double Module::getReactionRateFromPreviousFrame(double windSpeed) {
     double moduleTemp = getLastFrameState()->temperature;
-    if (moduleTemp < reaction_rate_t0) return 0.0;
-    if (moduleTemp > reaction_rate_t1) return 1.0;
-    double tempRatio = (moduleTemp - reaction_rate_t0) / (reaction_rate_t1 - reaction_rate_t0);
+    double t0 = worldTempToSimulationTemp(min_combust_temp_cel);
+    double t1 = worldTempToSimulationTemp(max_combust_temp_cel);
+    if (moduleTemp < t0) return 0.0;
+    if (moduleTemp > t1) return 1.0;
+    double tempRatio = (moduleTemp - t0) / (t1 - t0);
     double rate = sigmoidFunc(tempRatio);
 
     //TODO: double check this
@@ -200,6 +209,16 @@ double Module::getMassChangeRateFromPreviousFrame(double windSpeed) {
     double reactionRate = getReactionRateFromPreviousFrame(windSpeed);
     double surfaceArea = getLastFrameState()->area;
     return -reactionRate * reation_rate_multiplier * surfaceArea;
+}
+
+/** Sample a random point from the center of a branch */
+vec3 Module::sampleFromBranchCenter(Branch *branch) const {
+    mat4 model = branch->model;
+    dvec3 branchStart = dvec3(model * trunkObjectBottom);
+    dvec3 branchEnd = dvec3(model * trunkObjectTop);
+    double distanceAlongBranch = randomFloat() * branch->length;
+    dvec3 branchDir = normalize(branchEnd - branchStart);
+    return vec3(branchStart + branchDir * distanceAlongBranch);
 }
 
 void Module::updateLastFrameData(){

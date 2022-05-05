@@ -20,6 +20,7 @@ public:
 
     void drawParticles( CS123::GL::CS123Shader* shader, OpenGLShape* shape);
     void drawSmoke( CS123::GL::CS123Shader* shader, OpenGLShape* shape);
+    void setSize(float size);
 
 private:
     // particle cluster property

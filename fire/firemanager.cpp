@@ -24,7 +24,8 @@
 
 using namespace CS123::GL;
 
-FireManager::FireManager()
+FireManager::FireManager(VoxelGrid *grid) :
+    m_grid(grid)
 {
     m_fires.clear();
     std::vector<float> particle_quad = { -1, 1, 0, 0, 0,
@@ -55,21 +56,29 @@ FireManager::FireManager()
 }
 
 
-void FireManager::addFire(Voxel* v, glm::vec3 pos, float size)
+void FireManager::addFire(Module *m, glm::vec3 pos, float size)
 {
-    int density = 200;
-    std::shared_ptr<Fire> fire = std::make_shared<Fire>(density, pos, size, v->grid);
-    int resolution = v->grid->getResolution();
-    int index = v->XIndex*resolution*resolution + v->YIndex*resolution + v->ZIndex;
-    if(m_fires.count(index)>0) m_fires.erase(index);
-    m_fires.insert({index, fire});
+    int density = densityFromSize(size);
+    std::shared_ptr<Fire> fire = std::make_shared<Fire>(density, pos, size, m_grid);
+    m_fires.insert({m, fire});
 }
 
-void FireManager::removeFire(Voxel* v)
+void FireManager::setModuleFireSizes(Module *m, float size)
 {
-    int resolution = v->grid->getResolution();
-    int index = v->XIndex*resolution*resolution + v->YIndex*resolution + v->ZIndex;
-    if(m_fires.count(index)>0) m_fires.erase(index);
+    auto equalRange = m_fires.equal_range(m);
+    int count = std::distance(equalRange.first, equalRange.second);
+    if (count == 0) {
+        return;
+    }
+    for (auto it = equalRange.first; it != equalRange.second; it++) {
+        auto fire = it->second;
+        fire->setSize(size);
+    }
+}
+
+void FireManager::removeFires(Module *m)
+{
+    m_fires.erase(m);
 }
 
 void FireManager::setScale(float fire_particle_size, float smoke_particle_size)
@@ -125,6 +134,22 @@ void FireManager::drawFires(bool smoke)
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_BLEND);
+}
+
+
+/** Return size of fire based on the mass change rate */
+double FireManager::massChangeRateToFireSize(double massChangeRate) {
+    double massLossRate = -massChangeRate;
+    double minFireSize = 0.4;
+    double maxFireSize = 1.0;
+    double minMassLossRate = 0.1;
+    double maxMassLossRate = 0.7;
+    double massLossRateDiff = maxMassLossRate - minMassLossRate;
+    if (massLossRate < minMassLossRate) return minFireSize;
+    if (massLossRate > maxMassLossRate) return maxFireSize;
+    double massLossRatio = (massLossRate - minMassLossRate) / massLossRateDiff;
+    double normalizedFireSize = Module::sigmoidFunc(massLossRatio);
+    return minFireSize + massLossRateDiff * normalizedFireSize;
 }
 
 

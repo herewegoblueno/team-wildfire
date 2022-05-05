@@ -5,14 +5,16 @@
 
 using namespace glm;
 
-Forest::Forest(VoxelGrid *grid, int numTrees, float forestWidth, float forestHeight) :
+Forest::Forest(VoxelGrid *grid, FireManager *fireManager,
+               int numTrees, float forestWidth, float forestHeight) :
+    _fireManager(fireManager),
     _grid(grid),
     _treeGenerator(nullptr)
 {
     initializeTrunkPrimitive();
     initializeLeafPrimitive();
     createTrees(numTrees, forestWidth, forestHeight);
-    initMassAndAreaOfModules();
+    initModuleProperties();
     initializeModuleVoxelMapping(); // depends on module mass
     initMassOfVoxels(); // depends on voxel mapping
     initTempOfModules(); // depends on voxel mapping
@@ -208,8 +210,10 @@ void Forest::initTempOfModules() {
 void Forest::artificiallyUpdateTemperatureOfModule(int moduleID, double delta){
     if (_moduleIDs.find(moduleID) != _moduleIDs.end()) {
         Module *m = _moduleIDs[moduleID];
-        m->getCurrentState()->temperature += delta;
-        m->getLastFrameState()->temperature += delta;
+        if (m->getCurrentState()->temperature + delta < maxSimulationTemp) {
+            m->getCurrentState()->temperature += delta;
+            m->getLastFrameState()->temperature += delta;
+        }
     }
 }
 
@@ -217,17 +221,19 @@ void Forest::artificiallyUpdateVoxelTemperatureAroundModule(int moduleID, double
     if (_moduleIDs.find(moduleID) != _moduleIDs.end()) {
         VoxelSet voxs = _moduleToVoxels[_moduleIDs[moduleID]];
         for (Voxel *v : voxs){
-            v->getCurrentState()->temperature += delta;
-            v->getLastFrameState()->temperature += delta;
+            if (v->getCurrentState()->temperature + delta < maxSimulationTemp) {
+                v->getCurrentState()->temperature += delta;
+                v->getLastFrameState()->temperature += delta;
+            }
         }
     }
 }
 
 
-/** Init mass of each module based on its branches */
-void Forest::initMassAndAreaOfModules() {
+/** Init properties of each module based on its branches */
+void Forest::initModuleProperties() {
     for (Module *module : _modules) {
-        module->initMassAndArea();
+        module->initPropertiesFromBranches();
     }
 }
 
@@ -339,6 +345,8 @@ void Forest::deleteModuleAndChildren(Module *m){
     //First remove it from all the necessary maps
     //TODO: there might be a tiny amount of mass left from that module in the associated voxels, maybe we should eventually clean that up
     _moduleIDs.erase(m->ID);
+    // Clean up fires
+    _fireManager->removeFires(m);
 
     VoxelSet associatedVoxels = getVoxelsMappedToModule(m);
     for (Voxel *v : associatedVoxels) _voxelToModules[v].erase(m);

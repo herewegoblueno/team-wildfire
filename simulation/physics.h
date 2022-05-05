@@ -5,7 +5,6 @@
 //These are all the relevant tunable physics variables for the simulation
 
 // general
-
 const double sealevel_temperature = 280;
 const double sealevel_pressure = 100000;
 const double mass_scale = 1;
@@ -22,17 +21,16 @@ const double viscosity = 0.01;
 const double gravity_acceleration = 1;
 const double air_density = 1.225;
 
-
 // heat transfer
-const double HEAT_DIFFUSION_INTENSITY_TERM = 0.02; //alpha
-const double RADIATIVE_COOLING_TERM = 0.01; //gamma
-const double adjacent_module_diffusion = 0.04; // alpha_M
+const double HEAT_DIFFUSION_INTENSITY_TERM = 0.2; //alpha
+const double RADIATIVE_COOLING_TERM = 0.002; //gamma
+const double adjacent_module_diffusion = 0.08; // alpha_M
 const double air_to_module_diffusion = 0.75; // b
-const double module_to_air_diffusion = 100; // tau
+const double module_to_air_diffusion = 150; // tau
 
 // combustion
-const double reaction_rate_t0 = 12.0; // TODO: make these physically accurate
-const double reaction_rate_t1 = 20.0;
+const double min_combust_temp_cel = 150.0; // T_0
+const double max_combust_temp_cel = 450.0; // T_1
 const double max_wind_combustion_boost = 1.5; // n_max
 const double speed_for_max_wind_boost = 1.0; // u_ref
 const double reation_rate_multiplier = 1.0; //Not in paper, added by us
@@ -44,14 +42,13 @@ double ambientTemperatureFunc(glm::dvec3 point);
 const double woodDensity = 40;
 
 // fire particle
-const double alpha_temp = 0.98;
-const double beta_temp = 0.02;
+const double alpha_temp = 0.9;
+const double beta_temp = 0.1;
 const double burn_coef = 0.1;
 const double thermal_expansion = 0.05;
 
-
 //For temperature conversions
-const double maxReasonableCelcuis = 200;
+const double maxReasonableCelcuis = 600;
 const double minReasonableCelcuis = 20;
 const double celciusdiff = maxReasonableCelcuis - minReasonableCelcuis;
 
