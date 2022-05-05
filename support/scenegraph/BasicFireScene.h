@@ -19,13 +19,14 @@ public:
     std::vector<std::unique_ptr<CS123::GL::CS123Shader>> * getShaderPrograms();
 
 private:
-    FireManager fireManager;
 
     void setShaderSceneUniforms(SupportCanvas3D *context);
 
     std::vector<std::unique_ptr<CS123::GL::CS123Shader>> shader_bank;
     CS123::GL::CS123Shader *current_shader;
     VoxelGrid voxelGrid;
+    FireManager fireManager;
+
     Simulator simulator;
 };
 

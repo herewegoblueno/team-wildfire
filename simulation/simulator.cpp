@@ -84,8 +84,10 @@ void Simulator::linear_step(VoxelGrid *grid, Forest *forest)
                              x, x + jumpPerThread, grid_temp, grid_q_v, grid_h , u_xyz, id_xyz);
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
 
+#ifdef CUDA_FLUID
     processWindGPU(grid_temp, grid_q_v, grid_h, u_xyz, id_xyz, 20,
                    gridResolution, grid->cellSideLength(), deltaTime/1000.);
+#endif
 
     threads.clear();
     for (int x = 0; x < gridResolution; x += jumpPerThread)
