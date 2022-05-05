@@ -38,15 +38,12 @@ void buoyancyKernel(double* grid_temp, double* grid_q_v, double* grid_h, double*
         double X_v = grid_q_v[idx]/(1+grid_q_v[idx]);
         double M_th = 18.02*X_v + 28.96*(1-X_v);
         double T_air = 35-grid_h[idx]*3 + 273.15;
-        double buoyancy =   0.3*(28.96*T_th/(M_th*T_air) - 1);
+        double buoyancy =   3*(28.96*T_th/(M_th*T_air) - 1);
 
         src_u[1] += buoyancy*dt;
-        if(fabs(f[0]*5 - src_u[0]) > 0.3) src_u[0] += (f[0]*5 - src_u[0])/fabs(f[0]*5 - src_u[0])*0.3*dt;
-        else  src_u[0] += (f[0]*5 - src_u[0])*dt;
-        if(fabs(f[1]*5 - src_u[1]) > 0.3) src_u[1] += (f[1]*5 - src_u[1])/fabs(f[1]*5 - src_u[1])*0.3*dt;
-        else  src_u[1] += (f[1]*5 - src_u[1])*dt;
-        if(fabs(f[2]*5 - src_u[2]) > 0.3) src_u[2] += (f[2]*5 - src_u[2])/fabs(f[2]*5 - src_u[2])*0.3*dt;
-        else  src_u[2] += (f[2]*5 - src_u[2])*dt;
+        src_u[0] += f[0]*0.1*dt;
+        src_u[1] += f[1]*0.1*dt;
+        src_u[2] += f[2]*0.1*dt;
     }
 }
 
