@@ -41,7 +41,7 @@ void Simulator::stepModuleHeatTransfer(Module *m, VoxelSet surroundingAir, int d
         surroundingAirTemp += v->getLastFrameState()->temperature;
     }
     surroundingAirTemp = surroundingAirTemp / static_cast<double>(surroundingAir.size());
-    double dTdt = 100 * tempLaplace
+    double dTdt = adjacent_module_diffusion * tempLaplace
             + air_to_module_diffusion * (surroundingAirTemp - moduleTemp);
     m->getCurrentState()->temperature = moduleTemp + dTdt * deltaTimeInMs / 1000.0;
 };

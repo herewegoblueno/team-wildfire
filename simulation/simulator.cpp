@@ -125,7 +125,6 @@ void Simulator::stepThreadHandlerWind(VoxelGrid *grid, Forest *forest, double de
                 Voxel *v = grid->getVoxel(x, y, z);
                 ModuleSet nearbyModules = forest == nullptr ? ModuleSet() : forest->getModulesMappedToVoxel(v);
                 stepVoxelHeatTransfer(v, nearbyModules, deltaTime);
-//                stepVoxelWind(grid->getVoxel(x, y, z), deltaTime);
 
             #ifdef CUDA_FLUID
                 grid_temp[index] = v->getCurrentState()->temperature;

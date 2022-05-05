@@ -10,7 +10,14 @@
 
 using namespace std::chrono;
 
-
+struct host2cuda_data
+{
+    double* grid_temp;
+    double* grid_q_v;
+    double* grid_h;
+    double* u_xyz;
+    int* id_xyz;
+};
 
 class Simulator
 {
@@ -39,6 +46,7 @@ private:
     void stepVoxelWind(Voxel* v, double deltaTimeInMs);
 
     void stepModuleHeatTransfer(Module *m, VoxelSet surroundingAir, int deltaTimeInMs);
+    host2cuda_data host2cuda;
 
 
 };
