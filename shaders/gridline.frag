@@ -33,10 +33,10 @@ void main()
 
     }else if (propType == 2){ //Coloring based on water content
             alpha = 1;
-            float divisor = 1.3;
 
+            //qv + qc + qr <= 1
             if (!renderingVectorField){
-                FragColor = vec4(prop / divisor, secondProp / divisor, 0, alpha); //red, yellow, green
+                FragColor = vec4(prop, secondProp, 0, alpha); //red, yellow, green
             }
         }
 
