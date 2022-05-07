@@ -6,7 +6,6 @@
 #include "physics.h"
 #include "fluid.h"
 #include "trees/forest.h"
-#include <Eigen/Sparse>
 
 using namespace std::chrono;
 

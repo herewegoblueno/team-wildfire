@@ -6,7 +6,7 @@
 #include <iostream>
 #include <chrono>
 #include <memory>
-#include "info.cuh"
+//#include "info.cuh"
 
 
 

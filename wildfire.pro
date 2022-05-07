@@ -18,7 +18,6 @@ macx {
 win32 {
     DEFINES += GLEW_STATIC
     LIBS += -lopengl32 -lglu32
-    INCLUDEPATH +=  ../eigen-master
 }
 
 SOURCES += ui/mainwindow.cpp \
@@ -191,8 +190,8 @@ win32 {
     HOME_DIR = $$(HOMEPATH)
 }
 
-QMAKE_CXXFLAGS = -I "$${HOME_DIR}/eigen-git-mirror"
-INCLUDEPATH += "$${HOME_DIR}/eigen-git-mirror"
-DEPENDPATH += "$${HOME_DIR}/eigen-git-mirror"
+#QMAKE_CXXFLAGS = -I "$${HOME_DIR}/eigen-git-mirror"
+#INCLUDEPATH += "$${HOME_DIR}/eigen-git-mirror"
+#DEPENDPATH += "$${HOME_DIR}/eigen-git-mirror"
 
 include(cuda_lib/cuda_lib.pri)

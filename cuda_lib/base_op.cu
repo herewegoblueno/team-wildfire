@@ -1,3 +1,3 @@
-#include "info.cuh"
+//#include "info.cuh"
 
 
