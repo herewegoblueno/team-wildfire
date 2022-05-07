@@ -11,6 +11,15 @@
 using namespace glm;
 using namespace std;
 
+struct VoxelGridDim {
+    vec3 center;
+    float axisSize;
+    VoxelGridDim(vec3 center, float axisSize) :
+        center(center),
+        axisSize(axisSize)
+    {}
+};
+
 class Voxel;
 
 typedef std::unordered_set<Voxel *> VoxelSet;
@@ -18,7 +27,7 @@ typedef std::unordered_set<Voxel *> VoxelSet;
 class VoxelGrid
 {
 public:
-    VoxelGrid(int axisSize, vec3 offset, int resolution);
+    VoxelGrid(VoxelGridDim dimensions, int resolution);
     void toggleVisualization(bool enableVoxels, bool enableWind);
     int getResolution();
     Voxel *getVoxel(int xIndex, int yIndex, int zIndex);

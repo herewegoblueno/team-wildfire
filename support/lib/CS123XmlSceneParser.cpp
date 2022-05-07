@@ -27,14 +27,20 @@ CS123XmlSceneParser::CS123XmlSceneParser(const std::string& name)
     memset(&m_globalData, 0, sizeof(CS123SceneGlobalData));
     m_objects.clear();
     m_lights.clear();
+    m_treeRegions.clear();
     m_nodes.clear();
 }
 
 CS123XmlSceneParser::~CS123XmlSceneParser()
 {
-    std::vector<CS123SceneLightData*>::iterator lights;
-    for (lights = m_lights.begin(); lights != m_lights.end(); lights++) {
-        delete *lights;
+    std::vector<CS123SceneLightData*>::iterator light;
+    for (light = m_lights.begin(); light != m_lights.end(); light++) {
+        delete *light;
+    }
+
+    std::vector<TreeRegionData*>::iterator treeRegion;
+    for (treeRegion = m_treeRegions.begin(); treeRegion != m_treeRegions.end(); treeRegion++) {
+        delete *treeRegion;
     }
 
     // Delete all Scene Nodes
@@ -53,6 +59,7 @@ CS123XmlSceneParser::~CS123XmlSceneParser()
 
     m_nodes.clear();
     m_lights.clear();
+    m_treeRegions.clear();
     m_objects.clear();
 }
 
@@ -70,12 +77,25 @@ int CS123XmlSceneParser::getNumLights() const {
     return m_lights.size();
 }
 
+int CS123XmlSceneParser::getNumTreeRegions() const {
+    return m_treeRegions.size();
+}
+
 bool CS123XmlSceneParser::getLightData(int i, CS123SceneLightData& data) const {
     if (i < 0 || (unsigned int)i >= m_lights.size()) {
         std::cout << "invalid light index %d" << std::endl;
         return false;
     }
     data = *m_lights[i];
+    return true;
+}
+
+bool CS123XmlSceneParser::getTreeRegionData(int i, TreeRegionData &data) const {
+    if (i < 0 || (unsigned int)i >= m_treeRegions.size()) {
+        std::cout << "invalid tree region index %d" << std::endl;
+        return false;
+    }
+    data = *m_treeRegions[i];
     return true;
 }
 
@@ -132,6 +152,9 @@ bool CS123XmlSceneParser::parse() {
         if (e.tagName() == "globaldata") {
             if (!parseGlobalData(e))
                 return false;
+        } else if (e.tagName() == "treeregion") {
+            if (!parseTreeRegionData(e))
+                return false;
         } else if (e.tagName() == "lightdata") {
             if (!parseLightData(e))
                 return false;
@@ -149,6 +172,8 @@ bool CS123XmlSceneParser::parse() {
     }
 
     std::cout << "finished parsing " << file_name << std::endl;
+
+    std::cout << m_treeRegions[0]->numTrees << std::endl;
     return true;
 }
 
@@ -441,6 +466,53 @@ bool CS123XmlSceneParser::parseLightData(const QDomElement &lightdata) {
         childNode = childNode.nextSibling();
     }
 
+    return true;
+}
+
+
+/**
+ * Parse a <treeregion> tag and add a new TreeRegionData to m_treeRegions.
+ */
+bool CS123XmlSceneParser::parseTreeRegionData(const QDomElement &treeRegionElement) {
+    // Create a default tree region
+    TreeRegionData* region = new TreeRegionData();
+    m_treeRegions.push_back(region);
+    memset(region, 0, sizeof(TreeRegionData));
+    region->center = glm::vec3(0, 0, 0);
+    region->width = 10.f;
+    region->height = 10.f;
+    region->numTrees = 100;
+    // Iterate over child elements
+    QDomNode childNode = treeRegionElement.firstChild();
+    while (!childNode.isNull()) {
+        QDomElement e = childNode.toElement();
+        if (e.tagName() == "center") {
+            if (!parseTriple(e, region->center.x, region->center.y, region->center.z,
+                             "x", "y", "z")) {
+                PARSE_ERROR(e);
+                return false;
+            }
+        } else if (e.tagName() == "width") {
+            if (!parseSingle(e, region->width, "v")) {
+                PARSE_ERROR(e);
+                return false;
+            }
+        } else if (e.tagName() == "height") {
+            if (!parseSingle(e, region->height, "v")) {
+                PARSE_ERROR(e);
+                return false;
+            }
+        } else if (e.tagName() == "numtrees") {
+            if (!parseInt(e, region->numTrees, "v")) {
+                PARSE_ERROR(e);
+                return false;
+            }
+        } else if (!e.isNull()) {
+            UNSUPPORTED_ELEMENT(e);
+            return false;
+        }
+        childNode = childNode.nextSibling();
+    }
     return true;
 }
 

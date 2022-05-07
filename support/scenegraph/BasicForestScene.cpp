@@ -17,28 +17,32 @@
 using namespace std::chrono;
 using namespace CS123::GL;
 
-
-
 BasicForestScene::BasicForestScene(MainWindow *mainWindow):
-     _voxelGrid(forestWidth + gridBuffer, vec3(0,(forestWidth + gridBuffer)/2,0), 64),
-     _fireManager(&_voxelGrid),
      mainWindow(mainWindow)
 {
     loadShaders();
     tessellateShapes();
-    _voxelGrid.getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeVectorField);
-    _forest = std::make_unique<Forest>(&_voxelGrid, &_fireManager,
-                                       numTrees, forestWidth, forestHeight);
-    _lastFrameNumModules = _forest->getAllModuleIDs().size();
-    //The forest also initializes the mass of the voxels
-    updatePrimitivesFromForest();
-    _simulator.init();
-    _voxelGrid.getVisualization()->setForestReference(_forest.get());
-    mainWindow->updateModuleSelectionOptions(_forest->getAllModuleIDs());
 }
 
 BasicForestScene::~BasicForestScene()
 {
+}
+
+/** Initialize the scene after it has been filled by the parser */
+void BasicForestScene::init() {
+    VoxelGridDim gridDimensions = computeGridDimensions();
+    _voxelGrid = std::make_unique<VoxelGrid>(gridDimensions, 64);
+    _voxelGrid->getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeVectorField);
+    _forest = std::make_unique<Forest>(_voxelGrid.get(), _fireManager.get(),
+                                       treeRegions, gridDimensions);
+    _fireManager = std::make_unique<FireManager>(_voxelGrid.get()),
+    _lastFrameNumModules = _forest->getAllModuleIDs().size();
+    //The forest also initializes the mass of the voxels
+    updatePrimitivesFromForest();
+    _simulator = std::make_unique<Simulator>();
+    _simulator->init();
+    _voxelGrid->getVisualization()->setForestReference(_forest.get());
+    mainWindow->updateModuleSelectionOptions(_forest->getAllModuleIDs());
 }
 
 /**
@@ -51,16 +55,16 @@ void BasicForestScene::updateFires() {
         bool burningThisFrame = massChangeRate < 0.0;
         if (burningThisFrame) {
             // Adjust size of fire based on mass change rate
-            float fireSize = _fireManager.massChangeRateToFireSize(massChangeRate);
+            float fireSize = _fireManager->massChangeRateToFireSize(massChangeRate);
             if (!burningLastFrame) {
                 for (vec3 &fireSpawnPos : m->_fireSpawnPoints) {
-                    _fireManager.addFire(m, fireSpawnPos, fireSize);
+                    _fireManager->addFire(m, fireSpawnPos, fireSize);
                 }
             } else {
-                _fireManager.setModuleFireSizes(m, fireSize);
+                _fireManager->setModuleFireSizes(m, fireSize);
             }
         } else if (burningLastFrame) {
-            _fireManager.removeFires(m);
+            _fireManager->removeFires(m);
         }
         _lastFrameModuleBurnState[m] = burningThisFrame;
     }
@@ -95,7 +99,7 @@ void BasicForestScene::loadShaders() {
 }
 
 void BasicForestScene::render(SupportCanvas3D *context) {
-    _simulator.step(&_voxelGrid, _forest.get());
+    _simulator->step(_voxelGrid.get(), _forest.get());
 
     Camera *camera = context->getCamera();
     glClearColor(0.2, 0.2, 0.2, 0.3);
@@ -111,15 +115,15 @@ void BasicForestScene::render(SupportCanvas3D *context) {
     glBindTexture(GL_TEXTURE_2D, 0);
     selectedShader->unbind();
 
-    _voxelGrid.getVisualization()->setPV(camera->getProjectionMatrix() * camera->getViewMatrix());
-    _voxelGrid.getVisualization()->draw(context);
+    _voxelGrid->getVisualization()->setPV(camera->getProjectionMatrix() * camera->getViewMatrix());
+    _voxelGrid->getVisualization()->draw(context);
 
     updateFires();
-    _fireManager.setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
-    _fireManager.setScale(0.03, 0.05);
-    _fireManager.drawFires(_simulator.getTimeSinceLastFrame()/1000., true);
+    _fireManager->setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
+    _fireManager->setScale(0.03, 0.05);
+    _fireManager->drawFires(_simulator->getTimeSinceLastFrame()/1000.0, true);
 
-    _simulator.cleanupForNextStep(&_voxelGrid, _forest.get());
+    _simulator->cleanupForNextStep(_voxelGrid.get(), _forest.get());
 
     updatePrimitivesFromForest();
     std::vector<int> moduleIDs = _forest->getAllModuleIDs();
@@ -225,20 +229,31 @@ void BasicForestScene::renderGround() {
     _ground->unbindVAO();
 }
 
-void BasicForestScene::defineLights() {
-    lightingInformation.clear();
-    CS123SceneLightData light;
-    light.type = LightType::LIGHT_DIRECTIONAL;
-    light.dir = glm::normalize(glm::vec4(1.f, -1.f, -1.f, 0.f));
-    light.color.r = light.color.g = light.color.b = 1;
-    light.id = 0;
-    lightingInformation.push_back(light);
-}
-
-void BasicForestScene::defineGlobalData() {
-    globalData.ka = 1.0f;
-    globalData.kd = 1.0f;
-    globalData.ks = 1.0f;
+/** Compute center and axis size of grid such that it bounds all tree regions */
+VoxelGridDim BasicForestScene::computeGridDimensions() {
+    float minX = FLT_MAX;
+    float minZ = FLT_MAX;
+    float maxX = -FLT_MAX;
+    float maxZ = -FLT_MAX;
+    for (TreeRegionData &region : treeRegions) {
+        vec3 center = region.center;
+        float width = region.width;
+        float height = region.height;
+        float regionMinX = (center.x - width / 2.f);
+        float regionMinZ = (center.z - height / 2.f);
+        float regionMaxX = (center.x + width / 2.f);
+        float regionMaxZ = (center.z + height / 2.f);
+        minX = std::min(minX, regionMinX);
+        minZ = std::min(minZ, regionMinZ);
+        maxX = std::max(maxX, regionMaxX);
+        maxZ = std::max(maxZ, regionMaxZ);
+    }
+    float width = maxX - minX;
+    float height = maxZ - minZ;
+    float axisSize = std::max(width, height) + gridBuffer;
+    // shift up by axisSize / 2 so the bottom of the grid is at y=0
+    vec3 center = vec3(minX + width / 2.f, axisSize / 2.f, minZ + height / 2.f);
+    return VoxelGridDim(center, axisSize);
 }
 
 void BasicForestScene::setLights(CS123Shader *selectedShader)
@@ -263,8 +278,8 @@ void BasicForestScene::setSceneUniforms(SupportCanvas3D *context, CS123Shader *s
 }
 
 void BasicForestScene::settingsChanged() {
-     _voxelGrid.getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeVectorField);
-     _voxelGrid.getVisualization()->updateValuesFromSettings();
+     _voxelGrid->getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeVectorField);
+     _voxelGrid->getVisualization()->updateValuesFromSettings();
 }
 
 Forest * BasicForestScene::getForest(){
@@ -272,5 +287,5 @@ Forest * BasicForestScene::getForest(){
 }
 
 VoxelGrid * BasicForestScene::getVoxelGrid(){
-    return &_voxelGrid;
+    return _voxelGrid.get();
 }

@@ -24,6 +24,7 @@ public:
     BasicForestScene(MainWindow *mainWindow);
     virtual ~BasicForestScene();
 
+    void init();
     virtual void render(SupportCanvas3D *context) override;
     virtual void settingsChanged() override;
 
@@ -42,8 +43,7 @@ private:
     void loadShaders();
     void tessellateShapes();
 
-    void defineLights();
-    void defineGlobalData();
+    VoxelGridDim computeGridDimensions();
     void setLights(CS123::GL::CS123Shader *s);
     void setGlobalData(CS123::GL::CS123Shader *s);
     void setSceneUniforms(SupportCanvas3D *context, CS123::GL::CS123Shader *s);
@@ -52,7 +52,6 @@ private:
     uint _lastFrameNumModules;
     std::unique_ptr<CS123::GL::CS123Shader> _phongShader;
     std::unique_ptr<CS123::GL::CS123Shader> _moduleVisShader;
-    VoxelGrid _voxelGrid;
     std::unique_ptr<Forest> _forest;
     std::unique_ptr<Trunk> _trunk;
     std::unique_ptr<Leaf> _leaf;
@@ -61,8 +60,9 @@ private:
     std::vector<PrimitiveBundle> _leafBundles;
     PrimitiveBundle _groundBundle;
     std::unordered_map<int, CS123SceneMaterial> _moduleIDToMat;
-    Simulator _simulator;
-    FireManager _fireManager;
+    std::unique_ptr<VoxelGrid> _voxelGrid;
+    std::unique_ptr<Simulator> _simulator;
+    std::unique_ptr<FireManager> _fireManager;
 
     MainWindow *mainWindow;
 };

@@ -11,11 +11,13 @@ const int gridBuffer = 3; // make grid slightly larger than forest
 // that overlap a module
 const int voxelSearchRadius = 6;
 
+typedef std::vector<TreeRegionData> TreeRegions;
+
 class Forest
 {
 public:
     Forest(VoxelGrid *grid, FireManager *fireManager,
-           int numTrees, float forestWidth, float forestHeight);
+           TreeRegions regions, VoxelGridDim voxelGridDim);
     ~Forest();
     void recalculatePrimitives();
     std::vector<PrimitiveBundle> getPrimitives();
@@ -36,15 +38,13 @@ public:
     void deleteDeadModules();
 
 private:
-    void createTrees();
+    void createTrees(TreeRegionData region);
     void addTreeToForest(const ModuleSet &modules, glm::mat4 trans);
     void initializeTrunkPrimitive();
     void initializeLeafPrimitive();
     void initializeGroundPrimitive();
 
-    int _numTrees;
-    float _forestWidth;
-    float _forestHeight;
+    TreeRegions _treeRegions;
     FireManager *_fireManager;
     VoxelGrid *_grid;
     BranchSet _branches;
@@ -55,6 +55,7 @@ private:
     std::unique_ptr<CS123ScenePrimitive> _leaf;
     std::unique_ptr<CS123ScenePrimitive> _ground;
     glm::mat4 _groundModel;
+    VoxelGridDim _voxelGridDim; // so ground can have same dimensions
 
     bool checkModuleVoxelOverlap(Module *module, Voxel *voxel, double cellSideLength);
     void initializeModuleVoxelMapping();

@@ -30,6 +30,13 @@
 	<color r=".1" g=".1" b=".1"/>
     </lightdata>
 
+    <treeregion>
+        <center x="0" y="0" z="0"/>
+        <width v="10"/>
+        <height v="10"/>
+        <numtrees v="100"/>
+    </treeregion>
+
     <object type="tree" name="root">
     </object>
 

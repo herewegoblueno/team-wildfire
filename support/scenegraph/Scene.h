@@ -20,6 +20,7 @@ public:
     Scene(Scene &scene);
     virtual ~Scene();
 
+    std::vector<TreeRegionData> treeRegions;
     std::vector<CS123SceneLightData> lightingInformation;
     std::vector<PrimitiveBundle> primitives;
     CS123SceneGlobalData globalData;
@@ -35,6 +36,9 @@ protected:
 
     // Adds a light to the scene.
     virtual void addLight(const CS123SceneLightData &sceneLight);
+
+    // Add a tree region to the scene.
+    virtual void addTreeRegion(const TreeRegionData &treeRegion);
 
     // Sets the global data for the scene.
     virtual void setGlobal(const CS123SceneGlobalData &global);

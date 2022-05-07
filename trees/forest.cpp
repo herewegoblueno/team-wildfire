@@ -6,18 +6,19 @@
 using namespace glm;
 
 Forest::Forest(VoxelGrid *grid, FireManager *fireManager,
-               int numTrees, float forestWidth, float forestHeight) :
-    _numTrees(numTrees),
-    _forestWidth(forestWidth),
-    _forestHeight(forestHeight),
+               TreeRegions regions, VoxelGridDim voxelGridDim) :
+    _treeRegions(regions),
     _fireManager(fireManager),
     _grid(grid),
-    _treeGenerator(nullptr)
+    _treeGenerator(nullptr),
+    _voxelGridDim(voxelGridDim)
 {
     initializeTrunkPrimitive();
     initializeLeafPrimitive();
     initializeGroundPrimitive();
-    createTrees();
+    for (TreeRegionData &region : _treeRegions) {
+        createTrees(region);
+    }
     initModuleProperties();
     initializeModuleVoxelMapping(); // depends on module mass
     initMassOfVoxels(); // depends on voxel mapping
@@ -58,15 +59,16 @@ void Forest::recalculatePrimitives() {
  * Generate trees, add their modules and branches to state.
  * Use stratified sampling to avoid tree overlap.
  */
-void Forest::createTrees() {
+void Forest::createTrees(TreeRegionData region) {
+    glm::vec3 center = region.center;
+    float width = region.width;
+    float height = region.height;
+    int numTrees = region.numTrees;
     _treeGenerator = std::make_unique<TreeGenerator>();
-    int xStrata = std::max(static_cast<int>(std::sqrt(_numTrees)), 1);
-    int zStrata = _numTrees / xStrata;
-    std::cout << "Tree position stratified sampling:" << std::endl;
-    std::cout << xStrata << " horizontal strata" << std::endl;
-    std::cout << zStrata << " vertical strata" << std::endl;
-    float strataWidth = _forestWidth / static_cast<float>(xStrata);
-    float strataHeight = _forestHeight / static_cast<float>(zStrata);
+    int xStrata = std::max(static_cast<int>(std::sqrt(numTrees)), 1);
+    int zStrata = numTrees / xStrata;
+    float strataWidth = width / static_cast<float>(xStrata);
+    float strataHeight = height / static_cast<float>(zStrata);
     for (int zStep = 0; zStep < zStrata; zStep++) {
         for (int xStep = 0; xStep < xStrata; xStep++) {
             // Sample a point in unit square
@@ -75,9 +77,9 @@ void Forest::createTrees() {
             // Map to a point on the current strata
             float x = (xStep + xSample) * strataWidth;
             float z = (zStep + zSample) * strataHeight;
-            x = x - _forestWidth / 2.f;
-            z = z - _forestHeight / 2.f;
-            mat4 trans = translate(vec3(x, 0, z));
+            x = x - width / 2.f;
+            z = z - height / 2.f;
+            mat4 trans = translate(center + vec3(x, 0, z));
             _treeGenerator->generateTree();
             ModuleTree moduleTree = _treeGenerator->getModuleTree();
             addTreeToForest(moduleTree.modules, trans);
@@ -402,8 +404,11 @@ void Forest::initializeLeafPrimitive() {
 /** Initialize the ground primitive */
 void Forest::initializeGroundPrimitive() {
     // Initialize ground model
-    _groundModel = glm::scale(glm::vec3(_forestWidth + gridBuffer, 0,
-                                        _forestHeight + gridBuffer));
+    float axisSize = _voxelGridDim.axisSize;
+    mat4 scale = glm::scale(glm::vec3(axisSize, 0, axisSize));
+    vec3 gridCenter = _voxelGridDim.center;
+    mat4 translate = glm::translate(vec3(gridCenter.x, 0, gridCenter.z));
+    _groundModel = translate * scale;
     // Initialize green material for ground
     std::unique_ptr<CS123SceneMaterial> material = std::make_unique<CS123SceneMaterial>();
     material->clear();
