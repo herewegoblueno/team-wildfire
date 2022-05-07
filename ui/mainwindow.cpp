@@ -17,12 +17,15 @@
 
 using namespace std::chrono;
 
+QString defaultForestXMLScene = ":/xmlScenes/xmlScenes/basicScene.xml";
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
-{
+{  
     ui->setupUi(this);
     settings.loadSettingsOrDefaults();
+    currentForestXMLScene = defaultForestXMLScene;
 
     //You can make changes to the scene now
 
@@ -116,7 +119,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 //m_canvas3D doesn't call initializeGL immediately, but we need to wait before it does
 //for us to start rendering anything
 void MainWindow::onSupportCanvasInitialized(){
-    openXmlFileForForestScene(":/xmlScenes/xmlScenes/basicScene.xml");
+    openXmlFileForForestScene(currentForestXMLScene);
     initializeFrameCounting();
 }
 
@@ -194,7 +197,7 @@ void MainWindow::changeCameraSettings(bool useOrbiting){
 //"Go to slots"
 void MainWindow::on_resetForestButton_clicked()
 {
-    openXmlFileForForestScene(":/xmlScenes/xmlScenes/basicScene.xml");
+    openXmlFileForForestScene(currentForestXMLScene);
     initializeFrameCounting();
 }
 
@@ -429,3 +432,16 @@ void MainWindow::on_resetWindfieldZ_clicked()
 {
     ui->WindFieldZSlider->setValue(0);
 }
+
+void MainWindow::on_useDefaultSceneButton_clicked()
+{
+    currentForestXMLScene = defaultForestXMLScene;
+}
+
+
+void MainWindow::on_chooseSceneButton_clicked()
+{
+    currentForestXMLScene = QFileDialog::getOpenFileName(
+                this, "Choose an xml forest file scene.", "/", "XML files (*.xml)");
+}
+
