@@ -1,9 +1,7 @@
 #include "Scene.h"
 #include "support/camera/Camera.h"
 #include "support/lib/CS123ISceneParser.h"
-
 #include "glm/gtx/transform.hpp"
-
 
 Scene::Scene()
 {
@@ -14,6 +12,7 @@ Scene::Scene(Scene &scene)
 {
     setGlobal(scene.globalData);
     lightingInformation = scene.lightingInformation;
+    treeRegions = scene.treeRegions;
     primitives = scene.primitives;
     primitiveCount = scene.primitiveCount;
 }
@@ -34,6 +33,12 @@ void Scene::parse(Scene *sceneToFill, CS123ISceneParser *parser) {
        sceneToFill->addLight(light);
    }
 
+   TreeRegionData region;
+   for (int i = 0; i < parser->getNumTreeRegions(); i++){
+       parser->getTreeRegionData(i, region);
+       sceneToFill->addTreeRegion(region);
+   }
+
    traverseSceneGraph(sceneToFill, glm::mat4(1.f), parser->getRootNode());
    sceneToFill->primitiveCount = sceneToFill->primitives.size();
 }
@@ -44,6 +49,10 @@ void Scene::addPrimitive(const CS123ScenePrimitive &scenePrimitive, const glm::m
 
 void Scene::addLight(const CS123SceneLightData &sceneLight) {
     lightingInformation.push_back(sceneLight);
+}
+
+void Scene::addTreeRegion(const TreeRegionData &region) {
+    treeRegions.push_back(region);
 }
 
 void Scene::setGlobal(const CS123SceneGlobalData &global) {

@@ -19,7 +19,7 @@ using namespace CS123::GL;
 
 
 BasicFireScene::BasicFireScene():
-     voxelGrid(10, vec3(0,5,0), 64),
+     voxelGrid(VoxelGridDim(vec3(0, 5, 0), 10), 64),
      fireManager(&voxelGrid)
 {
 

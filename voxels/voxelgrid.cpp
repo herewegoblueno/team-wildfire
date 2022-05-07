@@ -1,9 +1,9 @@
 #include "voxelgrid.h"
 
-VoxelGrid::VoxelGrid(int axisSize, vec3 offset, int resolution) :
+VoxelGrid::VoxelGrid(VoxelGridDim dimensions, int resolution) :
     resolution(resolution),
-    axisSize(axisSize),
-    offset(offset)
+    axisSize(dimensions.axisSize),
+    offset(dimensions.center)
 {
     overallNumberOfCells = std::pow(resolution, 3);
     double overallVoxelSpaceVolume = std::pow(axisSize, 3);

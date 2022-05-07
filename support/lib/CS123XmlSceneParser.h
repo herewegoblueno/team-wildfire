@@ -36,10 +36,13 @@ public:
     virtual CS123SceneNode* getRootNode() const;
 
     virtual int getNumLights() const;
+    virtual int getNumTreeRegions() const;
 
     // Returns the ith light data
     virtual bool getLightData(int i, CS123SceneLightData& data) const;
 
+    // Returns the ith tree region data
+    virtual bool getTreeRegionData(int i, TreeRegionData& data) const;
 
 private:
     // The filename should be contained within this parser implementation.
@@ -47,12 +50,14 @@ private:
     bool parseGlobalData(const QDomElement &globaldata);
     bool parseCameraData(const QDomElement &cameradata);
     bool parseLightData(const QDomElement &lightdata);
+    bool parseTreeRegionData(const QDomElement &treeRegionData);
     bool parseObjectData(const QDomElement &object);
     bool parseTransBlock(const QDomElement &transblock, CS123SceneNode* node);
     bool parsePrimitive(const QDomElement &prim, CS123SceneNode* node);
 
     std::string file_name;
     mutable std::map<std::string, CS123SceneNode*> m_objects;
+    std::vector<TreeRegionData*> m_treeRegions;
     CS123SceneCameraData m_cameraData;
     std::vector<CS123SceneLightData*> m_lights;
     CS123SceneGlobalData m_globalData;

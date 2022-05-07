@@ -80,6 +80,13 @@ struct CS123SceneCameraData {
    float focalLength;   // Only applicable for depth of field
 };
 
+struct TreeRegionData {
+    glm::vec3 center;
+    float width;
+    float height;
+    int numTrees;
+};
+
 // Data for file maps (ie: texture maps)
 struct CS123SceneFileMap {
 //    CS123SceneFileMap() : texid(0) {}

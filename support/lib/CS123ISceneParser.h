@@ -17,6 +17,7 @@ struct CS123SceneCameraData;
 struct CS123SceneNode;
 struct CS123SceneGlobalData;
 struct CS123SceneLightData;
+struct TreeRegionData;
 
 // Interface for accessing parsed scenegraph data.
 // Subclasses will have file format specific implementations.
@@ -28,9 +29,16 @@ public:
     // Returns the number of lights in the scene
     virtual int getNumLights() const = 0;
 
+    // Returns the number of tree regions in the scene
+    virtual int getNumTreeRegions() const = 0;
+
     // On return, data will contain the information for the ith light.
     virtual bool getLightData(
         const int i, CS123SceneLightData& data) const = 0;
+
+    // On return, data will contain the information for the ith tree region
+    virtual bool getTreeRegionData(
+        const int i, TreeRegionData& data) const = 0;
 
     // On return data will contain the global scene data
     virtual bool getGlobalData(CS123SceneGlobalData& data) const = 0;
