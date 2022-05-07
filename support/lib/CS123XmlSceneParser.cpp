@@ -172,8 +172,6 @@ bool CS123XmlSceneParser::parse() {
     }
 
     std::cout << "finished parsing " << file_name << std::endl;
-
-    std::cout << m_treeRegions[0]->numTrees << std::endl;
     return true;
 }
 
