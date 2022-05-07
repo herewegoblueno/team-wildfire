@@ -27,6 +27,7 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
     dTdt -= glm::dot(tempGradientInfo.gradient_pos, v->getLastFrameState()->u)*0.5;
     dTdt -= glm::dot(tempGradientInfo.gradient_neg, v->getNegfaceVel())*0.5;
     dTdt -= module_to_air_diffusion * dMdt;
+#ifdef CUDA_FLUID
     v->getLastFrameState()->temperature += 0.5*dTdt * deltaTimeInMs / 1000.0;
     // second pass
     differenceFromAmbience = clamp(
@@ -41,15 +42,12 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
     // integrate
     v->getLastFrameState()->temperature = temperature_save;
     v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt2 * deltaTimeInMs / 1000.0;
+#else
+    v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt * deltaTimeInMs / 1000.0;
+#endif
     v->getCurrentState()->tempGradientFromPrevState = tempGradientInfo.gradient;
     v->getCurrentState()->tempLaplaceFromPrevState = tempGradientInfo.laplace;
 
-//    if(std::abs(v->getCurrentState()->temperature)>10000)
-//    {
-//        dvec3 u = v->getLastFrameState()->u;
-////        cout<< "[" << v->XIndex << "," << v->YIndex << "," << v->ZIndex << ",(";
-////        cout<< u.x <<"," <<u.y<<"," <<u.z << "]  " << std::flush;
-//    }
 };
 
 /** Equation 25 of Fire in Paradise paper */
