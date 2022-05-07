@@ -3,14 +3,12 @@ layout (location = 0) in vec3 position;
 layout (location = 5) in vec2 texCoord; // UV texture coordinates
 
 out vec2 TexCoords;
-out vec4 ParticleColor;
 out float Temperature;
 
 
 uniform mat4 m;
 uniform mat4 v;
 uniform mat4 p;
-uniform vec4 color;
 uniform float temp;
 uniform float scale;
 
@@ -23,7 +21,6 @@ void main()
     vec3 pos        = invViewRot * position;
     vec4 position_cameraSpace = v * m * vec4(pos*scale, 1.0);
     TexCoords = texCoord;
-    ParticleColor = color;
     Temperature = temp-10;
     gl_Position = p * position_cameraSpace;
 }

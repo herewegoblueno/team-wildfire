@@ -54,19 +54,19 @@ void Smoke::update_particles(float timeStep)
             glm::vec3 u = vec3(vox->u);
             float ambient_T = vox->temperature;
 
-            float b_factor = 0.5;
+            float b_factor = 0.015;
             #ifdef CUDA_FLUID
-            b_factor = 0.2;
-            #else
-            if(timeStep>0) p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
+                b_factor = 0.2;
             #endif
+
+            if(timeStep>0) p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
+
             float b = gravity_acceleration*thermal_expansion*b_factor*
                     (float)std::max(simTempToWorldTemp(p.Temp) - simTempToWorldTemp(ambient_T), 0.); // Buoyancy
             u.y += b;
             p.Position += u * timeStep;
             p.Temp = alpha_temp*p.Temp + beta_temp*(ambient_T);
 
-//            p.Velocity = p.Velocity*0.9f;
         }
     }
 }
@@ -101,7 +101,6 @@ void Smoke::drawParticles(CS123::GL::CS123Shader* shader, OpenGLShape* shape) {
     {
         if (particle.Life > 0.0f)
         {
-            shader->setUniform("color", particle.Color);
             glm::mat4 M_fire = glm::translate(glm::mat4(), particle.Position);
             shader->setUniform("m", M_fire);
             shader->setUniform("temp", particle.Temp);
