@@ -52,7 +52,7 @@ SOURCES += ui/mainwindow.cpp \
     support/lib/RGBA.cpp \
     support/lib/ResourceLoader.cpp \
     support/scenegraph/BasicFireScene.cpp \
-    support/scenegraph/BasicForestScene.cpp \
+    support/scenegraph/ForestScene.cpp \
     support/scenegraph/OpenGLScene.cpp \
     support/scenegraph/Scene.cpp \
     support/scenegraph/SupportCanvas3D.cpp \
@@ -111,7 +111,7 @@ HEADERS += ui/mainwindow.h \
     support/lib/RGBA.h \
     support/lib/ResourceLoader.h \
     support/scenegraph/BasicFireScene.h \
-    support/scenegraph/BasicForestScene.h \
+    support/scenegraph/ForestScene.h \
     support/scenegraph/OpenGLScene.h \
     support/scenegraph/Scene.h \
     support/scenegraph/SupportCanvas3D.h \

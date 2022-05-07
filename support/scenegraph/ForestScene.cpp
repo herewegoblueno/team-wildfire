@@ -1,4 +1,4 @@
-#include "BasicForestScene.h"
+#include "ForestScene.h"
 #include "GL/glew.h"
 #include <QGLWidget>
 #include "support/camera/Camera.h"
@@ -17,19 +17,19 @@
 using namespace std::chrono;
 using namespace CS123::GL;
 
-BasicForestScene::BasicForestScene(MainWindow *mainWindow):
+ForestScene::ForestScene(MainWindow *mainWindow):
      mainWindow(mainWindow)
 {
     loadShaders();
     tessellateShapes();
 }
 
-BasicForestScene::~BasicForestScene()
+ForestScene::~ForestScene()
 {
 }
 
 /** Initialize the scene after it has been filled by the parser */
-void BasicForestScene::init() {
+void ForestScene::init() {
     VoxelGridDim gridDimensions = computeGridDimensions();
     _voxelGrid = std::make_unique<VoxelGrid>(gridDimensions, 64);
     _fireManager = std::make_unique<FireManager>(_voxelGrid.get()),
@@ -48,7 +48,7 @@ void BasicForestScene::init() {
 /**
  * Update fires for any modules that started or stopped burning since previous frame
  */
-void BasicForestScene::updateFires() {
+void ForestScene::updateFires() {
     for (Module *m : _forest->getModules()) {
         bool burningLastFrame = _lastFrameModuleBurnState[m];
         double massChangeRate = m->getCurrentState()->massChangeRateFromLastFrame;
@@ -71,7 +71,7 @@ void BasicForestScene::updateFires() {
 }
 
 /** Update scene primitives based on the new state of the forest */
-void BasicForestScene::updatePrimitivesFromForest() {
+void ForestScene::updatePrimitivesFromForest() {
     _leafBundles.clear();
     _trunkBundles.clear();
     _forest->recalculatePrimitives();
@@ -89,7 +89,7 @@ void BasicForestScene::updatePrimitivesFromForest() {
     }
 }
 
-void BasicForestScene::loadShaders() {
+void ForestScene::loadShaders() {
     std::string vertexSource = ResourceLoader::loadResourceFileToString(":/shaders/default.vert");
     std::string fragmentSource = ResourceLoader::loadResourceFileToString(":/shaders/default.frag");
     _phongShader = std::make_unique<CS123Shader>(vertexSource, fragmentSource);
@@ -98,7 +98,7 @@ void BasicForestScene::loadShaders() {
     _moduleVisShader = std::make_unique<CS123Shader>(vertexSource, fragmentSource);
 }
 
-void BasicForestScene::render(SupportCanvas3D *context) {
+void ForestScene::render(SupportCanvas3D *context) {
     _simulator->step(_voxelGrid.get(), _forest.get());
 
     Camera *camera = context->getCamera();
@@ -140,14 +140,14 @@ void BasicForestScene::render(SupportCanvas3D *context) {
 /**
  *  Tessellate scene shapes and store them for later rendering
  */
-void BasicForestScene::tessellateShapes() {
+void ForestScene::tessellateShapes() {
     _leaf = std::make_unique<Leaf>();
     _trunk = std::make_unique<Trunk>(1, 1);
     _ground = std::make_unique<Ground>();
 }
 
 /** Render each primitive's shape */
-void BasicForestScene::renderGeometry() {
+void ForestScene::renderGeometry() {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     renderGround();
     if (settings.seeBranchModules) {
@@ -159,7 +159,7 @@ void BasicForestScene::renderGeometry() {
 }
 
 /** Color each branch based on the module it's in */
-void BasicForestScene::renderTrunksVisualizedModules() {
+void ForestScene::renderTrunksVisualizedModules() {
     _trunk->bindVAO();
     for (PrimitiveBundle &bundle : _trunkBundles) {
         int moduleID = bundle.moduleID;
@@ -201,7 +201,7 @@ void BasicForestScene::renderTrunksVisualizedModules() {
     _trunk->unbindVAO();
 }
 
-void BasicForestScene::renderTrunks() {
+void ForestScene::renderTrunks() {
     _trunk->bindVAO();
     for (PrimitiveBundle &bundle : _trunkBundles) {
         _phongShader->setUniform("m",  bundle.model);
@@ -211,7 +211,7 @@ void BasicForestScene::renderTrunks() {
     _trunk->unbindVAO();
 }
 
-void BasicForestScene::renderLeaves() {
+void ForestScene::renderLeaves() {
     _leaf->bindVAO();
     for (PrimitiveBundle &bundle : _leafBundles) {
         _phongShader->setUniform("m",  bundle.model);
@@ -221,7 +221,7 @@ void BasicForestScene::renderLeaves() {
     _leaf->unbindVAO();
 }
 
-void BasicForestScene::renderGround() {
+void ForestScene::renderGround() {
     _ground->bindVAO();
     _phongShader->setUniform("m",  _groundBundle.model);
     _phongShader->applyMaterial(_groundBundle.primitive.material);
@@ -230,7 +230,7 @@ void BasicForestScene::renderGround() {
 }
 
 /** Compute center and axis size of grid such that it bounds all tree regions */
-VoxelGridDim BasicForestScene::computeGridDimensions() {
+VoxelGridDim ForestScene::computeGridDimensions() {
     float minX = FLT_MAX;
     float minZ = FLT_MAX;
     float maxX = -FLT_MAX;
@@ -256,7 +256,7 @@ VoxelGridDim BasicForestScene::computeGridDimensions() {
     return VoxelGridDim(center, axisSize);
 }
 
-void BasicForestScene::setLights(CS123Shader *selectedShader)
+void ForestScene::setLights(CS123Shader *selectedShader)
 {
     int size = lightingInformation.size();
     for (int i = 0; i < size; i++){
@@ -264,28 +264,28 @@ void BasicForestScene::setLights(CS123Shader *selectedShader)
     }
 }
 
-void BasicForestScene::setGlobalData(CS123Shader *selectedShader){
+void ForestScene::setGlobalData(CS123Shader *selectedShader){
     selectedShader->setUniform("ka", globalData.ka);
     selectedShader->setUniform("kd", globalData.kd);
     selectedShader->setUniform("ks", globalData.ks);
 }
 
-void BasicForestScene::setSceneUniforms(SupportCanvas3D *context, CS123Shader *selectedShader) {
+void ForestScene::setSceneUniforms(SupportCanvas3D *context, CS123Shader *selectedShader) {
     Camera *camera = context->getCamera();
     selectedShader->setUniform("useLighting", settings.useLighting);
     selectedShader->setUniform("p" , camera->getProjectionMatrix());
     selectedShader->setUniform("v", camera->getViewMatrix());
 }
 
-void BasicForestScene::settingsChanged() {
+void ForestScene::settingsChanged() {
      _voxelGrid->getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeVectorField);
      _voxelGrid->getVisualization()->updateValuesFromSettings();
 }
 
-Forest * BasicForestScene::getForest(){
+Forest * ForestScene::getForest(){
     return _forest.get();
 }
 
-VoxelGrid * BasicForestScene::getVoxelGrid(){
+VoxelGrid * ForestScene::getVoxelGrid(){
     return _voxelGrid.get();
 }

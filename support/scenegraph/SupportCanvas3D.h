@@ -16,7 +16,7 @@ class OpenGLScene;
 class OrbitingCamera;
 class CamtransCamera;
 class CS123XmlSceneParser;
-class BasicForestScene;
+class ForestScene;
 class BasicFireScene;
 class ShaderImportScene;
 class LSystemTreeScene;
@@ -56,7 +56,7 @@ public:
     // Returns a pointer to the current scene. If no scene is loaded, this function returns nullptr.
     OpenGLScene *getScene() { return m_currentScene; }
 
-    BasicForestScene *getForestScene() { return m_basicForestScene.get(); }
+    ForestScene *getForestScene() { return m_forestScene.get(); }
 
 
     void loadSceneFromParserForForestScene(CS123XmlSceneParser &parser);
@@ -130,9 +130,9 @@ private:
     std::unique_ptr<OrbitingCamera> m_defaultOrbitingCamera;
     OpenGLScene *m_currentScene;
 
-    std::unique_ptr<BasicForestScene> m_basicForestScene;
+    std::unique_ptr<ForestScene> m_forestScene;
     std::unique_ptr<BasicFireScene> m_basicFireScene;
-    CameraConfig m_basicForestSceneCameraConfig;
+    CameraConfig m_forestSceneCameraConfig;
     CameraConfig m_basicFireSceneCameraConfig;
 
     MainWindow *m_mainWindowParent;

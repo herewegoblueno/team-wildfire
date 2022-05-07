@@ -19,10 +19,10 @@ const int numTrees = 100;
 const float forestHeight = 10;
 const float forestWidth = 10;
 
-class BasicForestScene : public OpenGLScene {
+class ForestScene : public OpenGLScene {
 public:
-    BasicForestScene(MainWindow *mainWindow);
-    virtual ~BasicForestScene();
+    ForestScene(MainWindow *mainWindow);
+    virtual ~ForestScene();
 
     void init();
     virtual void render(SupportCanvas3D *context) override;

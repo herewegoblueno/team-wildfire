@@ -10,7 +10,7 @@
 #include "support/camera/CamtransCamera.h"
 #include "support/camera/OrbitingCamera.h"
 
-#include "BasicForestScene.h"
+#include "ForestScene.h"
 #include "BasicFireScene.h"
 
 #include <iostream>
@@ -56,7 +56,7 @@ OrbitingCamera *SupportCanvas3D::getOrbitingCamera() {
 CameraConfig *SupportCanvas3D::getCurrentSceneCamtasConfig() {
     switch(settings.getSceneMode()) {
         case FOREST_SCENE_MODE:
-           return &m_basicForestSceneCameraConfig;
+           return &m_forestSceneCameraConfig;
         case FIRE_SCENE_MODE:
            return &m_basicFireSceneCameraConfig;
     }
@@ -154,11 +154,11 @@ void SupportCanvas3D::setSceneFromSettings() {
 
 void SupportCanvas3D::loadSceneFromParserForForestScene(CS123XmlSceneParser &parser) {
     //The basic forest scene is currently the only scene who is designed to load from an xml file
-    m_basicForestScene = std::make_unique<BasicForestScene>(m_mainWindowParent);
-    Scene::parse(m_basicForestScene.get(), &parser);
-    m_basicForestScene->init();
+    m_forestScene = std::make_unique<ForestScene>(m_mainWindowParent);
+    Scene::parse(m_forestScene.get(), &parser);
+    m_forestScene->init();
     m_settingsDirty = true;
-    if(settings.getSceneMode() == FOREST_SCENE_MODE) applyCameraConfig(m_basicForestSceneCameraConfig);
+    if(settings.getSceneMode() == FOREST_SCENE_MODE) applyCameraConfig(m_forestSceneCameraConfig);
 }
 
 void SupportCanvas3D::applyCameraConfig(CameraConfig c){
@@ -168,9 +168,9 @@ void SupportCanvas3D::applyCameraConfig(CameraConfig c){
 
 
 void SupportCanvas3D::setSceneToForestScene(){
-    assert(m_basicForestScene.get());
-    m_currentScene = m_basicForestScene.get();
-    applyCameraConfig(m_basicForestSceneCameraConfig);
+    assert(m_forestScene.get());
+    m_currentScene = m_forestScene.get();
+    applyCameraConfig(m_forestSceneCameraConfig);
 }
 
 void SupportCanvas3D::setSceneToFireScene(){
