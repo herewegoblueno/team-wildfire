@@ -30,7 +30,9 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
     v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt * deltaTimeInMs / 1000.0;
     if(std::isnan(v->getCurrentState()->temperature))
     {
-        cout<< "[" << v->XIndex << "," << v->YIndex << "," << v->ZIndex << "]  " << std::flush;
+        dvec3 u = v->getLastFrameState()->u;
+        cout<< "[" << v->XIndex << "," << v->YIndex << "," << v->ZIndex << ",(";
+        cout<< u.x <<"," <<u.y<<"," <<u.z << "]  " << std::flush;
     }
 };
 

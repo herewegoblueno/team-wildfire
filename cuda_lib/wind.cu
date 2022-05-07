@@ -171,12 +171,21 @@ void vorticityKernel(double* su_xyz, int* id_xyz, double* tu_xyz, double* vortic
                          safe_get(x, y-1, z, vorticity_len, resolution))/2/cell_size;
         double dvor_z = (safe_get(x, y, z+1, vorticity_len, resolution) -
                          safe_get(x, y, z-1, vorticity_len, resolution))/2/cell_size;
-        double len = sqrt(dvor_x*dvor_x+dvor_y*dvor_y+dvor_z*dvor_z) + 0.000001;
-        dvor_x /= len; dvor_y /= len; dvor_z /= len;
-
-        dst_u[0] = src_u[0] + (dvor_y*vor_z - dvor_z*vor_y)*cell_size*dt*0.1;
-        dst_u[1] = src_u[1] + (dvor_z*vor_x - dvor_x*vor_z)*cell_size*dt*0.1;
-        dst_u[2] = src_u[2] + (dvor_x*vor_y - dvor_y*vor_x)*cell_size*dt*0.1;
+        double len = sqrt(dvor_x*dvor_x+dvor_y*dvor_y+dvor_z*dvor_z);
+        if(len>0)
+        {
+            dvor_x /= len; dvor_y /= len; dvor_z /= len;
+//            printf("(%f,%f,%f)-[%f]",dvor_x,dvor_y,dvor_z,len);
+            dst_u[0] = src_u[0] + (dvor_y*vor_z - dvor_z*vor_y)*cell_size*dt*0.1;
+            dst_u[1] = src_u[1] + (dvor_z*vor_x - dvor_x*vor_z)*cell_size*dt*0.1;
+            dst_u[2] = src_u[2] + (dvor_x*vor_y - dvor_y*vor_x)*cell_size*dt*0.1;
+        }
+        else
+        {
+            dst_u[0] = src_u[0];
+            dst_u[1] = src_u[1];
+            dst_u[2] = src_u[2];
+        }
     }
 }
 
@@ -255,6 +264,7 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
     double air_density = 1.225;
     double viscosity = 0.2;
     cudaError err;
+    printf("[param]-[density:%f]-[viscosity:%f]-[cell:%f]", air_density, viscosity, cell_size);
 
     auto t1 = now();
     int cell_num = resolution*resolution*resolution;
@@ -266,7 +276,7 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
     cudaMalloc(&d_u,    cell_num * sizeof(double) * 3); // vel 1
     cudaMalloc(&d_u2,   cell_num * sizeof(double) * 3); // vel 2(for switching values)
     cudaMalloc(&d_id,   cell_num * sizeof(int) * 3); // temperature
-    cudaMalloc(&d_f,    sizeof(double) * 3); // temperature
+    cudaMalloc(&d_f,    sizeof(double) * 3); // wind field
 
     cudaMemcpy(d_temp,  grid_temp, cell_num * sizeof(double), cudaMemcpyHostToDevice);
     cudaMemcpy(d_q_v,   grid_q_v,  cell_num * sizeof(double), cudaMemcpyHostToDevice);
@@ -402,19 +412,20 @@ __global__ void jacobi(double* x_next, double* A, double* x_now, double* b, int*
 
 __device__ double getVel(int x, int y, int z, double* u, int resolution, int dim)
 {
-    if(x<0 || y<0 || z<0 || x>resolution-1 || y>resolution-1 || y>resolution-1)
+    if(x<0 || y<0 || z<0 || x>resolution-2 || y>resolution-2 || z>resolution-2)
         return 0;
-    if(dim==0 && x==resolution-1) return 0;
-    if(dim==1 && y==resolution-1) return 0;
-    if(dim==2 && z==resolution-1) return 0;
     int index = x*resolution*resolution + y*resolution + z;
     return u[index*3 + dim];
 }
 
 __device__ double safe_get(int x, int y, int z, double* u, int resolution)
 {
-    if(x<0 || y<0 || z<0 || x>resolution-1 || y>resolution-1 || y>resolution-1)
-        return 0;
+    if(x<0) x=0;
+    if(y<0) y=0;
+    if(z<0) z=0;
+    if(x>resolution-1) x=resolution-1;
+    if(y>resolution-1) y=resolution-1;
+    if(z>resolution-1) z=resolution-1;
     int index = x*resolution*resolution + y*resolution + z;
     return u[index];
 }

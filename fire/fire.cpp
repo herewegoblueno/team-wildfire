@@ -96,7 +96,7 @@ void Fire::update_particles(float timeStep)
             float ambient_T = vox->temperature;
             if(std::isnan(ambient_T)) ambient_T = p.Temp;
 
-            float b_factor = 0.15;
+            float b_factor = 0.005;
             glm::vec3 u = vec3(vox->u);
             #ifdef CUDA_FLUID
             b_factor = 0.01;

@@ -6,7 +6,7 @@
 #include "support/Settings.h"
 
 
-const int Simulator::NUMBER_OF_SIMULATION_THREADS = 4;
+const int Simulator::NUMBER_OF_SIMULATION_THREADS = 16;
 
 Simulator::Simulator() {}
 

@@ -20,7 +20,7 @@ using namespace CS123::GL;
 
 
 BasicForestScene::BasicForestScene(MainWindow *mainWindow):
-     _voxelGrid(forestWidth + gridBuffer, vec3(0,(forestWidth + gridBuffer)/2,0), 40),
+     _voxelGrid(forestWidth + gridBuffer, vec3(0,(forestWidth + gridBuffer)/2,0), 64),
      _fireManager(&_voxelGrid),
      mainWindow(mainWindow)
 {
