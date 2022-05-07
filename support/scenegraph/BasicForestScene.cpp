@@ -32,10 +32,10 @@ BasicForestScene::~BasicForestScene()
 void BasicForestScene::init() {
     VoxelGridDim gridDimensions = computeGridDimensions();
     _voxelGrid = std::make_unique<VoxelGrid>(gridDimensions, 64);
+    _fireManager = std::make_unique<FireManager>(_voxelGrid.get()),
     _voxelGrid->getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeVectorField);
     _forest = std::make_unique<Forest>(_voxelGrid.get(), _fireManager.get(),
                                        treeRegions, gridDimensions);
-    _fireManager = std::make_unique<FireManager>(_voxelGrid.get()),
     _lastFrameNumModules = _forest->getAllModuleIDs().size();
     //The forest also initializes the mass of the voxels
     updatePrimitivesFromForest();
