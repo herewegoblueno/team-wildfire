@@ -19,17 +19,17 @@ using namespace CS123::GL;
 
 
 BasicFireScene::BasicFireScene():
-     voxelGrid(10, vec3(0,5,0), 40),
+     voxelGrid(10, vec3(0,5,0), 64),
      fireManager(&voxelGrid)
 {
 
-    Voxel* v = voxelGrid.getVoxel(15, 2, 20);
-    fireManager.addFire(nullptr, vec3(v->centerInWorldSpace), 15);
+    Voxel* v = voxelGrid.getVoxel(16, 2, 32);
+    fireManager.addFire(nullptr, vec3(v->centerInWorldSpace), 30);
 
-    v = voxelGrid.getVoxel(25, 2, 20);
-    fireManager.addFire(nullptr, vec3(v->centerInWorldSpace), 15);
+    v = voxelGrid.getVoxel(48, 2, 32);
+    fireManager.addFire(nullptr, vec3(v->centerInWorldSpace), 30);
 
-    v = voxelGrid.getVoxel(20, 20, 20);
+    v = voxelGrid.getVoxel(5, 5, 5);
     v->getLastFrameState()->temperature = 100;
     v->getCurrentState()->temperature = 100;
     voxelGrid.getVisualization()->toggle(true, true);
@@ -52,6 +52,7 @@ std::vector<std::unique_ptr<CS123Shader>> *BasicFireScene::getShaderPrograms(){
 
 void BasicFireScene::render(SupportCanvas3D *context) {
     voxelGrid.getVisualization()->updateValuesFromSettings();
+
     simulator.step(&voxelGrid);
 
     glClearColor(0.2, 0.2, 0.2, 0.3);

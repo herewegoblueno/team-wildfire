@@ -81,7 +81,9 @@ void Fire::update_particles(float timeStep)
     for (unsigned int i = 0; i < m_density; ++i)
     {
         Particle &p = m_particles[i];
+    #ifndef CUDA_FLUID
         p.Life -= fire_frame_rate;
+    #endif
 
         if (p.Life > 0.0f)
         {
@@ -94,11 +96,12 @@ void Fire::update_particles(float timeStep)
             float b_factor = 0.025;
             glm::vec3 u = vec3(vox->u);
 
-            #ifdef CUDA_FLUID
-                b_factor = 0.01;
-            #endif
-
+        #ifdef CUDA_FLUID
+            b_factor = 0.00;
+        #endif
+        #ifndef CUDA_FLUID
             if(timeStep>0) p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
+        #endif
 
             float b = gravity_acceleration*thermal_expansion*b_factor*
                     (float)std::max(simTempToWorldTemp(p.Temp) - simTempToWorldTemp(ambient_T), 0.); // Buoyancy
@@ -107,7 +110,9 @@ void Fire::update_particles(float timeStep)
 
             if(p.Life < fire_frame_rate*1.5 || p.Temp < 10)
             {
+                #ifndef CUDA_FLUID
                 m_smoke->RespawnParticle(i, p);
+                #endif
                 p.Life = 0;
             }
         }

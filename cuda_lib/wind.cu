@@ -248,6 +248,11 @@ void pressureKernel(double* su_xyz, int* id_xyz, double* tu_xyz, double* pressur
         if(z<resolution-1) dP = safe_get(x,y,z+1,pressure,resolution) - safe_get(x,y,z,pressure,resolution);
         else dP = 0;
         dst_u[2] = src_u[2] - dP*dt/(cell_size*density);
+        if(x==5 && y==5 && z==5)
+        {
+             printf("(%f, %f, %f)=>(%f, %f, %f)\n", src_u[0], src_u[1], src_u[2], dst_u[0], dst_u[1], dst_u[2]);
+        }
+
         if(x==0 || y==0 || z==0 || x==resolution-1 || y==resolution-1 || y==resolution-1)
         {
             dst_u[0] = 0; dst_u[1] = 0; dst_u[2] = 0;
@@ -263,8 +268,9 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
 {
     double air_density = 1.225;
     double viscosity = 0.2;
+    dt = dt/20;
     cudaError err;
-    printf("[param]-[density:%f]-[viscosity:%f]-[cell:%f]", air_density, viscosity, cell_size);
+
 
     auto t1 = now();
     int cell_num = resolution*resolution*resolution;
@@ -372,6 +378,7 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
                  __FILE__, __LINE__, cudaGetErrorString( err) );
     }
 
+    printf("[param]-[density:%f]-[viscosity:%f]-[cell:%f]-", air_density, viscosity, cell_size);
     std::cout << "[Wind Update Ellapse Summary]";
     std::cout << "-[Total- " << milliseconds(t7 - t1) << "]\n";
     std::cout << "[load- " << milliseconds(t2 - t1) << "]-";

@@ -49,7 +49,7 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
     dvec3 g_w = grid->getGlobalFField();
     double g_w3[3] = {g_w.x, g_w.y, g_w.z};
     processWindGPU(host2cuda.grid_temp, host2cuda.grid_q_v, host2cuda.grid_h, host2cuda.u_xyz, host2cuda.id_xyz,
-                   20, g_w3, gridResolution, grid->cellSideLengthForGradients(), deltaTime/1000.);
+                   64, g_w3, gridResolution, grid->cellSideLengthForGradients(), deltaTime/1000.);
     threads.clear();
     for (int x = 0; x < gridResolution; x += jumpPerThread)
         threads.emplace_back(&Simulator::stepCuda2hostThreadHandler, this, grid, forest, deltaTime, gridResolution, x, x + jumpPerThread);
@@ -92,6 +92,10 @@ void Simulator::stepCuda2hostThreadHandler(VoxelGrid *grid ,Forest * forest, int
                 Voxel* vox = grid->getVoxel(x,y,z);
                 dvec3 u(host2cuda.u_xyz[index*3], host2cuda.u_xyz[index*3+1], host2cuda.u_xyz[index*3+2]);
                 vox->getCurrentState()->u = u;
+                if(glm::length(u)>100)
+                {
+                    double temperature = vox->getLastFrameState()->temperature;
+                }
                 index++;
             }
         }

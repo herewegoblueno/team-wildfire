@@ -49,14 +49,16 @@ void Smoke::update_particles(float timeStep)
         Particle &p = m_particles[i];
         if (p.Life > 0.9f)
         {	// particle is alive, thus update
-            VoxelPhysicalData* vox = m_grid->getVoxelClosestToPoint(p.Position)->getCurrentState();
-
-            glm::vec3 u = vec3(vox->u);
+            VoxelPhysicalData voxel = m_grid->getStateInterpolatePoint(p.Position);
+            VoxelPhysicalData* vox = &voxel;
             float ambient_T = vox->temperature;
+            if(std::isnan(ambient_T)) ambient_T = p.Temp;
 
-            float b_factor = 0.015;
+            float b_factor = 0.025;
+            glm::vec3 u = vec3(vox->u);;
+
             #ifdef CUDA_FLUID
-                b_factor = 0.2;
+                b_factor = 0.02;
             #endif
 
             if(timeStep>0) p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
