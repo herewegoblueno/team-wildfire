@@ -81,9 +81,7 @@ void Fire::update_particles(float timeStep)
     for (unsigned int i = 0; i < m_density; ++i)
     {
         Particle &p = m_particles[i];
-    #ifndef CUDA_FLUID
         p.Life -= fire_frame_rate;
-    #endif
 
         if (p.Life > 0.0f)
         {

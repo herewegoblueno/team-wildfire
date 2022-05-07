@@ -1,7 +1,9 @@
 #include "voxel.h"
 #include "glm/ext.hpp"
 #include "simulation/physics.h"
+#include "simulation/fluid.h"
 #include "voxelgrid.h"
+
 
 #define GLM_ENABLE_EXPERIMENTAL
 
@@ -15,6 +17,9 @@ Voxel::Voxel(VoxelGrid *grid, int XIndex, int YIndex, int ZIndex, vec3 center) :
 {
     lastFramePhysicalState.temperature = ambientTemperatureFunc(centerInWorldSpace);
     currentPhysicalState.temperature = ambientTemperatureFunc(centerInWorldSpace);
+    double h = centerInWorldSpace.y;
+    currentPhysicalState.q_v = saturate(absolute_pres(h), absolute_temp(h))*(sin(h*10)+2)*0.2;
+    lastFramePhysicalState.q_v = currentPhysicalState.q_v;
 
     //for testing
 //    int targetIndex = ceil(grid->getResolution() / 2.f);
@@ -105,16 +110,19 @@ double Voxel::getNeighbourTemperature(int xOffset, int yOffset, int zOffset){
 }
 
 
-dvec3 Voxel::getNegfaceVel()
+dvec3 Voxel::getNegfaceVel(bool now)
 {
     dvec3 vel;
     Voxel* v;
     v = grid->getVoxel(XIndex-1, YIndex, ZIndex);
-    vel.x = v==nullptr ? 0:v->getLastFrameState()->u.x;
+    if(now) vel.x = v==nullptr ? 0:v->getCurrentState()->u.x;
+    else vel.x = v==nullptr ? 0:v->getLastFrameState()->u.x;
     v = grid->getVoxel(XIndex, YIndex-1, ZIndex);
-    vel.y = v==nullptr ? 0:v->getLastFrameState()->u.y;
+    if(now) vel.y = v==nullptr ? 0:v->getCurrentState()->u.y;
+    else vel.y = v==nullptr ? 0:v->getLastFrameState()->u.y;
     v = grid->getVoxel(XIndex, YIndex, ZIndex-1);
-    vel.z = v==nullptr ? 0:v->getLastFrameState()->u.z;
+    if(now) vel.z = v==nullptr ? 0:v->getCurrentState()->u.z;
+    else vel.z = v==nullptr ? 0:v->getLastFrameState()->u.z;
     return vel;
 }
 

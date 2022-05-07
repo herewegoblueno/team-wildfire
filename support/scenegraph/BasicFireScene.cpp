@@ -29,9 +29,7 @@ BasicFireScene::BasicFireScene():
     v = voxelGrid.getVoxel(48, 2, 32);
     fireManager.addFire(nullptr, vec3(v->centerInWorldSpace), 30);
 
-    v = voxelGrid.getVoxel(5, 5, 5);
-    v->getLastFrameState()->temperature = 100;
-    v->getCurrentState()->temperature = 100;
+
     voxelGrid.getVisualization()->toggle(true, true);
 
     simulator.init();
@@ -52,7 +50,9 @@ std::vector<std::unique_ptr<CS123Shader>> *BasicFireScene::getShaderPrograms(){
 
 void BasicFireScene::render(SupportCanvas3D *context) {
     voxelGrid.getVisualization()->updateValuesFromSettings();
-
+    Voxel* v = voxelGrid.getVoxel(5, 5, 5);
+    v->getLastFrameState()->temperature = 100;
+    v->getCurrentState()->temperature = 100;
     simulator.step(&voxelGrid);
 
     glClearColor(0.2, 0.2, 0.2, 0.3);

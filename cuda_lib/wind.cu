@@ -267,8 +267,8 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
                     int resolution, double cell_size, float dt)
 {
     double air_density = 1.225;
-    double viscosity = 0.2;
-    dt = dt/20;
+    double viscosity = 0.5;
+    dt = dt/10;
     cudaError err;
 
 

@@ -19,9 +19,9 @@ struct VoxelPhysicalData {
     dvec3 u = dvec3(0,-0.001,0);  // velocity field
 
     // water coefs
-    float q_v = 0.6; // water vapor
-    float q_c = 0.3; // condensed water
-    float q_r = 0.1; // rain (ignore for now)
+    float q_v = 0.0002; // water vapor
+    float q_c = 0.0002; // condensed water
+    float q_r = 0.0002; // rain (ignore for now)
 
     VoxelPhysicalData operator+(const VoxelPhysicalData& rhs) const
     {
@@ -86,7 +86,7 @@ public:
     dvec3 getVelGradient();
     dvec3 getVelLaplace();
     dvec3 getVorticity();
-    dvec3 getNegfaceVel();
+    dvec3 getNegfaceVel(bool now=false);
 
 private:
     //Set and changed over the course of simulation

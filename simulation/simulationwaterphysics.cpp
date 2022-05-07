@@ -10,17 +10,25 @@ void Simulator::stepVoxelWater(Voxel* v, double deltaTimeInMs)
     glm::dvec3 u = v->getCurrentState()->u; // at this point u is already calculated
     double h = v->centerInWorldSpace.y; // need discussion
 
-    q_v = advect(get_q_v, u, deltaTimeInMs, v);
-    q_c = advect(get_q_c, u, deltaTimeInMs, v);
-    q_r = advect(get_q_r, u, deltaTimeInMs, v);
 
-    float q_vs = saturate(absolute_pres(h), ambientTemperatureFunc(v->centerInWorldSpace));
+
+    dvec3 grad_v = v->getGradient(get_q_v);
+    dvec3 grad_c = v->getGradient(get_q_c);
+    dvec3 grad_r = v->getGradient(get_q_r);
+    dvec3 u_center = (v->getNegfaceVel(true)+u)/2.;
+    q_v -= glm::dot(grad_v, u_center)*deltaTimeInMs;
+    q_c -= glm::dot(grad_c, u_center)*deltaTimeInMs;
+    q_r -= glm::dot(grad_r, u_center)*deltaTimeInMs;
+
+    double ambient_temperature = absolute_temp(v->centerInWorldSpace.y);
+    float q_vs = saturate(absolute_pres(h), ambient_temperature);
     float E_r = q_r*evaporation_rate*std::max(q_vs - q_v, 0.);// evaporation of rain Fire Eq.22
     float A_c = autoconverge_cloud*(q_c - 0.001); // below Stormscape Eq.24
     float K_c = raindrop_accelerate*q_c*q_r;  // below Stormscape Eq.24
     q_v = q_v + std::min(q_vs - q_v, q_c) + E_r;
     q_c = q_c - std::min(q_vs - q_v, q_c) - A_c - K_c;
     q_r = A_c + K_c - E_r;
+
 
     float X_v = mole_fraction(q_v);
     float M_th = avg_mole_mass(X_v);
@@ -32,10 +40,6 @@ void Simulator::stepVoxelWater(Voxel* v, double deltaTimeInMs)
     v->getCurrentState()->q_v = q_v;
     v->getCurrentState()->q_c = q_c;
     v->getCurrentState()->q_r = q_r;
-    if(std::isnan(evp_temp))
-    {
-        std::cout << "[evaporation temperature error]";
-    }
     v->getCurrentState()->temperature += evp_temp;
 }
 
@@ -61,8 +65,8 @@ double saturate(double pressure, double temperature)
 double absolute_temp(double height)
 {
 //    height = height_scale*height;
-    height = (height + 20)*10;
-    return sealevel_temperature - 0.0065*height - 273.15;
+    height = (height + 20)*100;
+    return sealevel_temperature - 0.0065*height;
 }
 
 // absolute pressure calculation based on Eq.28 Stormscape

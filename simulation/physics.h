@@ -5,7 +5,7 @@
 //These are all the relevant tunable physics variables for the simulation
 
 // general
-const double sealevel_temperature = 280;
+const double sealevel_temperature = 30;
 const double sealevel_pressure = 100000;
 const double mass_scale = 1;
 const double height_scale = 1000;

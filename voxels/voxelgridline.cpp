@@ -215,8 +215,8 @@ void VoxelGridLine::renderVoxel(Voxel *vox, bool renderingInEyeMode){
             shader->setUniform("prop", temperature);
             shader->setUniform("selectedVoxel", !isValidTemperature);
         }else if (voxelMode == WATER){
-            shader->setUniform("prop", (float)vox->getCurrentState()->q_v);
-            shader->setUniform("secondProp", (float)vox->getCurrentState()->q_c);
+            shader->setUniform("prop", (float)(vox->getCurrentState()->q_v*80));
+            shader->setUniform("secondProp", (float)vox->getCurrentState()->q_c*80);
         }
         shader->setUniform("renderingVectorField", false);
         glDrawArrays(GL_LINES, 0, pointsReservedForVoxels);
