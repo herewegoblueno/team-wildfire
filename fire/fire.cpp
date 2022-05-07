@@ -81,12 +81,7 @@ void Fire::update_particles(float timeStep)
     for (unsigned int i = 0; i < m_density; ++i)
     {
         Particle &p = m_particles[i];
-//        p.Life -= fire_frame_rate*p.Temp*burn_coef;
-        #ifdef CUDA_FLUID
         p.Life -= fire_frame_rate;
-        #else
-        p.Life -= fire_frame_rate;
-        #endif
 
         if (p.Life > 0.0f)
         {
@@ -96,14 +91,15 @@ void Fire::update_particles(float timeStep)
             float ambient_T = vox->temperature;
             if(std::isnan(ambient_T)) ambient_T = p.Temp;
 
-            float b_factor = 0.15;
+            float b_factor = 0.025;
             glm::vec3 u = vec3(vox->u);
+
             #ifdef CUDA_FLUID
-            b_factor = 0.01;
-            if(timeStep>0) p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
-            #else
-            if(timeStep>0) p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
+                b_factor = 0.01;
             #endif
+
+            if(timeStep>0) p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
+
             float b = gravity_acceleration*thermal_expansion*b_factor*
                     (float)std::max(simTempToWorldTemp(p.Temp) - simTempToWorldTemp(ambient_T), 0.); // Buoyancy
             u.y += b;
@@ -111,9 +107,6 @@ void Fire::update_particles(float timeStep)
 
             if(p.Life < fire_frame_rate*1.5 || p.Temp < 10)
             {
-                #ifndef CUDA_FLUID
-                m_smoke->RespawnParticle(i, p);
-                #endif
                 m_smoke->RespawnParticle(i, p);
                 p.Life = 0;
             }
@@ -154,7 +147,6 @@ void Fire::drawParticles(CS123::GL::CS123Shader* shader, OpenGLShape* shape) {
     {
         if (particle.Life > 0.0f)
         {
-            shader->setUniform("color", particle.Color);
             glm::mat4 M_fire = glm::translate(glm::mat4(), particle.Position);
             shader->setUniform("m", M_fire);
             shader->setUniform("temp", particle.Temp);

@@ -89,6 +89,7 @@ void VoxelGridLine::draw(SupportCanvas3D *) {
 
     //Drawing the grid boundary as well
     shader->setUniform("m", vec3(0,0,0));
+    shader->setUniform("renderingVectorField", false);
     shader->setUniform("renderingGridBoundary", true);
     shader->setUniform("propType", -1);
     glDrawArrays(GL_LINES, pointsReservedForVoxels + pointsReservedForVectorRendering, pointsReservedForVoxelGridBoundry);

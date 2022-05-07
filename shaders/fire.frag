@@ -1,6 +1,5 @@
 #version 330 core
 in vec2 TexCoords;
-in vec4 ParticleColor;
 in float Temperature;
 out vec4 color;
 
