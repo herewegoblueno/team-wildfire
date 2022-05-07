@@ -28,10 +28,11 @@ public:
     void init();
     void step(VoxelGrid *grid, Forest *forest = nullptr);
     void cleanupForNextStep(VoxelGrid *grid, Forest *forest = nullptr);
-
+    float getTimeFrame();
 
 private:
     milliseconds timeLastFrame;
+    float timeElapse;
     void stepThreadHandler(VoxelGrid *grid, Forest *forest, int deltaTime, int resolution, int minX, int maxX);
     void stepCuda2hostThreadHandler(VoxelGrid *grid ,Forest * forest, int deltaTime, int resolution,
                                                                        int minXInclusive, int maxXExclusive);

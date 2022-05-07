@@ -41,7 +41,7 @@ Smoke::~Smoke()
 }
 
 
-void Smoke::update_particles()
+void Smoke::update_particles(float timeStep)
 {
     // update all particles
     for (unsigned int i = 0; i < m_density; ++i)
@@ -58,17 +58,15 @@ void Smoke::update_particles()
             #ifdef CUDA_FLUID
             b_factor = 0.2;
             #else
-            p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
+            if(timeStep>0) p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
             #endif
             float b = gravity_acceleration*thermal_expansion*b_factor*
                     (float)std::max(simTempToWorldTemp(p.Temp) - simTempToWorldTemp(ambient_T), 0.); // Buoyancy
             u.y += b;
-            p.Position += u * m_frame_rate;
-
-            p.Position += (b+u+p.Velocity) * m_frame_rate;
+            p.Position += u * timeStep;
             p.Temp = alpha_temp*p.Temp + beta_temp*(ambient_T);
 
-            p.Velocity = p.Velocity*0.9f;
+//            p.Velocity = p.Velocity*0.9f;
         }
     }
 }
@@ -99,8 +97,6 @@ void Smoke::RespawnParticle(int index, Particle& fire_particle)
 }
 
 void Smoke::drawParticles(CS123::GL::CS123Shader* shader, OpenGLShape* shape) {
-    update_particles();
-
     for (Particle particle : m_particles)
     {
         if (particle.Life > 0.0f)

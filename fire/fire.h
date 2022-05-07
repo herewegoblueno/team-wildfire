@@ -21,6 +21,8 @@ public:
     void drawParticles( CS123::GL::CS123Shader* shader, OpenGLShape* shape);
     void drawSmoke( CS123::GL::CS123Shader* shader, OpenGLShape* shape);
     void setSize(float size);
+    void update_particles(float time);
+    void updateSmoke(float time);
 
 private:
     // particle cluster property
@@ -37,7 +39,6 @@ private:
 
     // particle life cycle
     unsigned int lastUsedParticle = 0;
-    void update_particles();
     unsigned int FirstUnusedParticle();
     void RespawnParticle(int index);
 

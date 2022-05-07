@@ -31,7 +31,7 @@ public:
     double massChangeRateToFireSize(double massChangeRate);
     void setModuleFireSizes(Module *m, float size);
     void removeFires(Module *m);
-    void drawFires(bool smoke=true);
+    void drawFires(float time, bool smoke=true);
 
     void setScale(float fire_particle_size, float smoke_particle_size);
     void setCamera(glm::mat4 projection, glm::mat4 view);

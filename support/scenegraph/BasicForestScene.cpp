@@ -117,7 +117,7 @@ void BasicForestScene::render(SupportCanvas3D *context) {
     updateFires();
     _fireManager.setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
     _fireManager.setScale(0.03, 0.05);
-    _fireManager.drawFires(true);
+    _fireManager.drawFires(_simulator.getTimeFrame()/1000., true);
 
     _simulator.cleanupForNextStep(&_voxelGrid, _forest.get());
 

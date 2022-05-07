@@ -26,7 +26,7 @@ public:
     ~Smoke();
 
     void drawParticles(CS123::GL::CS123Shader* shader, OpenGLShape* shape);
-    void update_particles();
+    void update_particles(float time);
     void RespawnParticle(int index, Particle& fire_particle);
 
 private:

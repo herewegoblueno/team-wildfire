@@ -92,9 +92,9 @@ VoxelPhysicalData VoxelGrid::getStateInterpolatePoint(vec3 point){
     }
 
 
-    double xd = (point.x - p000->centerInWorldSpace.x)/voxelSize;
-    double yd = (point.y - p000->centerInWorldSpace.y)/voxelSize;
-    double zd = (point.z - p000->centerInWorldSpace.z)/voxelSize;
+    double xd = (point.x - p000->centerInWorldSpace.x - voxelSize*0.5)/voxelSize;
+    double yd = (point.y - p000->centerInWorldSpace.y - voxelSize*0.5)/voxelSize;
+    double zd = (point.z - p000->centerInWorldSpace.z - voxelSize*0.5)/voxelSize;
 
     VoxelPhysicalData c00 = (*p000->getCurrentState())*(1.-xd) + (*p100->getCurrentState())*xd;
     VoxelPhysicalData c01 = (*p001->getCurrentState())*(1.-xd) + (*p101->getCurrentState())*xd;

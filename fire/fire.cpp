@@ -66,7 +66,7 @@ void Fire::setSize(float size) {
     m_size = size;
 }
 
-void Fire::update_particles()
+void Fire::update_particles(float timeStep)
 {
     unsigned int nr_new_particles = m_respawn_num;
     // add new particles
@@ -83,7 +83,7 @@ void Fire::update_particles()
         Particle &p = m_particles[i];
 //        p.Life -= fire_frame_rate*p.Temp*burn_coef;
         #ifdef CUDA_FLUID
-        p.Life -= fire_frame_rate*0.05;
+        p.Life -= fire_frame_rate;
         #else
         p.Life -= fire_frame_rate;
         #endif
@@ -99,21 +99,22 @@ void Fire::update_particles()
             float b_factor = 0.15;
             glm::vec3 u = vec3(vox->u);
             #ifdef CUDA_FLUID
-            b_factor = 0.00;
-//            p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
+            b_factor = 0.01;
+            if(timeStep>0) p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
             #else
-            p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
+            if(timeStep>0) p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
             #endif
             float b = gravity_acceleration*thermal_expansion*b_factor*
                     (float)std::max(simTempToWorldTemp(p.Temp) - simTempToWorldTemp(ambient_T), 0.); // Buoyancy
             u.y += b;
-            p.Position += u * fire_frame_rate*0.5f;
+            p.Position += u * timeStep;
 
             if(p.Life < fire_frame_rate*1.5 || p.Temp < 10)
             {
                 #ifndef CUDA_FLUID
                 m_smoke->RespawnParticle(i, p);
                 #endif
+                m_smoke->RespawnParticle(i, p);
                 p.Life = 0;
             }
         }
@@ -137,14 +138,17 @@ void Fire::RespawnParticle(int index)
     particle.Velocity = m_size*m_vels[index];
 }
 
-
+void Fire::updateSmoke(float time)
+{
+    m_smoke->update_particles(time);
+}
 
 void Fire::drawSmoke(CS123::GL::CS123Shader* shader, OpenGLShape* shape) {
     m_smoke->drawParticles(shader, shape);
 }
 
 void Fire::drawParticles(CS123::GL::CS123Shader* shader, OpenGLShape* shape) {
-    update_particles();
+
 
     for (Particle particle : m_particles)
     {

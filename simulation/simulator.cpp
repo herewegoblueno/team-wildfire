@@ -18,6 +18,7 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
     milliseconds currentTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
     int deltaTime = (currentTime - timeLastFrame).count();
     if (deltaTime > 100) deltaTime = 100;
+    timeElapse = settings.simulatorTimescale*deltaTime;
     deltaTime *= settings.simulatorTimescale;
     timeLastFrame = currentTime;
     if (deltaTime == 0) return; //Don't bother doing anything
@@ -126,6 +127,10 @@ void Simulator::stepCleanupThreadHandler(VoxelGrid *grid, Forest *, int resoluti
     }
 }
 
+float Simulator::getTimeFrame()
+{
+    return timeElapse;
+}
 
 void Simulator::mallocHost2cuda(VoxelGrid *grid)
 {

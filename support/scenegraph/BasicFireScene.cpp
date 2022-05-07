@@ -23,16 +23,16 @@ BasicFireScene::BasicFireScene():
      fireManager(&voxelGrid)
 {
 
-    Voxel* v = voxelGrid.getVoxel(15, 16, 20);
+    Voxel* v = voxelGrid.getVoxel(15, 2, 20);
     fireManager.addFire(nullptr, vec3(v->centerInWorldSpace), 15);
 
-    v = voxelGrid.getVoxel(25, 16, 20);
+    v = voxelGrid.getVoxel(25, 2, 20);
     fireManager.addFire(nullptr, vec3(v->centerInWorldSpace), 15);
 
     v = voxelGrid.getVoxel(20, 20, 20);
     v->getLastFrameState()->temperature = 100;
     v->getCurrentState()->temperature = 100;
-    voxelGrid.getVisualization()->toggle(false, true);
+    voxelGrid.getVisualization()->toggle(true, true);
 
     simulator.init();
     constructShaders();
@@ -64,7 +64,7 @@ void BasicFireScene::render(SupportCanvas3D *context) {
 
     fireManager.setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
     fireManager.setScale(0.03, 0.05);
-    fireManager.drawFires(false);
+    fireManager.drawFires(10, false);
 
     //Trigger another render
     simulator.cleanupForNextStep(&voxelGrid);

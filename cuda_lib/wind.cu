@@ -38,7 +38,7 @@ void buoyancyKernel(double* grid_temp, double* grid_q_v, double* grid_h, double*
         double X_v = grid_q_v[idx]/(1+grid_q_v[idx]);
         double M_th = 18.02*X_v + 28.96*(1-X_v);
         double T_air = 35-grid_h[idx]*3 + 273.15;
-        double buoyancy =   3*(28.96*T_th/(M_th*T_air) - 1);
+        double buoyancy =   1*(28.96*T_th/(M_th*T_air) - 1);
 
         src_u[1] += buoyancy*dt;
         src_u[0] += f[0]*0.1*dt;
@@ -124,25 +124,25 @@ void pre_vorticityKernel(double* su_xyz, int* id_xyz, double* vorticity, double*
         double grad0, grad1;
         grad0 = (getVel(x, y, z+1, su_xyz, resolution, 1) + getVel(x, y-1, z+1, su_xyz, resolution, 1) -
                  getVel(x, y, z-1, su_xyz, resolution, 1) - getVel(x, y-1, z-1, su_xyz, resolution, 1)); // grad_uy.z
-        grad1 = (getVel(x, y+1, z, su_xyz, resolution, 1) + getVel(x, y+1, z-1, su_xyz, resolution, 1) -
-                 getVel(x, y-1, z, su_xyz, resolution, 1) - getVel(x, y-1, z-1, su_xyz, resolution, 1)); // grad_uz.y
-        tmp = (grad1 - grad0)/2/cell_size;
+        grad1 = (getVel(x, y+1, z, su_xyz, resolution, 2) + getVel(x, y+1, z-1, su_xyz, resolution, 2) -
+                 getVel(x, y-1, z, su_xyz, resolution, 2) - getVel(x, y-1, z-1, su_xyz, resolution, 2)); // grad_uz.y
+        tmp = (grad1 - grad0)/4/cell_size;
         dst_v[0] = tmp;
         len += tmp*tmp;
 
-        grad0 = (getVel(x+1, y, z, su_xyz, resolution, 1) + getVel(x+1, y, z-1, su_xyz, resolution, 1) -
-                 getVel(x-1, y, z, su_xyz, resolution, 1) - getVel(x-1, y, z-1, su_xyz, resolution, 1)); // grad_uz.x
-        grad1 = (getVel(x, y, z+1, su_xyz, resolution, 1) + getVel(x-1, y, z+1, su_xyz, resolution, 1) -
-                 getVel(x, y, z-1, su_xyz, resolution, 1) - getVel(x-1, y, z-1, su_xyz, resolution, 1)); // grad_ux.z
-        tmp = (grad1 - grad0)/2/cell_size;
+        grad0 = (getVel(x+1, y, z, su_xyz, resolution, 2) + getVel(x+1, y, z-1, su_xyz, resolution, 2) -
+                 getVel(x-1, y, z, su_xyz, resolution, 2) - getVel(x-1, y, z-1, su_xyz, resolution, 2)); // grad_uz.x
+        grad1 = (getVel(x, y, z+1, su_xyz, resolution, 0) + getVel(x-1, y, z+1, su_xyz, resolution, 0) -
+                 getVel(x, y, z-1, su_xyz, resolution, 0) - getVel(x-1, y, z-1, su_xyz, resolution, 0)); // grad_ux.z
+        tmp = (grad1 - grad0)/4/cell_size;
         dst_v[1] = tmp;
         len += tmp*tmp;
 
-        grad0 = (getVel(x, y+1, z, su_xyz, resolution, 1) + getVel(x-1, y+1, z, su_xyz, resolution, 1) -
-                 getVel(x, y-1, z, su_xyz, resolution, 1) - getVel(x-1, y-1, z, su_xyz, resolution, 1)); // grad_ux.y
+        grad0 = (getVel(x, y+1, z, su_xyz, resolution, 0) + getVel(x-1, y+1, z, su_xyz, resolution, 0) -
+                 getVel(x, y-1, z, su_xyz, resolution, 0) - getVel(x-1, y-1, z, su_xyz, resolution, 0)); // grad_ux.y
         grad1 = (getVel(x+1, y, z, su_xyz, resolution, 1) + getVel(x+1, y-1, z, su_xyz, resolution, 1) -
                  getVel(x-1, y, z, su_xyz, resolution, 1) - getVel(x-1, y-1, z, su_xyz, resolution, 1)); // grad_uy.x
-        tmp = (grad1 - grad0)/2/cell_size;
+        tmp = (grad1 - grad0)/4/cell_size;
         dst_v[2] = tmp;
         len += tmp*tmp;
 
@@ -169,14 +169,14 @@ void vorticityKernel(double* su_xyz, int* id_xyz, double* tu_xyz, double* vortic
                          safe_get(x-1, y, z, vorticity_len, resolution))/2/cell_size;
         double dvor_y = (safe_get(x, y+1, z, vorticity_len, resolution) -
                          safe_get(x, y-1, z, vorticity_len, resolution))/2/cell_size;
-        double dvor_z = (safe_get(x+1, y, z, vorticity_len, resolution) -
-                         safe_get(x-1, y, z, vorticity_len, resolution))/2/cell_size;
+        double dvor_z = (safe_get(x, y, z+1, vorticity_len, resolution) -
+                         safe_get(x, y, z-1, vorticity_len, resolution))/2/cell_size;
         double len = sqrt(dvor_x*dvor_x+dvor_y*dvor_y+dvor_z*dvor_z) + 0.000001;
         dvor_x /= len; dvor_y /= len; dvor_z /= len;
 
-        dst_u[0] = src_u[0] + (dvor_y*vor_z - dvor_z*vor_y)*cell_size*dt*0.01;
-        dst_u[1] = src_u[1] + (dvor_z*vor_x - dvor_x*vor_z)*cell_size*dt*0.01;
-        dst_u[2] = src_u[2] + (dvor_x*vor_y - dvor_y*vor_x)*cell_size*dt*0.01;
+        dst_u[0] = src_u[0] + (dvor_y*vor_z - dvor_z*vor_y)*cell_size*dt*0.1;
+        dst_u[1] = src_u[1] + (dvor_z*vor_x - dvor_x*vor_z)*cell_size*dt*0.1;
+        dst_u[2] = src_u[2] + (dvor_x*vor_y - dvor_y*vor_x)*cell_size*dt*0.1;
     }
 }
 
@@ -288,15 +288,15 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
     cudaDeviceSynchronize();
     // vorticity confinement
     auto t4 = now();
-    cudaMemcpy(d_u2,    d_u,     cell_num * sizeof(double) * 3, cudaMemcpyDeviceToDevice);
-//    double *vorticity, *vorticity_len;
-//    cudaMalloc(&vorticity,      cell_num * sizeof(double) * 3);
-//    cudaMalloc(&vorticity_len,  cell_num * sizeof(double));
-//    pre_vorticityKernel <<<numBlocks, blockSize>>> (d_u, d_id, vorticity, vorticity_len, resolution, cell_size, dt);
-//    cudaDeviceSynchronize();
-//    vorticityKernel <<<numBlocks, blockSize>>> (d_u, d_id, d_u2, vorticity, vorticity_len, resolution, cell_size, dt);
-//    cudaDeviceSynchronize();
-//    cudaFree(vorticity);  cudaFree(vorticity_len);
+//    cudaMemcpy(d_u2,    d_u,     cell_num * sizeof(double) * 3, cudaMemcpyDeviceToDevice);
+    double *vorticity, *vorticity_len;
+    cudaMalloc(&vorticity,      cell_num * sizeof(double) * 3);
+    cudaMalloc(&vorticity_len,  cell_num * sizeof(double));
+    pre_vorticityKernel <<<numBlocks, blockSize>>> (d_u, d_id, vorticity, vorticity_len, resolution, cell_size, dt);
+    cudaDeviceSynchronize();
+    vorticityKernel <<<numBlocks, blockSize>>> (d_u, d_id, d_u2, vorticity, vorticity_len, resolution, cell_size, dt);
+    cudaDeviceSynchronize();
+    cudaFree(vorticity);  cudaFree(vorticity_len);
     // buoyancy
     auto t5 = now();
     buoyancyKernel <<<numBlocks, blockSize>>> (d_temp, d_q_v, d_h, d_u2, d_f, resolution, dt);
