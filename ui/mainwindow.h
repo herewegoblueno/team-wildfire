@@ -4,10 +4,12 @@
 #include <memory>
 #include <QMainWindow>
 #include <vector>
+#include "ui/defaultforestscenechooser.h"
 
 class SupportCanvas3D;
 class ShaderEvolutionManager;
 class ShaderEvolutionTestingScene;
+class DefaultForestSceneChooser;
 
 namespace Ui {
     class MainWindow;
@@ -27,6 +29,7 @@ public:
     void onSupportCanvasInitialized();
     void notifyFrameCompleted();
     void updateModuleSelectionOptions(std::vector<int> moduleIDs);
+    QString currentForestXMLScene;
 
 protected:
 
@@ -115,7 +118,7 @@ private:
     SupportCanvas3D *m_canvas3D;
     void initializeFrameCounting();
 
-    QString currentForestXMLScene;
+    DefaultForestSceneChooser *forestPresetDialog;
 
     //For tracking fps
     int numberOfFramesRecorded;

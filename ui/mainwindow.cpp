@@ -21,7 +21,8 @@ QString defaultForestXMLScene = ":/xmlScenes/xmlScenes/basicScene.xml";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    forestPresetDialog(new DefaultForestSceneChooser(this))
 {  
     ui->setupUi(this);
     settings.loadSettingsOrDefaults();
@@ -109,6 +110,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    delete forestPresetDialog;
     delete ui;
 }
 
@@ -437,7 +439,7 @@ void MainWindow::on_resetWindfieldZ_clicked()
 
 void MainWindow::on_useDefaultSceneButton_clicked()
 {
-    currentForestXMLScene = defaultForestXMLScene;
+   forestPresetDialog->show();
 }
 
 

@@ -71,6 +71,7 @@ SOURCES += ui/mainwindow.cpp \
     trees/forest.cpp \
     trees/module.cpp \
     fire/fire.cpp \
+    ui/defaultforestscenechooser.cpp \
     ui/extrawidgets/ctkrangeslider.cpp \
     voxels/voxel.cpp \
     voxels/voxelgrid.cpp \
@@ -128,6 +129,7 @@ HEADERS += ui/mainwindow.h \
     support/shapes/Trunk.h \
     trees/LSystem.h \
     trees/TreeGenerator.h \
+    ui/defaultforestscenechooser.h \
     utils/Random.h \
     trees/forest.h \
     trees/module.h \
@@ -139,7 +141,8 @@ HEADERS += ui/mainwindow.h \
     voxels/voxelgrid.h \
     voxels/voxelgridline.h
 
-FORMS += ui/mainwindow.ui
+FORMS += ui/mainwindow.ui \
+    ui/defaultforestscenechooser.ui
 INCLUDEPATH += glm ui glew-1.10.0/include
 DEPENDPATH += glm ui glew-1.10.0/include
 
