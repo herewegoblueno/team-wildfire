@@ -31,7 +31,7 @@ ForestScene::~ForestScene()
 /** Initialize the scene after it has been filled by the parser */
 void ForestScene::init() {
     VoxelGridDim gridDimensions = computeGridDimensions();
-    _voxelGrid = std::make_unique<VoxelGrid>(gridDimensions, 64);
+    _voxelGrid = std::make_unique<VoxelGrid>(gridDimensions, 40);
     _fireManager = std::make_unique<FireManager>(_voxelGrid.get()),
     _voxelGrid->getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeVectorField);
     _forest = std::make_unique<Forest>(_voxelGrid.get(), _fireManager.get(),
