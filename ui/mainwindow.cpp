@@ -73,6 +73,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->TimescaleSlider->setRange(0, 20);
     ui->TimescaleSlider->setValue(settings.simulatorTimescale * 10);
 
+    ui->useMidpointForVoxelHeatTransfer->setCheckState(settings.useMidpointForVoxelHeatTransfer ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+
 
     #ifdef CUDA_FLUID
         ui->NoCudaWarning->hide();
@@ -443,5 +445,11 @@ void MainWindow::on_chooseSceneButton_clicked()
 {
     currentForestXMLScene = QFileDialog::getOpenFileName(
                 this, "Choose an xml forest file scene.", "/", "XML files (*.xml)");
+}
+
+
+void MainWindow::on_useMidpointForVoxelHeatTransfer_stateChanged(int state)
+{
+    settings.useMidpointForVoxelHeatTransfer = state == Qt::CheckState::Checked;
 }
 
