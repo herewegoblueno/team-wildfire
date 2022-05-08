@@ -10,12 +10,27 @@ void Simulator::stepVoxelWater(Voxel* v, double deltaTimeInMs)
     glm::dvec3 u = v->getCurrentState()->u; // at this point u is already calculated
     double h = v->centerInWorldSpace.y; // need discussion
 
-
+    double cell_size = v->grid->cellSideLengthForGradients();
+    int resolution = v->grid->getResolution();
 
     dvec3 grad_v = v->getGradient(get_q_v);
     dvec3 grad_c = v->getGradient(get_q_c);
     dvec3 grad_r = v->getGradient(get_q_r);
     dvec3 u_center = (v->getNegfaceVel(true)+u)/2.;
+
+    // grad correction (boundary condition)
+    if(v->XIndex==0 || v->XIndex==resolution-1) {
+        grad_v.x = 0; grad_c.x = 0; grad_r.x = 0;
+    }
+    if(v->ZIndex==0 || v->ZIndex==resolution-1) {
+        grad_v.z = 0; grad_c.z = 0; grad_r.z = 0;
+    }
+    if(v->YIndex==0 || v->YIndex==resolution-1) {
+        grad_v.y = 0; grad_c.y = 0; grad_r.y = 0;
+    }
+    if(v->YIndex==0) // random evaporation from land
+        grad_v.y = -(3*std::sin(v->XIndex*3) + 1*std::sin(v->ZIndex*5) + 0.5*std::sin(v->ZIndex*7)+4.5)*0.1;
+
     q_v -= glm::dot(grad_v, u_center)*deltaTimeInMs;
     q_c -= glm::dot(grad_c, u_center)*deltaTimeInMs;
     q_r -= glm::dot(grad_r, u_center)*deltaTimeInMs;
