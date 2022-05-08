@@ -1,6 +1,7 @@
 #include "simulator.h"
 #include <thread>
 #include <iostream>
+#include "support/Settings.h"
 
 //eq 21 in Fire in Paradise paper
 //TODO: add in water term
@@ -20,6 +21,7 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
     for (Module *m : nearbyModules) dMdt += m->getCurrentState()->massChangeRateFromLastFrame;
 
     double temperature_save = v->getLastFrameState()->temperature;
+
     // Midpoint Integration
     // first pass
     double dTdt = heat_diffusion_intensity * tempGradientInfo.laplace;
@@ -27,24 +29,27 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
     dTdt -= glm::dot(tempGradientInfo.gradient_pos, v->getLastFrameState()->u)*0.5;
     dTdt -= glm::dot(tempGradientInfo.gradient_neg, v->getNegfaceVel())*0.5;
     dTdt -= module_to_air_diffusion * dMdt;
-#ifdef CUDA_FLUID
-    v->getLastFrameState()->temperature += 0.5*dTdt * deltaTimeInMs / 1000.0;
-    // second pass
-    differenceFromAmbience = clamp(
-                    v->getLastFrameState()->temperature - v->getAmbientTemperature(),
-                    -differenceFromAmbienceCap, differenceFromAmbienceCap);
-    tempGradientInfo = v->getTemperatureGradientInfoFromPreviousFrame();
-    double dTdt2 = heat_diffusion_intensity * tempGradientInfo.laplace;
-    dTdt2 -= radiative_cooling * pow(differenceFromAmbience, 4) * ((differenceFromAmbience > 0) ? 1 : -1);
-    dTdt2 -= glm::dot(tempGradientInfo.gradient_pos, v->getLastFrameState()->u)*0.5;
-    dTdt2 -= glm::dot(tempGradientInfo.gradient_neg, v->getNegfaceVel())*0.5;
-    dTdt2 -= module_to_air_diffusion * dMdt;
-    // integrate
-    v->getLastFrameState()->temperature = temperature_save;
-    v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt2 * deltaTimeInMs / 1000.0;
-#else
-    v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt * deltaTimeInMs / 1000.0;
-#endif
+
+    if (settings.useMidpointForVoxelHeatTransfer){
+        v->getLastFrameState()->temperature += 0.5*dTdt * deltaTimeInMs / 1000.0;
+        // second pass
+        differenceFromAmbience = clamp(
+                        v->getLastFrameState()->temperature - v->getAmbientTemperature(),
+                        -differenceFromAmbienceCap, differenceFromAmbienceCap);
+        tempGradientInfo = v->getTemperatureGradientInfoFromPreviousFrame();
+        double dTdt2 = heat_diffusion_intensity * tempGradientInfo.laplace;
+        dTdt2 -= radiative_cooling * pow(differenceFromAmbience, 4) * ((differenceFromAmbience > 0) ? 1 : -1);
+        dTdt2 -= glm::dot(tempGradientInfo.gradient_pos, v->getLastFrameState()->u)*0.5;
+        dTdt2 -= glm::dot(tempGradientInfo.gradient_neg, v->getNegfaceVel())*0.5;
+        dTdt2 -= module_to_air_diffusion * dMdt;
+
+        // integrate
+        v->getLastFrameState()->temperature = temperature_save;
+        v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt2 * deltaTimeInMs / 1000.0;
+    }else{
+        v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt * deltaTimeInMs / 1000.0;
+    }
+
     v->getCurrentState()->tempGradientFromPrevState = tempGradientInfo.gradient;
     v->getCurrentState()->tempLaplaceFromPrevState = tempGradientInfo.laplace;
 

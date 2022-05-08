@@ -136,7 +136,7 @@
    <property name="minimumSize">
     <size>
      <width>335</width>
-     <height>563</height>
+     <height>575</height>
     </size>
    </property>
    <attribute name="dockWidgetArea">
@@ -429,7 +429,7 @@
            <item>
             <widget class="QToolBox" name="forestToolBox">
              <property name="currentIndex">
-              <number>1</number>
+              <number>3</number>
              </property>
              <widget class="QWidget" name="ForestVisualization">
               <property name="geometry">
@@ -437,7 +437,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>304</width>
-                <height>325</height>
+                <height>351</height>
                </rect>
               </property>
               <attribute name="label">
@@ -660,7 +660,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>304</width>
-                <height>325</height>
+                <height>351</height>
                </rect>
               </property>
               <attribute name="label">
@@ -848,7 +848,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>304</width>
-                <height>325</height>
+                <height>351</height>
                </rect>
               </property>
               <attribute name="label">
@@ -1033,20 +1033,45 @@
                </layout>
               </widget>
              </widget>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="useLightingForShaders">
-             <property name="text">
-              <string>Use Lighting (point)</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="useOrbitingCamera">
-             <property name="text">
-              <string>Use Orbiting Camera</string>
-             </property>
+             <widget class="QWidget" name="OtherForestSettings">
+              <attribute name="label">
+               <string>Other Settings</string>
+              </attribute>
+              <widget class="QWidget" name="OtherSettingsLayout" native="true">
+               <property name="geometry">
+                <rect>
+                 <x>20</x>
+                 <y>30</y>
+                 <width>231</width>
+                 <height>221</height>
+                </rect>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_6">
+                <item>
+                 <widget class="QCheckBox" name="useLightingForShaders">
+                  <property name="text">
+                   <string>Use Lighting (point)</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="useOrbitingCamera">
+                  <property name="text">
+                   <string>Use Orbiting Camera</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="useMidpointForVoxelHeatTransfer">
+                  <property name="text">
+                   <string>Use midpoint intergration 
+ for voxel heat transfer</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </widget>
             </widget>
            </item>
           </layout>

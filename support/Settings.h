@@ -67,6 +67,7 @@ struct Settings
     bool hideSelectedModuleHighlight;
 
     float simulatorTimescale;
+    bool useMidpointForVoxelHeatTransfer;
 
     // Shapes
     int shapeParameter1;

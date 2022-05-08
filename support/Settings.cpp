@@ -59,6 +59,8 @@ void Settings::loadSettingsOrDefaults() {
 
     simulatorTimescale = s.value("simulatorTimescale", 1).toDouble();
 
+    useMidpointForVoxelHeatTransfer = s.value("useMidpointForVoxelHeatTransfer", true).toBool();
+
     // Shape Tesselation Settings
     shapeParameter1 = s.value("shapeParameter1", 15).toInt();
     shapeParameter2 = s.value("shapeParameter2", 15).toInt();
@@ -100,6 +102,8 @@ void Settings::saveSettings() {
     s.setValue("moduleVisualizationMode", moduleVisualizationMode);
 
     s.setValue("simulatorTimescale", simulatorTimescale);
+    s.setValue("useMidpointForVoxelHeatTransfer", useMidpointForVoxelHeatTransfer);
+
     s.setValue("visualizeForestVoxelGridMinTemp", visualizeForestVoxelGridMinTemp);
     s.setValue("visualizeForestVoxelGridMaxTemp", visualizeForestVoxelGridMaxTemp);
 
