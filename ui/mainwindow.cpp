@@ -67,6 +67,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->visualizationTemperatureRangeSlider->setRange(-10, 150);
     ui->visualizationTemperatureRangeSlider->setValues(settings.visualizeForestVoxelGridMinTemp * 10, settings.visualizeForestVoxelGridMaxTemp * 10);
+    ui->visualizationTemperatureRangeSlider_2->setRange(-10, 500);
+    ui->visualizationTemperatureRangeSlider_2->setValues(settings.visualizeForestVoxelGridMinTemp * 10, settings.visualizeForestVoxelGridMaxTemp * 10);
+
 
     ui->FieldVisOptionsDropbox->setCurrentIndex(settings.vectorGridMode);
     auto explanation = VoxelGridLine::getVectorFieldModeExplanation(static_cast<VectorFieldVisualizationModes>(settings.vectorGridMode));

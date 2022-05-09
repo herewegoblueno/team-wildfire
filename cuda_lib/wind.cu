@@ -42,13 +42,13 @@ void buoyancyKernel(double* grid_temp, double* grid_q_v, double* grid_h, double*
 
         if (buoyancy<0) buoyancy=0;
         src_u[1] += buoyancy*dt;
-        if(fabs(src_u[0]) < f(src_u[0])) src_u[0] += f[0]*0.01*dt;
-        if(fabs(src_u[1]) < f(src_u[1])) src_u[1] += f[1]*0.01*dt;
-        if(fabs(src_u[2]) < f(src_u[2])) src_u[2] += f[2]*0.01*dt;
-//        if(idx==8271)
-//        {
-//             printf("=>B(%f, %f, %f)", src_u[0], src_u[1], src_u[2]);
-//        }
+        if(fabs(src_u[0]) < fabs(src_u[0])) src_u[0] += f[0]*0.01*dt;
+        if(fabs(src_u[1]) < fabs(src_u[1])) src_u[1] += f[1]*0.01*dt;
+        if(fabs(src_u[2]) < fabs(src_u[2])) src_u[2] += f[2]*0.01*dt;
+        if(idx==8271)
+        {
+             printf("=>B(%f, %f, %f)", src_u[0], src_u[1], src_u[2]);
+        }
     }
 }
 
@@ -74,10 +74,10 @@ void advectKernel(double* su_xyz, int* id_xyz, double* tu_xyz,
         ua = getVel(x, y, z-1, su_xyz, resolution, 2);
         ub = getVel(x, y, z+1, su_xyz, resolution, 2);
         dst_u[2] = src_u[2] - 0.95*(ub*ub - ua*ua)/2/cell_size*dt;
-//        if(x==8 && y==0 && z==15)
-//        {
-//             printf("O(%f, %f, %f)=>A(%f, %f, %f)", src_u[0], src_u[1], src_u[2], dst_u[0], dst_u[1], dst_u[2]);
-//        }
+        if(x==8 && y==0 && z==15)
+        {
+             printf("O(%f, %f, %f)=>A(%f, %f, %f)", src_u[0], src_u[1], src_u[2], dst_u[0], dst_u[1], dst_u[2]);
+        }
     }
 }
 
@@ -108,10 +108,10 @@ void viscosityKernel(double* su_xyz, int* id_xyz, double* tu_xyz, double viscosi
             u1 = getVel(x, y, z+1, su_xyz, resolution, 2);
             u0 = getVel(x, y, z-1, su_xyz, resolution, 2);
             dst_u[2] = src_u[2] + ((u1 - src_u[2]) - (src_u[2] - u0))*factor;
-//            if(x==8 && y==0 && z==15)
-//            {
-//                 printf("=>D(%f, %f, %f)\n", dst_u[0], dst_u[1], dst_u[2]);
-//            }
+            if(x==8 && y==0 && z==15)
+            {
+                 printf("=>D(%f, %f, %f)\n", dst_u[0], dst_u[1], dst_u[2]);
+            }
         }
         else
         {
@@ -193,10 +193,10 @@ void vorticityKernel(double* su_xyz, int* id_xyz, double* tu_xyz, double* vortic
             dst_u[0] = src_u[0] + (dvor_y*vor_z - dvor_z*vor_y)*cell_size*dt*0.01;
             dst_u[1] = src_u[1] + (dvor_z*vor_x - dvor_x*vor_z)*cell_size*dt*0.01;
             dst_u[2] = src_u[2] + (dvor_x*vor_y - dvor_y*vor_x)*cell_size*dt*0.01;
-//            if(x==8 && y==0 && z==15)
-//            {
-//                 printf("=>V(%f, %f, %f)", dst_u[0], dst_u[1], dst_u[2]);
-//            }
+            if(x==8 && y==0 && z==15)
+            {
+                 printf("=>V(%f, %f, %f)", dst_u[0], dst_u[1], dst_u[2]);
+            }
         }
         else
         {
@@ -291,10 +291,7 @@ void pressureKernel(double* su_xyz, int* id_xyz, double* tu_xyz, double* pressur
         if(z<resolution-1) dP = safe_get(x,y,z+1,pressure,resolution) - safe_get(x,y,z,pressure,resolution);
         else dP = 0;
         dst_u[2] = src_u[2] - dP*dt/(cell_size*density);
-//        if(x==8 && y==0 && z==15)
-//        {
-//             printf("=>[%f]/[%f]P(%f, %f, %f)\n", pressure[idx+resolution], pressure[idx], dst_u[0], dst_u[1], dst_u[2]);
-//        }
+
         if(x==resolution-1) dst_u[0] = 0;
         if(y==resolution-1) dst_u[1] = 0;
         if(z==resolution-1) dst_u[2] = 0;
