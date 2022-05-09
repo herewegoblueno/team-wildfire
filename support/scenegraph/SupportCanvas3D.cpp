@@ -154,7 +154,7 @@ void SupportCanvas3D::setSceneFromSettings() {
 
 void SupportCanvas3D::loadSceneFromParserForForestScene(CS123XmlSceneParser &parser) {
     //The basic forest scene is currently the only scene who is designed to load from an xml file
-    m_forestScene = std::make_unique<ForestScene>(m_mainWindowParent);
+    m_forestScene = std::make_unique<ForestScene>(m_mainWindowParent, this);
     Scene::parse(m_forestScene.get(), &parser);
     m_forestScene->init();
     m_settingsDirty = true;
@@ -281,7 +281,7 @@ void SupportCanvas3D::mousePressEvent(QMouseEvent *event) {
     }
 
     if (settings.getSceneMode() == FOREST_SCENE_MODE) {
-       m_forestScene->onMousePress(event, this);
+       m_forestScene->onMousePress(event);
     }
 }
 
@@ -297,6 +297,18 @@ void SupportCanvas3D::mouseReleaseEvent(QMouseEvent *event) {
         getCamera()->mouseUp(event->x(), event->y());
         m_isDragging = false;
         update();
+    }
+}
+
+void SupportCanvas3D::keyPressEvent(QKeyEvent *event) {
+    if (settings.getSceneMode() == FOREST_SCENE_MODE) {
+       m_forestScene->onKeyPressed(event);
+    }
+}
+
+void SupportCanvas3D::keyReleaseEvent(QKeyEvent *event) {
+    if (settings.getSceneMode() == FOREST_SCENE_MODE) {
+       m_forestScene->onKeyReleased(event);
     }
 }
 

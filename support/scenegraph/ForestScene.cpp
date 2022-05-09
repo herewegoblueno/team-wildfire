@@ -20,8 +20,9 @@
 using namespace std::chrono;
 using namespace CS123::GL;
 
-ForestScene::ForestScene(MainWindow *mainWindow):
-     mainWindow(mainWindow)
+ForestScene::ForestScene(MainWindow *mainWindow, SupportCanvas3D *canvas):
+     mainWindow(mainWindow),
+     canvas(canvas)
 {
     loadShaders();
     tessellateShapes();
@@ -46,6 +47,12 @@ void ForestScene::init() {
     _simulator->init();
     _voxelGrid->getVisualization()->setForestReference(_forest.get());
     mainWindow->updateModuleSelectionOptions(_forest->getAllModuleIDs());
+
+    //Making the cursors used for click-to-ignite and whatnot
+    QPixmap cursor_pixmap = QPixmap(":/images/images/firecursor.png");
+    fireCursor = QCursor(cursor_pixmap, 0, 0);
+    cursor_pixmap = QPixmap(":/images/images/snowflakecursor.png");
+    snowCursor = QCursor(cursor_pixmap, 0, 0);
 }
 
 /**
@@ -293,7 +300,7 @@ VoxelGrid * ForestScene::getVoxelGrid(){
     return _voxelGrid.get();
 }
 
-void ForestScene::onMousePress(QMouseEvent *event, SupportCanvas3D *canvas){
+void ForestScene::onMousePress(QMouseEvent *event){
     //Converting the mouse position from widget space to film slace [-1, 1]
     //top left corner of film coordinates is -1, 1
     Qt::KeyboardModifiers mod = QApplication::keyboardModifiers();
@@ -309,7 +316,7 @@ void ForestScene::onMousePress(QMouseEvent *event, SupportCanvas3D *canvas){
     float mouseFilmX = -1 + xUnitSize * mousePos.x();
     float mouseFilmY = 1 - yUnitSize * mousePos.y();
 
-    Plane plane = {{0,1,0}, {0,1,0}};
+    Plane plane = {{0,0,0}, {0,1,0}};
 
     IntersectionStatus intersect = Raycaster::checkMouseClickIntersectionWithPlane(
                 canvas->getCamera(), mouseFilmX, mouseFilmY, plane);
@@ -331,5 +338,25 @@ void ForestScene::changeTemperatureOfModulesAroundTemp(glm::vec3 center, double 
             _forest->artificiallyUpdateTemperatureOfModule(moduleId, delta);
         }
     }
+}
+
+
+void ForestScene::changeCursorBasedOnKeyboard(Qt::KeyboardModifiers mod){
+    if (mod != Qt::ShiftModifier && mod != Qt::ControlModifier){
+        canvas->setCursor(Qt::ArrowCursor);
+    }else if (mod == Qt::ShiftModifier){
+        canvas->setCursor(fireCursor);
+    }else{
+        canvas->setCursor(snowCursor);
+    }
+    QApplication::processEvents();
+}
+
+void ForestScene::onKeyPressed(QKeyEvent *event){
+    changeCursorBasedOnKeyboard(event->modifiers());
+}
+
+void ForestScene::onKeyReleased(QKeyEvent *event){
+    changeCursorBasedOnKeyboard(event->modifiers());
 }
 

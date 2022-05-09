@@ -21,5 +21,7 @@
     <qresource prefix="/images">
         <file>images/killWithFire.png</file>
         <file>images/Two-Buttons.jpeg</file>
+        <file>images/snowflakecursor.png</file>
+        <file>images/firecursor.png</file>
     </qresource>
 </RCC>

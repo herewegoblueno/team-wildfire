@@ -22,7 +22,7 @@ const float forestWidth = 10;
 
 class ForestScene : public OpenGLScene {
 public:
-    ForestScene(MainWindow *mainWindow);
+    ForestScene(MainWindow *mainWindow, SupportCanvas3D *canvas);
     virtual ~ForestScene();
 
     void init();
@@ -32,7 +32,9 @@ public:
     Forest *getForest();
     VoxelGrid *getVoxelGrid();
 
-    void onMousePress(QMouseEvent *event, SupportCanvas3D *canvas);
+    void onMousePress(QMouseEvent *event);
+    void onKeyPressed(QKeyEvent *event);
+    void onKeyReleased(QKeyEvent *event);
 
 private:
     void updatePrimitivesFromForest();
@@ -68,8 +70,13 @@ private:
     std::unique_ptr<FireManager> _fireManager;
 
     void changeTemperatureOfModulesAroundTemp(glm::vec3 center, double delta);
+    void changeCursorBasedOnKeyboard(Qt::KeyboardModifiers mod);
 
     MainWindow *mainWindow;
+    SupportCanvas3D *canvas;
+
+    QCursor fireCursor;
+    QCursor snowCursor;
 };
 
 
