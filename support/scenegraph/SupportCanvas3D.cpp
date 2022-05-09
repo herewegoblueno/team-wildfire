@@ -279,6 +279,10 @@ void SupportCanvas3D::mousePressEvent(QMouseEvent *event) {
         m_isDragging = true;
         update();
     }
+
+    if (settings.getSceneMode() == FOREST_SCENE_MODE) {
+       m_forestScene->onMousePress(event, this);
+    }
 }
 
 void SupportCanvas3D::mouseMoveEvent(QMouseEvent *event) {

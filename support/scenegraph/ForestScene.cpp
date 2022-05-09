@@ -12,8 +12,11 @@
 #include "support/shapes/Trunk.h"
 #include "support/shapes/Leaf.h"
 
+#include "raycasting/raycaster.h"
+
 #include <chrono>
 #include <iostream>
+#include <QApplication>
 using namespace std::chrono;
 using namespace CS123::GL;
 
@@ -289,3 +292,44 @@ Forest * ForestScene::getForest(){
 VoxelGrid * ForestScene::getVoxelGrid(){
     return _voxelGrid.get();
 }
+
+void ForestScene::onMousePress(QMouseEvent *event, SupportCanvas3D *canvas){
+    //Converting the mouse position from widget space to film slace [-1, 1]
+    //top left corner of film coordinates is -1, 1
+    Qt::KeyboardModifiers mod = QApplication::keyboardModifiers();
+    if (mod != Qt::ShiftModifier && mod != Qt::ControlModifier) return;
+
+    float height = canvas->height();
+    float width = canvas->width();
+    QPoint mousePos = event->pos();
+
+    float xUnitSize = 2 / (float) width;
+    float yUnitSize = 2 / (float) height;
+
+    float mouseFilmX = -1 + xUnitSize * mousePos.x();
+    float mouseFilmY = 1 - yUnitSize * mousePos.y();
+
+    Plane plane = {{0,1,0}, {0,1,0}};
+
+    IntersectionStatus intersect = Raycaster::checkMouseClickIntersectionWithPlane(
+                canvas->getCamera(), mouseFilmX, mouseFilmY, plane);
+
+    if (!intersect.intersectFound) return;
+
+    //Get all the modules that are within a region...
+    changeTemperatureOfModulesAroundTemp(intersect.point, mod == Qt::ShiftModifier ? 5 : -5);
+}
+
+void ForestScene::changeTemperatureOfModulesAroundTemp(glm::vec3 center, double delta){
+    glm::vec3 maxPoint = center + glm::vec3(0.5, 0, 0.5);
+    glm::vec3 minPoint = center - glm::vec3(0.5, 0, 0.5);
+    auto allModules = _forest->getAllModuleIDs();
+    for (int moduleId : allModules){
+        Module *m = _forest->getModuleFromId(moduleId);
+        glm::vec3 center = vec3(m->getCenterOfMass());
+        if (center.z > minPoint.z && center.x > minPoint.x && center.z < maxPoint.z && center.x < maxPoint.x){
+            _forest->artificiallyUpdateTemperatureOfModule(moduleId, delta);
+        }
+    }
+}
+

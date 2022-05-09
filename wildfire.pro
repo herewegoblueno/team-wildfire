@@ -25,6 +25,7 @@ SOURCES += ui/mainwindow.cpp \
     fire/smoke.cpp \
     main.cpp \
     glew-1.10.0/src/glew.c \
+    raycasting/raycaster.cpp \
     simulation/physics.cpp \
     simulation/simulationheattransfer.cpp \
     simulation/simulationwaterphysics.cpp \
@@ -82,6 +83,7 @@ HEADERS += ui/mainwindow.h \
     fire/firemanager.h \
     fire/particle.h \
     fire/smoke.h \
+    raycasting/raycaster.h \
     simulation/fluid.h \
     simulation/physics.h \
     simulation/simulator.h \

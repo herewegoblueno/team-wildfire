@@ -14,6 +14,7 @@
 #include "support/shapes/Ground.h"
 #include "simulation/simulator.h"
 #include <unordered_map>
+#include <QMouseEvent>
 
 const int numTrees = 100;
 const float forestHeight = 10;
@@ -30,6 +31,8 @@ public:
 
     Forest *getForest();
     VoxelGrid *getVoxelGrid();
+
+    void onMousePress(QMouseEvent *event, SupportCanvas3D *canvas);
 
 private:
     void updatePrimitivesFromForest();
@@ -63,6 +66,8 @@ private:
     std::unique_ptr<VoxelGrid> _voxelGrid;
     std::unique_ptr<Simulator> _simulator;
     std::unique_ptr<FireManager> _fireManager;
+
+    void changeTemperatureOfModulesAroundTemp(glm::vec3 center, double delta);
 
     MainWindow *mainWindow;
 };
