@@ -18,7 +18,7 @@ Voxel::Voxel(VoxelGrid *grid, int XIndex, int YIndex, int ZIndex, vec3 center) :
     lastFramePhysicalState.temperature = ambientTemperatureFunc(centerInWorldSpace);
     currentPhysicalState.temperature = ambientTemperatureFunc(centerInWorldSpace);
     double h = centerInWorldSpace.y;
-    currentPhysicalState.q_v = saturate(absolute_pres(h), absolute_temp(h))*(sin(h*10)+2)*0.2;
+    currentPhysicalState.q_v = saturate(absolute_pres(h), absolute_temp(h))*(sin(h*10)+2)*0.05;
     lastFramePhysicalState.q_v = currentPhysicalState.q_v;
 
     //for testing

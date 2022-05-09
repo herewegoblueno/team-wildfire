@@ -34,16 +34,21 @@ void buoyancyKernel(double* grid_temp, double* grid_q_v, double* grid_h, double*
     {
         double* src_u = su_xyz + idx*3;
 
-        double T_th = 10*grid_temp[idx] + 273.15;
+        double T_th = 580./18.*(grid_temp[idx]-2) + 20 + 273.15;
         double X_v = grid_q_v[idx]/(1+grid_q_v[idx]);
         double M_th = 18.02*X_v + 28.96*(1-X_v);
-        double T_air = 35-grid_h[idx]*3 + 273.15;
-        double buoyancy =   1*(28.96*T_th/(M_th*T_air) - 1);
+        double T_air = 20-0.0065*(grid_h[idx]+20)*100 + 273.15;
+        double buoyancy =   0.098*(28.96*T_th/(M_th*T_air) - 1);
 
+        if (buoyancy<0) buoyancy=0;
         src_u[1] += buoyancy*dt;
-        src_u[0] += f[0]*0.1*dt;
-        src_u[1] += f[1]*0.1*dt;
-        src_u[2] += f[2]*0.1*dt;
+        if(fabs(src_u[0]) < f(src_u[0])) src_u[0] += f[0]*0.01*dt;
+        if(fabs(src_u[1]) < f(src_u[1])) src_u[1] += f[1]*0.01*dt;
+        if(fabs(src_u[2]) < f(src_u[2])) src_u[2] += f[2]*0.01*dt;
+//        if(idx==8271)
+//        {
+//             printf("=>B(%f, %f, %f)", src_u[0], src_u[1], src_u[2]);
+//        }
     }
 }
 
@@ -62,13 +67,17 @@ void advectKernel(double* su_xyz, int* id_xyz, double* tu_xyz,
 
         ua = getVel(x-1, y, z, su_xyz, resolution, 0);
         ub = getVel(x+1, y, z, su_xyz, resolution, 0);
-        dst_u[0] = src_u[0] - 0.95*(ub - ua)/2/cell_size*src_u[0]*dt;
+        dst_u[0] = src_u[0] - 0.95*(ub*ub - ua*ua)/2/cell_size*dt;
         ua = getVel(x, y-1, z, su_xyz, resolution, 1);
         ub = getVel(x, y+1, z, su_xyz, resolution, 1);
-        dst_u[1] = src_u[1] - 0.95*(ub - ua)/2/cell_size*src_u[1]*dt;
+        dst_u[1] = src_u[1] - 0.95*(ub*ub - ua*ua)/2/cell_size*dt;
         ua = getVel(x, y, z-1, su_xyz, resolution, 2);
         ub = getVel(x, y, z+1, su_xyz, resolution, 2);
-        dst_u[2] = src_u[2] - 0.95*(ub - ua)/2/cell_size*src_u[2]*dt;
+        dst_u[2] = src_u[2] - 0.95*(ub*ub - ua*ua)/2/cell_size*dt;
+//        if(x==8 && y==0 && z==15)
+//        {
+//             printf("O(%f, %f, %f)=>A(%f, %f, %f)", src_u[0], src_u[1], src_u[2], dst_u[0], dst_u[1], dst_u[2]);
+//        }
     }
 }
 
@@ -99,6 +108,10 @@ void viscosityKernel(double* su_xyz, int* id_xyz, double* tu_xyz, double viscosi
             u1 = getVel(x, y, z+1, su_xyz, resolution, 2);
             u0 = getVel(x, y, z-1, su_xyz, resolution, 2);
             dst_u[2] = src_u[2] + ((u1 - src_u[2]) - (src_u[2] - u0))*factor;
+//            if(x==8 && y==0 && z==15)
+//            {
+//                 printf("=>D(%f, %f, %f)\n", dst_u[0], dst_u[1], dst_u[2]);
+//            }
         }
         else
         {
@@ -176,9 +189,14 @@ void vorticityKernel(double* su_xyz, int* id_xyz, double* tu_xyz, double* vortic
         {
             dvor_x /= len; dvor_y /= len; dvor_z /= len;
 //            printf("(%f,%f,%f)-[%f]",dvor_x,dvor_y,dvor_z,len);
-            dst_u[0] = src_u[0] + (dvor_y*vor_z - dvor_z*vor_y)*cell_size*dt*0.1;
-            dst_u[1] = src_u[1] + (dvor_z*vor_x - dvor_x*vor_z)*cell_size*dt*0.1;
-            dst_u[2] = src_u[2] + (dvor_x*vor_y - dvor_y*vor_x)*cell_size*dt*0.1;
+
+            dst_u[0] = src_u[0] + (dvor_y*vor_z - dvor_z*vor_y)*cell_size*dt*0.01;
+            dst_u[1] = src_u[1] + (dvor_z*vor_x - dvor_x*vor_z)*cell_size*dt*0.01;
+            dst_u[2] = src_u[2] + (dvor_x*vor_y - dvor_y*vor_x)*cell_size*dt*0.01;
+//            if(x==8 && y==0 && z==15)
+//            {
+//                 printf("=>V(%f, %f, %f)", dst_u[0], dst_u[1], dst_u[2]);
+//            }
         }
         else
         {
@@ -225,6 +243,31 @@ void pre_JacobiKernel(double* su_xyz, int* id_xyz, double density_term, int reso
     }
 }
 
+// Optimized device version of the Jacobi method
+__global__ void jacobi(double* x_next, double* A, double* x_now, double* b, int* xyz, int Ni, int Res, int segment)
+{
+    int idx = blockIdx.x*blockDim.x + threadIdx.x;
+
+    if (idx < Ni && idx>-1)
+    {
+        double sigma = 0.0;
+        int id_x = xyz[idx*3];
+        int id_y = xyz[idx*3+1];
+        int id_z = xyz[idx*3+2];
+
+        if(id_x > 0)     sigma += x_now[idx - Res*Res];
+        if(id_x < Res-1) sigma += x_now[idx + Res*Res];
+        if(id_y > 0)     sigma += x_now[idx - Res];
+        if(id_y < Res-1) sigma += x_now[idx + Res];
+        if(id_z > 0)     sigma += x_now[idx - 1];
+        if(id_z < Res-1) sigma += x_now[idx + 1];
+
+        x_next[idx] = (b[idx] + sigma) / A[idx];
+//        printf(" (%d: %d, %d, %d) ", idx, id_x, id_y, id_z);
+    }
+}
+
+
 __global__
 void pressureKernel(double* su_xyz, int* id_xyz, double* tu_xyz, double* pressure, double density,
                     int resolution, double cell_size, double dt)
@@ -248,15 +291,13 @@ void pressureKernel(double* su_xyz, int* id_xyz, double* tu_xyz, double* pressur
         if(z<resolution-1) dP = safe_get(x,y,z+1,pressure,resolution) - safe_get(x,y,z,pressure,resolution);
         else dP = 0;
         dst_u[2] = src_u[2] - dP*dt/(cell_size*density);
-        if(x==5 && y==5 && z==5)
-        {
-             printf("(%f, %f, %f)=>(%f, %f, %f)\n", src_u[0], src_u[1], src_u[2], dst_u[0], dst_u[1], dst_u[2]);
-        }
-
-        if(x==0 || y==0 || z==0 || x==resolution-1 || y==resolution-1 || y==resolution-1)
-        {
-            dst_u[0] = 0; dst_u[1] = 0; dst_u[2] = 0;
-        }
+//        if(x==8 && y==0 && z==15)
+//        {
+//             printf("=>[%f]/[%f]P(%f, %f, %f)\n", pressure[idx+resolution], pressure[idx], dst_u[0], dst_u[1], dst_u[2]);
+//        }
+        if(x==resolution-1) dst_u[0] = 0;
+        if(y==resolution-1) dst_u[1] = 0;
+        if(z==resolution-1) dst_u[2] = 0;
     }
 }
 
@@ -267,8 +308,8 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
                     int resolution, double cell_size, float dt)
 {
     double air_density = 1.225;
-    double viscosity = 0.5;
-    dt = dt/5;
+    double viscosity = 2000;
+    dt = dt/15;
     cudaError err;
 
 
@@ -392,35 +433,15 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
 
 
 
-// Optimized device version of the Jacobi method
-__global__ void jacobi(double* x_next, double* A, double* x_now, double* b, int* xyz, int Ni, int Res, int segment)
-{
-    int idx = blockIdx.x*blockDim.x + threadIdx.x;
-
-    if (idx < Ni && idx>-1)
-    {
-        double sigma = 0.0;
-        int id_x = xyz[idx*3];
-        int id_y = xyz[idx*3+1];
-        int id_z = xyz[idx*3+2];
-
-        if(id_x > 0)     sigma += x_now[idx - Res*Res];
-        if(id_x < Res-1) sigma += x_now[idx + Res*Res];
-        if(id_y > 0)     sigma += x_now[idx - Res];
-        if(id_y < Res-1) sigma += x_now[idx + Res];
-        if(id_z > 0)     sigma += x_now[idx - 1];
-        if(id_z < Res-1) sigma += x_now[idx + 1];
-
-        x_next[idx] = (b[idx] + sigma) / A[idx];
-//        printf(" (%d: %d, %d, %d) ", idx, id_x, id_y, id_z);
-    }
-}
 
 
 __device__ double getVel(int x, int y, int z, double* u, int resolution, int dim)
 {
-    if(x<0 || y<0 || z<0 || x>resolution-2 || y>resolution-2 || z>resolution-2)
+    if(x<0 || y<0 || z<0 || x>resolution-1 || y>resolution-1 || z>resolution-1)
         return 0;
+    if(dim==0 && x==resolution-1) return 0;
+    if(dim==1 && y==resolution-1) return 0;
+    if(dim==2 && z==resolution-1) return 0;
     int index = x*resolution*resolution + y*resolution + z;
     return u[index*3 + dim];
 }

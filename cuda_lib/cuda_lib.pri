@@ -41,9 +41,7 @@ win32 {
     CUDA_INC = $$join(INCLUDEPATH,'" -I"','-I"','"')
 
     # Add the necessary libraries
-    CUDA_LIB_NAMES = cudart_static kernel32 user32 gdi32 winspool comdlg32 \
-                     advapi32 shell32 ole32 oleaut32 uuid odbc32 odbccp32
-                     #freeglut glew32
+    CUDA_LIB_NAMES = cudart cuda
 
     for(lib, CUDA_LIB_NAMES) {
         CUDA_LIBS += -l$$lib

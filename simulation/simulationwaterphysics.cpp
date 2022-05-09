@@ -1,6 +1,7 @@
 #include "simulator.h"
 #include <math.h>
 #include <iostream>
+using namespace std;
 
 void Simulator::stepVoxelWater(Voxel* v, double deltaTimeInMs)
 {
@@ -25,15 +26,21 @@ void Simulator::stepVoxelWater(Voxel* v, double deltaTimeInMs)
     if(v->ZIndex==0 || v->ZIndex==resolution-1) {
         grad_v.z = 0; grad_c.z = 0; grad_r.z = 0;
     }
-    if(v->YIndex==0 || v->YIndex==resolution-1) {
+    if(v->YIndex==1 || v->YIndex==resolution-1) {
         grad_v.y = 0; grad_c.y = 0; grad_r.y = 0;
     }
-    if(v->YIndex==0) // random evaporation from land
-        grad_v.y = -(3*std::sin(v->XIndex*3) + 1*std::sin(v->ZIndex*5) + 0.5*std::sin(v->ZIndex*7)+4.5)*0.1;
+    if(v->YIndex==1) // random evaporation from land
+    {
+        grad_v.y = -(3*std::sin(v->XIndex*3) + 1*std::sin(v->ZIndex*5) + 0.5*std::sin(v->ZIndex*7)+4.5)/cell_size;
+//        v->getCurrentState()->temperature += (3*std::sin(v->XIndex*3) + 1*std::sin(v->ZIndex*5)
+//                                              + 0.5*std::sin(v->ZIndex*7)+4.5)*0.01;
+    }
 
-    q_v -= glm::dot(grad_v, u_center)*deltaTimeInMs;
-    q_c -= glm::dot(grad_c, u_center)*deltaTimeInMs;
-    q_r -= glm::dot(grad_r, u_center)*deltaTimeInMs;
+
+    q_v -= glm::dot(grad_v, u_center)*deltaTimeInMs*500;
+    q_c -= glm::dot(grad_c, u_center)*deltaTimeInMs*500;
+    q_r -= glm::dot(grad_r, u_center)*deltaTimeInMs*500;
+
 
     double ambient_temperature = absolute_temp(v->centerInWorldSpace.y);
     float q_vs = saturate(absolute_pres(h), ambient_temperature);
@@ -51,6 +58,12 @@ void Simulator::stepVoxelWater(Voxel* v, double deltaTimeInMs)
     float gamma_th = isentropic_exponent(Y_v);
     float c_th_p = heat_capacity(gamma_th, M_th);
     float evp_temp = 2.5/c_th_p*mole_fraction(-std::min(q_vs-q_v, q_c));
+
+    if(v->XIndex==8 && v->YIndex==2 && v->ZIndex==15)
+    {
+        cout << "q_v change:" << glm::dot(grad_v, u_center)*deltaTimeInMs*100 << " u_y:" << u_center.y ;
+        cout << " evp temp:" << evp_temp << endl << flush;
+    }
 
     v->getCurrentState()->q_v = q_v;
     v->getCurrentState()->q_c = q_c;
