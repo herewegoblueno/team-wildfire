@@ -49,17 +49,17 @@ std::vector<std::unique_ptr<CS123Shader>> *BasicFireScene::getShaderPrograms(){
 }
 
 void BasicFireScene::render(SupportCanvas3D *context) {
-    Voxel* v = voxelGrid.getVoxel(8, 2, 16);
-    v->getLastFrameState()->temperature = 200;
+    Voxel* v = voxelGrid.getVoxel(8, 4, 16);
+    v->getLastFrameState()->temperature = 20;
     v->getLastFrameState()->q_v = 0.01;
-    v = voxelGrid.getVoxel(8, 2, 15);
-    v->getLastFrameState()->temperature = 200;
+    v = voxelGrid.getVoxel(8, 4, 15);
+    v->getLastFrameState()->temperature = 20;
     v->getLastFrameState()->q_v = 0.01;
-    v = voxelGrid.getVoxel(9, 2, 16);
-    v->getLastFrameState()->temperature = 200;
+    v = voxelGrid.getVoxel(9, 4, 16);
+    v->getLastFrameState()->temperature = 20;
     v->getLastFrameState()->q_v = 0.01;
-    v = voxelGrid.getVoxel(9, 2, 15);
-    v->getLastFrameState()->temperature = 200;
+    v = voxelGrid.getVoxel(9, 4, 15);
+    v->getLastFrameState()->temperature = 20;
     v->getLastFrameState()->q_v = 0.01;
     simulator.step(&voxelGrid);
 

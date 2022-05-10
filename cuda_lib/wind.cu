@@ -190,9 +190,9 @@ void vorticityKernel(double* su_xyz, int* id_xyz, double* tu_xyz, double* vortic
             dvor_x /= len; dvor_y /= len; dvor_z /= len;
 //            printf("(%f,%f,%f)-[%f]",dvor_x,dvor_y,dvor_z,len);
 
-            dst_u[0] = src_u[0] + (dvor_y*vor_z - dvor_z*vor_y)*cell_size*dt*0.01;
-            dst_u[1] = src_u[1] + (dvor_z*vor_x - dvor_x*vor_z)*cell_size*dt*0.01;
-            dst_u[2] = src_u[2] + (dvor_x*vor_y - dvor_y*vor_x)*cell_size*dt*0.01;
+            dst_u[0] = src_u[0] + (dvor_y*vor_z - dvor_z*vor_y)*cell_size*dt*1;
+            dst_u[1] = src_u[1] + (dvor_z*vor_x - dvor_x*vor_z)*cell_size*dt*1;
+            dst_u[2] = src_u[2] + (dvor_x*vor_y - dvor_y*vor_x)*cell_size*dt*1;
             if(x==8 && y==0 && z==15)
             {
                  printf("=>V(%f, %f, %f)", dst_u[0], dst_u[1], dst_u[2]);
