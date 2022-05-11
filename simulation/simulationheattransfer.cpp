@@ -50,6 +50,11 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
         v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt * deltaTimeInMs / 1000.0;
     }
 
+    if(v->getCurrentState()->temperature>100)
+    {
+        std::cout << "error";
+    }
+
     v->getCurrentState()->tempGradientFromPrevState = tempGradientInfo.gradient;
     v->getCurrentState()->tempLaplaceFromPrevState = tempGradientInfo.laplace;
 

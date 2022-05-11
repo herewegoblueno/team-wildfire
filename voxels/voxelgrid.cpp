@@ -107,6 +107,9 @@ VoxelPhysicalData VoxelGrid::getStateInterpolatePoint(vec3 point){
     out.u.x = (1-xd)*getVel(xIndex-1, yIndex, zIndex, 0) + xd*getVel(xIndex, yIndex, zIndex, 0);
     out.u.y = (1-yd)*getVel(xIndex, yIndex-1, zIndex, 1) + yd*getVel(xIndex, yIndex, zIndex, 1);
     out.u.z = (1-zd)*getVel(xIndex, yIndex, zIndex-1, 2) + zd*getVel(xIndex, yIndex, zIndex, 2);
+    if (xIndex==0 || xIndex==resolution-1) out.u.x=0;
+    if (yIndex==0 || yIndex==resolution-1) out.u.y=0;
+    if (zIndex==0 || zIndex==resolution-1) out.u.z=0;
     return out;
 }
 

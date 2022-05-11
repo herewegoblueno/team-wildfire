@@ -86,8 +86,8 @@ linux {
     CUDA_DIR = "/usr/local/cuda"
     SYSTEM_NAME = x64                 # Depending on your system either 'Win32', 'x64', or 'Win64'
     SYSTEM_TYPE = 64                    # '32' or '64', depending on your system
-    CUDA_ARCH = compute_61
-    CUDA_CODE = SM_61               # Type of CUDA architecture
+    CUDA_ARCH = compute_75
+    CUDA_CODE = SM_75              # Type of CUDA architecture
     NVCC_OPTIONS = --use_fast_math
 
     # include paths
@@ -96,9 +96,9 @@ linux {
                    $$CUDA_DIR/../shared/inc
 
     # library directories
-    QMAKE_LIBDIR += $$CUDA_DIR/lib64/$$SYSTEM_NAME \
-                    $$CUDA_DIR/common/lib64/$$SYSTEM_NAME \
-                    $$CUDA_DIR/../shared/lib64/$$SYSTEM_NAME
+    QMAKE_LIBDIR += $$CUDA_DIR/lib64 \
+                    $$CUDA_DIR/common/lib64 \
+                    $$CUDA_DIR/../shared/lib64
 
     # The following makes sure all path names (which often include spaces) are put between quotation marks
     CUDA_INC = $$join(INCLUDEPATH,'" -I"','-I"','"')
