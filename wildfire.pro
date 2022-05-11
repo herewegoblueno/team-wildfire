@@ -185,7 +185,8 @@ RESOURCES += \
 
 DISTFILES += \
     xmlScenes/basicScene.xml \
-    xmlScenes/twoRegions.xml
+    xmlScenes/twoRegions.xml \
+    xmlScenes/twoRegionsCloser.xml
 
 # For Eigen, see readme for more details
 macx {
