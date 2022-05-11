@@ -26,8 +26,8 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
     // first pass
     double dTdt = heat_diffusion_intensity * tempGradientInfo.laplace;
     dTdt -= radiative_cooling * pow(differenceFromAmbience, 4) * ((differenceFromAmbience > 0) ? 1 : -1);
-    dTdt -= glm::dot(tempGradientInfo.gradient_pos, v->getLastFrameState()->u)*0.5;
-    dTdt -= glm::dot(tempGradientInfo.gradient_neg, v->getNegfaceVel())*0.5;
+    dTdt -= glm::dot(tempGradientInfo.gradient_pos, v->getLastFrameState()->u)*0.5*10;
+    dTdt -= glm::dot(tempGradientInfo.gradient_neg, v->getNegfaceVel())*0.5*10;
     dTdt -= module_to_air_diffusion * dMdt;
 
     if (settings.useMidpointForVoxelHeatTransfer){
@@ -48,6 +48,11 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
         v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt2 * deltaTimeInMs / 1000.0;
     }else{
         v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt * deltaTimeInMs / 1000.0;
+    }
+
+    if(v->getCurrentState()->temperature>100)
+    {
+        std::cout << "error";
     }
 
     v->getCurrentState()->tempGradientFromPrevState = tempGradientInfo.gradient;

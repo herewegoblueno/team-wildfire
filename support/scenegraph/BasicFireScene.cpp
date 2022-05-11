@@ -19,18 +19,18 @@ using namespace CS123::GL;
 
 
 BasicFireScene::BasicFireScene():
-     voxelGrid(VoxelGridDim(vec3(0, 5, 0), 10), 64),
+     voxelGrid(VoxelGridDim(vec3(0, 5, 0), 8), 48),
      fireManager(&voxelGrid)
 {
 
-    Voxel* v = voxelGrid.getVoxel(16, 2, 32);
-    fireManager.addFire(nullptr, vec3(v->centerInWorldSpace), 30);
+    Voxel* v = voxelGrid.getVoxel(8, 2, 16);
+    fireManager.addFire(nullptr, vec3(v->centerInWorldSpace), 15);
 
-    v = voxelGrid.getVoxel(48, 2, 32);
-    fireManager.addFire(nullptr, vec3(v->centerInWorldSpace), 30);
+    v = voxelGrid.getVoxel(24, 2, 16);
+    fireManager.addFire(nullptr, vec3(v->centerInWorldSpace), 15);
 
 
-    voxelGrid.getVisualization()->toggle(true, true);
+    voxelGrid.getVisualization()->toggle(false, true);
 
     simulator.init();
     constructShaders();
@@ -49,10 +49,18 @@ std::vector<std::unique_ptr<CS123Shader>> *BasicFireScene::getShaderPrograms(){
 }
 
 void BasicFireScene::render(SupportCanvas3D *context) {
-    voxelGrid.getVisualization()->updateValuesFromSettings();
-    Voxel* v = voxelGrid.getVoxel(5, 5, 5);
-    v->getLastFrameState()->temperature = 100;
-    v->getCurrentState()->temperature = 100;
+    Voxel* v = voxelGrid.getVoxel(8, 6, 16);
+    v->getLastFrameState()->temperature = 20;
+    v->getLastFrameState()->q_v = 0.01;
+    v = voxelGrid.getVoxel(8, 6, 15);
+    v->getLastFrameState()->temperature = 20;
+    v->getLastFrameState()->q_v = 0.01;
+    v = voxelGrid.getVoxel(9, 6, 16);
+    v->getLastFrameState()->temperature = 20;
+    v->getLastFrameState()->q_v = 0.01;
+    v = voxelGrid.getVoxel(9, 6, 15);
+    v->getLastFrameState()->temperature = 20;
+    v->getLastFrameState()->q_v = 0.01;
     simulator.step(&voxelGrid);
 
     glClearColor(0.2, 0.2, 0.2, 0.3);
@@ -81,7 +89,8 @@ void BasicFireScene::setShaderSceneUniforms(SupportCanvas3D *context) {
 
 
 void BasicFireScene::settingsChanged() {
-
+    voxelGrid.getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeVectorField);
+    voxelGrid.getVisualization()->updateValuesFromSettings();
 }
 
 

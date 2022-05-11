@@ -5,7 +5,7 @@
 //These are all the relevant tunable physics variables for the simulation
 
 // general
-const double sealevel_temperature = 30;
+const double sealevel_temperature = 20;
 const double sealevel_pressure = 100000;
 const double mass_scale = 1;
 const double height_scale = 1000;
@@ -13,7 +13,7 @@ const double height_scale = 1000;
 // water component related
 const double autoconverge_cloud = 0.001; // alpha A
 const double raindrop_accelerate = 0.01; // K c
-const double evaporation_rate = 0.001; // w
+const double evaporation_rate = 0.0001; // w
 
 // wind component related
 const double vorticity_epsilon = 0.1;
@@ -22,7 +22,7 @@ const double gravity_acceleration = 1;
 const double air_density = 1.225;
 
 // heat transfer
-const double heat_diffusion_intensity = 0.6; //alpha
+const double heat_diffusion_intensity = 0.3; //alpha
 const double radiative_cooling = 0.0002; //gamma
 const double adjacent_module_diffusion = 0.16; // alpha_M
 const double air_to_module_diffusion = 0.75; // b

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1100</width>
+    <width>1151</width>
     <height>800</height>
    </rect>
   </property>
@@ -135,8 +135,8 @@
   <widget class="QDockWidget" name="Dock">
    <property name="minimumSize">
     <size>
-     <width>335</width>
-     <height>575</height>
+     <width>361</width>
+     <height>629</height>
     </size>
    </property>
    <attribute name="dockWidgetArea">
@@ -187,7 +187,7 @@
           <locale language="English" country="UnitedStates"/>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="forestTab">
           <attribute name="title">
@@ -429,15 +429,15 @@
            <item>
             <widget class="QToolBox" name="forestToolBox">
              <property name="currentIndex">
-              <number>3</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="ForestVisualization">
               <property name="geometry">
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>304</width>
-                <height>351</height>
+                <width>326</width>
+                <height>256</height>
                </rect>
               </property>
               <attribute name="label">
@@ -449,7 +449,7 @@
                  <x>130</x>
                  <y>30</y>
                  <width>103</width>
-                 <height>42</height>
+                 <height>51</height>
                 </rect>
                </property>
                <layout class="QVBoxLayout" name="forestVisualizationEyeYSliderSuperParent">
@@ -486,7 +486,7 @@
                  <x>10</x>
                  <y>80</y>
                  <width>103</width>
-                 <height>42</height>
+                 <height>51</height>
                 </rect>
                </property>
                <layout class="QVBoxLayout" name="forestVisualizationEyeZSliderSuperParent">
@@ -523,7 +523,7 @@
                  <x>10</x>
                  <y>30</y>
                  <width>103</width>
-                 <height>42</height>
+                 <height>51</height>
                 </rect>
                </property>
                <layout class="QVBoxLayout" name="forestVisualizationEyeXSliderSuperParent">
@@ -560,7 +560,7 @@
                  <x>130</x>
                  <y>80</y>
                  <width>103</width>
-                 <height>42</height>
+                 <height>51</height>
                 </rect>
                </property>
                <layout class="QVBoxLayout" name="forestVisualizationEyeRSliderSuperParent">
@@ -659,8 +659,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>304</width>
-                <height>351</height>
+                <width>98</width>
+                <height>28</height>
                </rect>
               </property>
               <attribute name="label">
@@ -847,8 +847,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>304</width>
-                <height>351</height>
+                <width>98</width>
+                <height>28</height>
                </rect>
               </property>
               <attribute name="label">
@@ -1034,6 +1034,14 @@
               </widget>
              </widget>
              <widget class="QWidget" name="OtherForestSettings">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>98</width>
+                <height>28</height>
+               </rect>
+              </property>
               <attribute name="label">
                <string>Other Settings</string>
               </attribute>
@@ -1115,7 +1123,238 @@
              <height>469</height>
             </rect>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_4"/>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QToolBox" name="fireToolBox">
+              <property name="currentIndex">
+               <number>0</number>
+              </property>
+              <widget class="QWidget" name="ForestVisualization_2">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>0</y>
+                 <width>243</width>
+                 <height>412</height>
+                </rect>
+               </property>
+               <attribute name="label">
+                <string>Voxel + Wind Visualization Options</string>
+               </attribute>
+               <widget class="QWidget" name="verticalLayoutWidget_6">
+                <property name="geometry">
+                 <rect>
+                  <x>130</x>
+                  <y>30</y>
+                  <width>103</width>
+                  <height>51</height>
+                 </rect>
+                </property>
+                <layout class="QVBoxLayout" name="forestVisualizationEyeYSliderSuperParent_2">
+                 <item>
+                  <layout class="QHBoxLayout" name="forestVisualizationEyeYSliderParent_2">
+                   <item>
+                    <widget class="QLabel" name="forestVisualizationEyeYLabel_2">
+                     <property name="text">
+                      <string>Y</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QSlider" name="forestVisualizationEyeYSlider_2">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="forestVisualizationEyeYValue_2">
+                   <property name="text">
+                    <string>0</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="verticalLayoutWidget_7">
+                <property name="geometry">
+                 <rect>
+                  <x>10</x>
+                  <y>80</y>
+                  <width>103</width>
+                  <height>51</height>
+                 </rect>
+                </property>
+                <layout class="QVBoxLayout" name="forestVisualizationEyeZSliderSuperParent_2">
+                 <item>
+                  <layout class="QHBoxLayout" name="forestVisualizationEyeZSliderParent_2">
+                   <item>
+                    <widget class="QLabel" name="forestVisualizationEyeZLabel_2">
+                     <property name="text">
+                      <string>Z</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QSlider" name="forestVisualizationEyeZSlider_2">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="forestVisualizationEyeZValue_2">
+                   <property name="text">
+                    <string>0</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="verticalLayoutWidget_8">
+                <property name="geometry">
+                 <rect>
+                  <x>10</x>
+                  <y>30</y>
+                  <width>103</width>
+                  <height>51</height>
+                 </rect>
+                </property>
+                <layout class="QVBoxLayout" name="forestVisualizationEyeXSliderSuperParent_2">
+                 <item>
+                  <layout class="QHBoxLayout" name="forestVisualizationEyeXSliderParent_2">
+                   <item>
+                    <widget class="QLabel" name="forestVisualizationEyeXLabel_2">
+                     <property name="text">
+                      <string>X</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QSlider" name="forestVisualizationEyeXSlider_2">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="forestVisualizationEyeXValue_2">
+                   <property name="text">
+                    <string>0</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="verticalLayoutWidget_9">
+                <property name="geometry">
+                 <rect>
+                  <x>130</x>
+                  <y>80</y>
+                  <width>103</width>
+                  <height>51</height>
+                 </rect>
+                </property>
+                <layout class="QVBoxLayout" name="forestVisualizationEyeRSliderSuperParent_2">
+                 <item>
+                  <layout class="QHBoxLayout" name="forestVisualizationEyeRSliderParent_2">
+                   <item>
+                    <widget class="QLabel" name="forestVisualizationEyeRLabel_2">
+                     <property name="text">
+                      <string>R</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QSlider" name="forestVisualizationEyeRSlider_2">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="forestVisualizationEyeRValue_2">
+                   <property name="text">
+                    <string>0</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="verticalLayoutWidget_10">
+                <property name="geometry">
+                 <rect>
+                  <x>50</x>
+                  <y>150</y>
+                  <width>160</width>
+                  <height>80</height>
+                 </rect>
+                </property>
+                <layout class="QVBoxLayout" name="forestVisualizationTemperatureSuperParent_2">
+                 <item>
+                  <widget class="QLabel" name="forestVisualizationTemperatureLabel_2">
+                   <property name="text">
+                    <string>Temperature Range</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_12">
+                   <item>
+                    <widget class="QLabel" name="forestVisualizationTemperatureMinValue_2">
+                     <property name="text">
+                      <string>0</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="forestVisualizationTemperatureMaxValue_2">
+                     <property name="text">
+                      <string>0</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <widget class="ctkRangeSlider" name="visualizationTemperatureRangeSlider_2">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QLabel" name="visualizationEyePosition_2">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>269</width>
+                  <height>16</height>
+                 </rect>
+                </property>
+                <property name="font">
+                 <font>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Eye Position For Visualization</string>
+                </property>
+               </widget>
+              </widget>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </widget>
         </widget>
