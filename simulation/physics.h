@@ -33,6 +33,7 @@ const double min_combust_temp_cel = 150.0; // T_0
 const double max_combust_temp_cel = 450.0; // T_1
 const double max_wind_combustion_boost = 1.5; // n_max
 const double speed_for_max_wind_boost = 1.0; // u_ref
+const double vapor_release_ratio = 0.1;
 const double reation_rate_multiplier = 1.0; //Not in paper, added by us
 
 //Voxels

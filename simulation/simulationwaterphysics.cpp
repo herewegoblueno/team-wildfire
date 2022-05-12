@@ -64,24 +64,18 @@ void Simulator::stepVoxelWater(Voxel* v, double deltaTimeInMs)
 
     float evp_temp = 2.5/c_th_p/0.287*mole_fraction(-std::min(q_vs-q_v, q_c));
 
-    if(v->XIndex==8 && v->YIndex==2 && v->ZIndex==15)
-    {
-        cout << "q_v change:" << glm::dot(grad_v, u_center)*deltaTimeInMs*100 << " u_y:" << u_center.y ;
-        cout << " evp temp:" << evp_temp << endl << flush;
-    }
+//    if(v->XIndex==8 && v->YIndex==2 && v->ZIndex==15)
+//    {
+//        cout << "q_v change:" << glm::dot(grad_v, u_center)*deltaTimeInMs*100 << " u_y:" << u_center.y ;
+//        cout << " evp temp:" << evp_temp << endl << flush;
+//    }
 
     v->getCurrentState()->q_v = q_v;
     v->getCurrentState()->q_c = q_c;
     v->getCurrentState()->q_r = q_r;
     v->getCurrentState()->humidity = std::min(q_v,0.093)/10/saturate(abs_pres, ambient_temperature);
     v->getCurrentState()->temperature += evp_temp;
-    if(v->YIndex==resolution-5)
-    {
-        if(v->getCurrentState()->humidity>0.2)
-        {
-            cout<<"";
-        }
-    }
+
 }
 
 

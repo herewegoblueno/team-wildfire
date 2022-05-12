@@ -20,6 +20,8 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
     double dMdt = 0.0;
     for (Module *m : nearbyModules) dMdt += m->getCurrentState()->massChangeRateFromLastFrame;
 
+    // Vapor release
+    v->getLastFrameState()->q_v += dMdt*vapor_release_ratio*deltaTimeInMs/1000.0;
     double temperature_save = v->getLastFrameState()->temperature;
 
     // Midpoint Integration
