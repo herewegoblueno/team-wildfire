@@ -73,15 +73,7 @@ void CloudManager::draw()
 
 
     m_shader->bind();
-    // bind texture (though currently it's not even used in the shader since it doesn't work on Mac)
-    TextureParametersBuilder builder;
-    builder.setFilter(TextureParameters::FILTER_METHOD::LINEAR);
-    builder.setWrap(TextureParameters::WRAP_METHOD::REPEAT);
 
-    TextureParameters parameters = builder.build();
-    parameters.applyTo(*m_texture);
-    std::string filename = "sprite";
-    m_shader->setTexture(filename, *m_texture);
     m_shader->setUniform("scale", scale);
     m_shader->setUniform("p", p);
     m_shader->setUniform("v", v);

@@ -23,7 +23,11 @@ const double air_density = 1.225;
 
 // heat transfer
 const double heat_diffusion_intensity = 0.3; //alpha
-const double radiative_cooling = 0.0002; //gamma
+#ifdef CUDA_FLUID
+    const double radiative_cooling = 0.0002; //gamma
+#else
+    const double radiative_cooling = 0.0004; //gamma
+#endif
 const double adjacent_module_diffusion = 0.16; // alpha_M
 const double air_to_module_diffusion = 0.75; // b
 const double module_to_air_diffusion = 200; // tau

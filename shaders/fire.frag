@@ -3,8 +3,6 @@ in vec2 TexCoords;
 in float Temperature;
 out vec4 color;
 
-uniform sampler2D sprite;
-
 float rand(vec2 co){return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);}
 float rand (vec2 co, float l) {return rand(vec2(rand(co), l));}
 float rand (vec2 co, float l, float t) {return rand(vec2(rand(co, l), t));}
@@ -43,7 +41,6 @@ void main()
     else if(rel_temperature>3.0) color = vec4(0.9, 0.05, 0.0, 1);
     else color = vec4(0.8, 0, 0, 1);
 
-    //For some reason this isn't working on Mac....
     float guage = (0.1 + 0.5*rel_temperature/5)*(0.1 + 0.5*rel_temperature/5);
     float w = perlin(TexCoords, 2.5, 0.0);
     color.a = (w*0.5 + 0.5)*(0.25-f);

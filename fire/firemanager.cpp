@@ -41,7 +41,6 @@ FireManager::FireManager(VoxelGrid *grid) :
     CS123::GL::VBO vbo(particle_quad.data(), 20, attribs, VBO::GEOMETRY_LAYOUT::LAYOUT_TRIANGLE_STRIP);
     m_quad->m_VAO = std::make_unique<VAO>(vbo, 4);
 
-
     QImage img(":/textures/fire2.png");
     QImage gl_img = QGLWidget::convertToGLFormat(img);
     m_texture = std::make_unique<Texture2D>(gl_img.bits(), gl_img.width(), gl_img.height());
@@ -101,7 +100,6 @@ void FireManager::drawFires(float time, bool smoke)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
     m_fireshader->bind();
-    // bind texture (though currently it's not even used in the shader since it doesn't work on Mac)
     TextureParametersBuilder builder;
     builder.setFilter(TextureParameters::FILTER_METHOD::LINEAR);
     builder.setWrap(TextureParameters::WRAP_METHOD::REPEAT);

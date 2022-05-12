@@ -66,7 +66,7 @@ void BasicFireScene::render(SupportCanvas3D *context) {
 
     fireManager.setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
     fireManager.setScale(0.03, 0.05);
-    fireManager.drawFires(10, false);
+    fireManager.drawFires(10, settings.boolRenderSmoke);
 
     cloudManager.setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
     cloudManager.setScale(0.5);
