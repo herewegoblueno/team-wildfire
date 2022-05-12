@@ -27,8 +27,10 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
     int gridResolution = grid->getResolution();
     assert(gridResolution % NUMBER_OF_SIMULATION_THREADS == 0);
     int jumpPerThread = gridResolution / NUMBER_OF_SIMULATION_THREADS;
+    std::vector<std::thread> threads;
 
-    mallocHost2cuda(grid);
+    mallocHost2cuda(grid); //No-op if CUDA isn't active
+
     if (forest != nullptr){ //Forest is optional
         forest->updateMassAndAreaOfModulesViaBurning(deltaTime);
         //TODO: refactor a bit (better encapsulation maybe)
@@ -40,10 +42,10 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
         forest->updateMassOfVoxels();
     }
 
-    std::vector<std::thread> threads;
     for (int x = 0; x < gridResolution; x += jumpPerThread)
-        threads.emplace_back(&Simulator::stepThreadHandler, this, grid, forest, deltaTime, gridResolution, x, x + jumpPerThread);
+        threads.emplace_back(&Simulator::stepThreadHeatHandler, this, grid, forest, deltaTime, gridResolution, x, x + jumpPerThread);
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
+
 
 #ifdef CUDA_FLUID
     dvec3 g_w = grid->getGlobalFField();
@@ -51,11 +53,12 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
     processWindGPU(host2cuda.grid_temp, host2cuda.grid_q_v, host2cuda.grid_h, host2cuda.u_xyz, host2cuda.id_xyz,
                    64, g_w3, gridResolution, grid->cellSideLengthForGradients(), deltaTime/1000.);
     threads.clear();
-
 #endif
+
     for (int x = 0; x < gridResolution; x += jumpPerThread)
-        threads.emplace_back(&Simulator::stepCuda2hostThreadHandler, this, grid, forest, deltaTime, gridResolution, x, x + jumpPerThread);
+        threads.emplace_back(&Simulator::stepThreadWaterHandler, this, grid, forest, deltaTime, gridResolution, x, x + jumpPerThread);
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
+
     if (forest != nullptr){ //Forest is optional
         //This should be the last step of the simulation
         //We want the actual step to be based on last frame's mapping, but we want the scene's rendering
@@ -63,26 +66,26 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
         //(so the users see the most up to date state)
         forest->updateModuleVoxelMapping();
     }
-    freeHost2cuda();
+
+    freeHost2cuda(); //No-op if CUDA isn't active
 }
 
 
 
-void Simulator::stepThreadHandler(VoxelGrid *grid ,Forest * forest, int deltaTime, int resolution, int minXInclusive, int maxXExclusive){
+void Simulator::stepThreadHeatHandler(VoxelGrid *grid ,Forest * forest, int deltaTime, int resolution, int minXInclusive, int maxXExclusive){
     for (int x = minXInclusive; x < maxXExclusive; x++){
         for (int y = 0; y < resolution; y++){
             for (int z = 0; z < resolution; z++){
-                //<TODO: voxel water updates should go here>
                 Voxel *v = grid->getVoxel(x, y, z);
                 ModuleSet nearbyModules = forest == nullptr ? ModuleSet() : forest->getModulesMappedToVoxel(v);
                 stepVoxelHeatTransfer(v, nearbyModules, deltaTime);
-                writeHost2cudaSpace(v, x*resolution*resolution+y*resolution+z);
+                writeHost2cudaSpace(v, x*resolution*resolution+y*resolution+z); //No-op if CUDA isn't active
             }
         }
     }
 }
 
-void Simulator::stepCuda2hostThreadHandler(VoxelGrid *grid ,Forest * forest, int deltaTime, int resolution,
+void Simulator::stepThreadWaterHandler(VoxelGrid *grid ,Forest * forest, int deltaTime, int resolution,
                                            int minXInclusive, int maxXExclusive){
     int index;
     for (int x = minXInclusive; x < maxXExclusive; x++){

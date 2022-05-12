@@ -32,8 +32,6 @@ void Simulator::stepVoxelWater(Voxel* v, double deltaTimeInMs)
     if(v->YIndex==1) // random evaporation from land
     {
         grad_v.y = -(3*std::sin(v->XIndex*3) + 1*std::sin(v->ZIndex*5) + 0.5*std::sin(v->ZIndex*7)+4.5)/cell_size;
-//        v->getCurrentState()->temperature += (3*std::sin(v->XIndex*3) + 1*std::sin(v->ZIndex*5)
-//                                              + 0.5*std::sin(v->ZIndex*7)+4.5)*0.01;
     }
 
 
@@ -63,12 +61,6 @@ void Simulator::stepVoxelWater(Voxel* v, double deltaTimeInMs)
 
 
     float evp_temp = 2.5/c_th_p/0.287*mole_fraction(-std::min(q_vs-q_v, q_c));
-
-//    if(v->XIndex==8 && v->YIndex==2 && v->ZIndex==15)
-//    {
-//        cout << "q_v change:" << glm::dot(grad_v, u_center)*deltaTimeInMs*100 << " u_y:" << u_center.y ;
-//        cout << " evp temp:" << evp_temp << endl << flush;
-//    }
 
     v->getCurrentState()->q_v = q_v;
     v->getCurrentState()->q_c = q_c;

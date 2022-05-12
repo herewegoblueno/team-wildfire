@@ -4,7 +4,6 @@ DESTDIR = ../bin
 CUDA_OBJECTS_DIR = ./
 
 CUDA_SOURCES += \
-    $$PWD/jacobi.cu \
     $$PWD/base_op.cu \
     $$PWD/info.cu \
     $$PWD/wind.cu

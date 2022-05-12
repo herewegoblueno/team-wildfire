@@ -32,8 +32,8 @@ public:
 private:
     milliseconds timeLastFrame;
     float timeSinceLastFrame;
-    void stepThreadHandler(VoxelGrid *grid, Forest *forest, int deltaTime, int resolution, int minX, int maxX);
-    void stepCuda2hostThreadHandler(VoxelGrid *grid ,Forest * forest, int deltaTime, int resolution,
+    void stepThreadHeatHandler(VoxelGrid *grid, Forest *forest, int deltaTime, int resolution, int minX, int maxX);
+    void stepThreadWaterHandler(VoxelGrid *grid ,Forest * forest, int deltaTime, int resolution,
                                                                        int minXInclusive, int maxXExclusive);
     void stepCleanupThreadHandler(VoxelGrid *grid, Forest *forest, int resolution, int minX, int maxX);
 

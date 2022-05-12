@@ -4,7 +4,7 @@
 #include "support/Settings.h"
 
 //eq 21 in Fire in Paradise paper
-//TODO: add in water term
+//(the water term is handled in the water physics part of the simulation)
 void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int deltaTimeInMs){
     VoxelTemperatureGradientInfo tempGradientInfo = v->getTemperatureGradientInfoFromPreviousFrame();
 
@@ -16,16 +16,18 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
     double differenceFromAmbience = clamp(
                 v->getLastFrameState()->temperature - v->getAmbientTemperature(),
                 -differenceFromAmbienceCap, differenceFromAmbienceCap);
+
     //Mass loss is considered precomputed
     double dMdt = 0.0;
     for (Module *m : nearbyModules) dMdt += m->getCurrentState()->massChangeRateFromLastFrame;
 
-    // Vapor release
+    // Vapor release (the rest of the workon q_v will be done in the dedicated water physics part of the simulation)
     v->getLastFrameState()->q_v += dMdt*vapor_release_ratio*deltaTimeInMs/1000.0;
-    double temperature_save = v->getLastFrameState()->temperature;
+
 
     // Midpoint Integration
     // first pass
+    double temperature_save = v->getLastFrameState()->temperature;
     double dTdt = heat_diffusion_intensity * tempGradientInfo.laplace;
     dTdt -= radiative_cooling * pow(differenceFromAmbience, 4) * ((differenceFromAmbience > 0) ? 1 : -1);
     dTdt -= glm::dot(tempGradientInfo.gradient_pos, v->getLastFrameState()->u)*0.5*10;
