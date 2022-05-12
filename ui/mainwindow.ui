@@ -187,7 +187,7 @@
           <locale language="English" country="UnitedStates"/>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="forestTab">
           <attribute name="title">
@@ -348,6 +348,11 @@
                 <item>
                  <property name="text">
                   <string>Water Content</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Humudity</string>
                  </property>
                 </item>
                </widget>

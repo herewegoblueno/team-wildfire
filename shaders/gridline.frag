@@ -33,13 +33,19 @@ void main()
         }
 
     }else if (propType == 2){ //Coloring based on water content
-            alpha = 1;
+        alpha = 1;
 
-            //qv + qc + qr <= 1
-            if (!renderingVectorField){
-                FragColor = vec4(prop, secondProp, 0, alpha); //red, yellow, green
-            }
+        //qv + qc + qr <= 1
+        if (!renderingVectorField){
+            FragColor = vec4(prop, secondProp, 0, alpha); //red, yellow, green
         }
+    }else if (propType == 2){ //Coloring based on humidity
+        alpha = 1;
+
+        if (!renderingVectorField){
+            FragColor = vec4(0, 0, prop, alpha);
+        }
+    }
 
     if (renderingGridBoundary) FragColor = vec4(1, 1, 1, 1); //white
     if (renderingVectorField) FragColor = vec4(0, 1, 1, alpha); //cyan

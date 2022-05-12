@@ -68,6 +68,7 @@ void Fire::setSize(float size) {
 
 void Fire::update_particles(float timeStep)
 {
+    if (timeStep == 0) return;
     unsigned int nr_new_particles = m_respawn_num;
     // add new particles
     for (unsigned int i = 0; i < nr_new_particles; ++i)

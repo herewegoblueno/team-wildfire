@@ -43,6 +43,7 @@ Smoke::~Smoke()
 
 void Smoke::update_particles(float timeStep)
 {
+    if (timeStep == 0) return;
     // update all particles
     for (unsigned int i = 0; i < m_density; ++i)
     {

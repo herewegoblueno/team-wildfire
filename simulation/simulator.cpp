@@ -7,6 +7,7 @@
 
 
 const int Simulator::NUMBER_OF_SIMULATION_THREADS = 8;
+const int Simulator::MAX_TIMESTEP_MS_ALLOWED = 50;
 
 Simulator::Simulator() {}
 
@@ -17,7 +18,7 @@ void Simulator::init(){
 void Simulator::step(VoxelGrid *grid, Forest *forest){
     milliseconds currentTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
     int deltaTime = (currentTime - timeLastFrame).count();
-    if (deltaTime > 100) deltaTime = 100;
+    if (deltaTime > MAX_TIMESTEP_MS_ALLOWED) deltaTime = MAX_TIMESTEP_MS_ALLOWED;
     deltaTime *= settings.simulatorTimescale;
     timeSinceLastFrame = deltaTime;
     timeLastFrame = currentTime;

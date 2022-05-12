@@ -217,6 +217,8 @@ void VoxelGridLine::renderVoxel(Voxel *vox, bool renderingInEyeMode){
         }else if (voxelMode == WATER){
             shader->setUniform("prop", (float)(vox->getCurrentState()->q_v*80));
             shader->setUniform("secondProp", (float)vox->getCurrentState()->q_c*80);
+        }else if (voxelMode == HUMIDITY){
+            shader->setUniform("prop", (float)(vox->getCurrentState()->humidity));
         }
         shader->setUniform("renderingVectorField", false);
         glDrawArrays(GL_LINES, 0, pointsReservedForVoxels);
@@ -279,5 +281,7 @@ std::string VoxelGridLine::getVoxelFieldModeExplanation(VoxelVisualizationModes 
         return "Scale: Cyan (--) -> Blue (-) -> Red (+) -> Magenta (++)";
      case WATER:
         return "Red -> more water vapor. Green -> more condensed water";
+    case HUMIDITY:
+       return "More blue -> more humid";
     }
 }

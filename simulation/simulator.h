@@ -22,6 +22,7 @@ class Simulator
 {
 public:
     static const int NUMBER_OF_SIMULATION_THREADS;
+    static const int MAX_TIMESTEP_MS_ALLOWED;
 
     Simulator();
     void init();
