@@ -15,6 +15,7 @@
     <qresource prefix="/xmlScenes">
         <file>xmlScenes/basicScene.xml</file>
         <file>xmlScenes/twoRegions.xml</file>
+        <file>xmlScenes/twoRegionsCloser.xml</file>
     </qresource>
     <qresource prefix="/textures">
         <file alias="fire.png">fire/fire_particle.jpg</file>

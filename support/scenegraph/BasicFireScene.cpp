@@ -35,10 +35,6 @@ BasicFireScene::~BasicFireScene()
 
 void BasicFireScene::constructShaders() {
 
-    cloudCube = std::make_unique<Cube>(1,1);
-    std::string vertexSource = ResourceLoader::loadResourceFileToString(":/shaders/cloud.vert");
-    std::string fragmentSource = ResourceLoader::loadResourceFileToString(":/shaders/cloud.frag");
-    _cloudShader = std::make_unique<CS123Shader>(vertexSource, fragmentSource);
 }
 
 std::vector<std::unique_ptr<CS123Shader>> *BasicFireScene::getShaderPrograms(){

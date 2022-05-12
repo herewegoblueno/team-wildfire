@@ -27,7 +27,6 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
     int gridResolution = grid->getResolution();
     assert(gridResolution % NUMBER_OF_SIMULATION_THREADS == 0);
     int jumpPerThread = gridResolution / NUMBER_OF_SIMULATION_THREADS;
-    std::vector<std::thread> threads;
 
     mallocHost2cuda(grid); //No-op if CUDA isn't active
 
@@ -42,6 +41,7 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
         forest->updateMassOfVoxels();
     }
 
+    std::vector<std::thread> threads;
     for (int x = 0; x < gridResolution; x += jumpPerThread)
         threads.emplace_back(&Simulator::stepThreadHeatHandler, this, grid, forest, deltaTime, gridResolution, x, x + jumpPerThread);
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
@@ -52,11 +52,11 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
     double g_w3[3] = {g_w.x, g_w.y, g_w.z};
     processWindGPU(host2cuda.grid_temp, host2cuda.grid_q_v, host2cuda.grid_h, host2cuda.u_xyz, host2cuda.id_xyz,
                    64, g_w3, gridResolution, grid->cellSideLengthForGradients(), deltaTime/1000.);
-    threads.clear();
 #endif
 
+    threads.clear();
     for (int x = 0; x < gridResolution; x += jumpPerThread)
-        threads.emplace_back(&Simulator::stepThreadWaterHandler, this, grid, forest, deltaTime, gridResolution, x, x + jumpPerThread);
+        threads.emplace_back(&Simulator::stepThreadWaterHandler, this, grid, deltaTime, gridResolution, x, x + jumpPerThread);
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
 
     if (forest != nullptr){ //Forest is optional
@@ -85,8 +85,7 @@ void Simulator::stepThreadHeatHandler(VoxelGrid *grid ,Forest * forest, int delt
     }
 }
 
-void Simulator::stepThreadWaterHandler(VoxelGrid *grid ,Forest * forest, int deltaTime, int resolution,
-                                           int minXInclusive, int maxXExclusive){
+void Simulator::stepThreadWaterHandler(VoxelGrid *grid, int deltaTime, int resolution, int minXInclusive, int maxXExclusive){
     int index;
     for (int x = minXInclusive; x < maxXExclusive; x++){
         index = x*resolution*resolution;

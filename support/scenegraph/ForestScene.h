@@ -15,6 +15,8 @@
 #include "simulation/simulator.h"
 #include <unordered_map>
 #include <QMouseEvent>
+#include "fire/cloudmanager.h"
+#include "support/shapes/Cube.h"
 
 const int numTrees = 100;
 const float forestHeight = 10;
@@ -68,6 +70,7 @@ private:
     std::unique_ptr<VoxelGrid> _voxelGrid;
     std::unique_ptr<Simulator> _simulator;
     std::unique_ptr<FireManager> _fireManager;
+    std::unique_ptr<CloudManager> _cloudManager;
 
     void changeTemperatureOfModulesAroundTemp(glm::vec3 center, double delta);
     void changeCursorBasedOnKeyboard(Qt::KeyboardModifiers mod);

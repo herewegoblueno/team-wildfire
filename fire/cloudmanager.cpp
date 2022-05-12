@@ -54,8 +54,6 @@ CloudManager::CloudManager(VoxelGrid *grid) :
 }
 
 
-
-
 void CloudManager::setCamera(glm::mat4 projection, glm::mat4 view)
 {
     p = projection;
@@ -71,11 +69,8 @@ void CloudManager::draw()
 {
     glEnable(GL_BLEND);
     glDepthMask(GL_FALSE);
-//    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//    glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
-//    glBlendFunc(GL_ONE, GL_SRC_ALPHA);
-//    glBlendFunc(GL_ONE, GL_ONE);
+
 
     m_shader->bind();
     // bind texture (though currently it's not even used in the shader since it doesn't work on Mac)
@@ -135,8 +130,6 @@ void CloudManager::draw()
 //            m_quad->drawVAO();
 //        }
 //    }
-
-
 
     m_quad->unbindVAO();
 

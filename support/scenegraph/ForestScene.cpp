@@ -36,10 +36,10 @@ ForestScene::~ForestScene()
 void ForestScene::init() {
     VoxelGridDim gridDimensions = computeGridDimensions();
     _voxelGrid = std::make_unique<VoxelGrid>(gridDimensions, 40);
-    _fireManager = std::make_unique<FireManager>(_voxelGrid.get()),
+    _fireManager = std::make_unique<FireManager>(_voxelGrid.get());
+    _cloudManager = std::make_unique<CloudManager>(_voxelGrid.get());
     _voxelGrid->getVisualization()->toggle(settings.visualizeForestVoxelGrid, settings.visualizeVectorField);
-    _forest = std::make_unique<Forest>(_voxelGrid.get(), _fireManager.get(),
-                                       treeRegions, gridDimensions);
+    _forest = std::make_unique<Forest>(_voxelGrid.get(), _fireManager.get(),treeRegions, gridDimensions);
     _lastFrameNumModules = _forest->getAllModuleIDs().size();
     //The forest also initializes the mass of the voxels
     updatePrimitivesFromForest();
@@ -132,6 +132,10 @@ void ForestScene::render(SupportCanvas3D *context) {
     _fireManager->setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
     _fireManager->setScale(0.03, 0.05);
     _fireManager->drawFires(_simulator->getTimeSinceLastFrame()/1000.0, true);
+
+    _cloudManager->setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
+    _cloudManager->setScale(0.5);
+    _cloudManager->draw();
 
     _simulator->cleanupForNextStep(_voxelGrid.get(), _forest.get());
 

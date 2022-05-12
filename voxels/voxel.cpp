@@ -77,7 +77,12 @@ double Voxel::getNeighbourTemperature(int xOffset, int yOffset, int zOffset){
     double temperatureBack = getNeighbourTemperature(0, 0, -1); // -z
     double temperatureMiddle = lastFramePhysicalState.temperature;
 
+#ifdef CUDA_FLUID
+    //Intentionally not using cellSideLengthForGradients since it's stable enough without it
+    double cellSize = grid->cellSideLength();
+#else
     double cellSize = grid->cellSideLengthForGradients();
+#endif
 
     //calculating the ∇T (gradient)
     double yGradient = (temperatureTop - temperatureBottom) / (cellSize * 2);

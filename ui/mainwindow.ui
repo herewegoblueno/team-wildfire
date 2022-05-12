@@ -436,8 +436,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>326</width>
-                <height>256</height>
+                <width>330</width>
+                <height>351</height>
                </rect>
               </property>
               <attribute name="label">
@@ -659,8 +659,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>98</width>
-                <height>28</height>
+                <width>330</width>
+                <height>351</height>
                </rect>
               </property>
               <attribute name="label">
@@ -847,8 +847,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>98</width>
-                <height>28</height>
+                <width>330</width>
+                <height>351</height>
                </rect>
               </property>
               <attribute name="label">
@@ -1038,8 +1038,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>98</width>
-                <height>28</height>
+                <width>330</width>
+                <height>351</height>
                </rect>
               </property>
               <attribute name="label">
@@ -1114,7 +1114,7 @@
             <string>Use Orbiting Camera</string>
            </property>
           </widget>
-          <widget class="QWidget" name="InitializeAndSrc_2" native="true">
+          <widget class="QWidget" name="FireTabMainPanel" native="true">
            <property name="geometry">
             <rect>
              <x>10</x>
@@ -1129,13 +1129,13 @@
               <property name="currentIndex">
                <number>0</number>
               </property>
-              <widget class="QWidget" name="ForestVisualization_2">
+              <widget class="QWidget" name="FireVisualizationOptions">
                <property name="geometry">
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>243</width>
-                 <height>412</height>
+                 <width>247</width>
+                 <height>421</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1150,18 +1150,18 @@
                   <height>51</height>
                  </rect>
                 </property>
-                <layout class="QVBoxLayout" name="forestVisualizationEyeYSliderSuperParent_2">
+                <layout class="QVBoxLayout" name="fireVisualizationEyeYSliderSuperParent">
                  <item>
-                  <layout class="QHBoxLayout" name="forestVisualizationEyeYSliderParent_2">
+                  <layout class="QHBoxLayout" name="fireVisualizationEyeYSliderParent">
                    <item>
-                    <widget class="QLabel" name="forestVisualizationEyeYLabel_2">
+                    <widget class="QLabel" name="fireVisualizationEyeYLabel">
                      <property name="text">
                       <string>Y</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QSlider" name="forestVisualizationEyeYSlider_2">
+                    <widget class="QSlider" name="fireVisualizationEyeYSlider">
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
                      </property>
@@ -1170,7 +1170,7 @@
                   </layout>
                  </item>
                  <item>
-                  <widget class="QLabel" name="forestVisualizationEyeYValue_2">
+                  <widget class="QLabel" name="fireVisualizationEyeYValue">
                    <property name="text">
                     <string>0</string>
                    </property>
@@ -1187,18 +1187,18 @@
                   <height>51</height>
                  </rect>
                 </property>
-                <layout class="QVBoxLayout" name="forestVisualizationEyeZSliderSuperParent_2">
+                <layout class="QVBoxLayout" name="fireVisualizationEyeZSliderSuperParent">
                  <item>
-                  <layout class="QHBoxLayout" name="forestVisualizationEyeZSliderParent_2">
+                  <layout class="QHBoxLayout" name="fireVisualizationEyeZSliderParent">
                    <item>
-                    <widget class="QLabel" name="forestVisualizationEyeZLabel_2">
+                    <widget class="QLabel" name="fireVisualizationEyeZLabel">
                      <property name="text">
                       <string>Z</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QSlider" name="forestVisualizationEyeZSlider_2">
+                    <widget class="QSlider" name="fireVisualizationEyeZSlider">
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
                      </property>
@@ -1207,7 +1207,7 @@
                   </layout>
                  </item>
                  <item>
-                  <widget class="QLabel" name="forestVisualizationEyeZValue_2">
+                  <widget class="QLabel" name="fireVisualizationEyeZValue">
                    <property name="text">
                     <string>0</string>
                    </property>
@@ -1224,18 +1224,18 @@
                   <height>51</height>
                  </rect>
                 </property>
-                <layout class="QVBoxLayout" name="forestVisualizationEyeXSliderSuperParent_2">
+                <layout class="QVBoxLayout" name="fireVisualizationEyeXSliderSuperParent">
                  <item>
-                  <layout class="QHBoxLayout" name="forestVisualizationEyeXSliderParent_2">
+                  <layout class="QHBoxLayout" name="fireVisualizationEyeXSliderParent">
                    <item>
-                    <widget class="QLabel" name="forestVisualizationEyeXLabel_2">
+                    <widget class="QLabel" name="fireVisualizationEyeXLabel">
                      <property name="text">
                       <string>X</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QSlider" name="forestVisualizationEyeXSlider_2">
+                    <widget class="QSlider" name="fireVisualizationEyeXSlider">
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
                      </property>
@@ -1244,7 +1244,7 @@
                   </layout>
                  </item>
                  <item>
-                  <widget class="QLabel" name="forestVisualizationEyeXValue_2">
+                  <widget class="QLabel" name="fireVisualizationEyeXValue">
                    <property name="text">
                     <string>0</string>
                    </property>
@@ -1261,18 +1261,18 @@
                   <height>51</height>
                  </rect>
                 </property>
-                <layout class="QVBoxLayout" name="forestVisualizationEyeRSliderSuperParent_2">
+                <layout class="QVBoxLayout" name="fireVisualizationEyeRSliderSuperParent">
                  <item>
-                  <layout class="QHBoxLayout" name="forestVisualizationEyeRSliderParent_2">
+                  <layout class="QHBoxLayout" name="fireVisualizationEyeRSliderParent">
                    <item>
-                    <widget class="QLabel" name="forestVisualizationEyeRLabel_2">
+                    <widget class="QLabel" name="fireVisualizationEyeRLabel">
                      <property name="text">
                       <string>R</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QSlider" name="forestVisualizationEyeRSlider_2">
+                    <widget class="QSlider" name="fireVisualizationEyeRSlider">
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
                      </property>
@@ -1281,7 +1281,7 @@
                   </layout>
                  </item>
                  <item>
-                  <widget class="QLabel" name="forestVisualizationEyeRValue_2">
+                  <widget class="QLabel" name="fireVisualizationEyeRValue">
                    <property name="text">
                     <string>0</string>
                    </property>
@@ -1298,9 +1298,9 @@
                   <height>80</height>
                  </rect>
                 </property>
-                <layout class="QVBoxLayout" name="forestVisualizationTemperatureSuperParent_2">
+                <layout class="QVBoxLayout" name="fireVisualizationTemperatureSuperParent">
                  <item>
-                  <widget class="QLabel" name="forestVisualizationTemperatureLabel_2">
+                  <widget class="QLabel" name="fireVisualizationTemperatureLabel">
                    <property name="text">
                     <string>Temperature Range</string>
                    </property>
@@ -1309,14 +1309,14 @@
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_12">
                    <item>
-                    <widget class="QLabel" name="forestVisualizationTemperatureMinValue_2">
+                    <widget class="QLabel" name="fireVisualizationTemperatureMinValue">
                      <property name="text">
                       <string>0</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="forestVisualizationTemperatureMaxValue_2">
+                    <widget class="QLabel" name="fireVisualizationTemperatureMaxValue">
                      <property name="text">
                       <string>0</string>
                      </property>
@@ -1325,7 +1325,7 @@
                   </layout>
                  </item>
                  <item>
-                  <widget class="ctkRangeSlider" name="visualizationTemperatureRangeSlider_2">
+                  <widget class="ctkRangeSlider" name="fireVisualizationTemperatureRangeSlider">
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
                    </property>
@@ -1333,7 +1333,7 @@
                  </item>
                 </layout>
                </widget>
-               <widget class="QLabel" name="visualizationEyePosition_2">
+               <widget class="QLabel" name="fireVisualizationEyePosition">
                 <property name="geometry">
                  <rect>
                   <x>0</x>

@@ -32,6 +32,11 @@
      <string>Forest with two clusters</string>
     </property>
    </item>
+   <item>
+    <property name="text">
+     <string>Forest with two clusters (closer)</string>
+    </property>
+   </item>
   </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">

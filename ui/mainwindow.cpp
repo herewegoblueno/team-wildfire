@@ -49,26 +49,26 @@ MainWindow::MainWindow(QWidget *parent) :
     int vizEyeRange = 50;
     ui->forestVisualizationEyeXSlider->setRange(-vizEyeRange, vizEyeRange);
     ui->forestVisualizationEyeXSlider->setValue(settings.visualizeForestVoxelGridEyeX * 10);
-    ui->forestVisualizationEyeYSlider->setRange(-vizEyeRange, vizEyeRange);
+    ui->forestVisualizationEyeYSlider->setRange(-vizEyeRange + 50, vizEyeRange + 50);
     ui->forestVisualizationEyeYSlider->setValue(settings.visualizeForestVoxelGridEyeY * 10);
     ui->forestVisualizationEyeZSlider->setRange(-vizEyeRange, vizEyeRange);
     ui->forestVisualizationEyeZSlider->setValue(settings.visualizeForestVoxelGridEyeZ * 10);
     ui->forestVisualizationEyeRSlider->setRange(0, 30);
     ui->forestVisualizationEyeRSlider->setValue(settings.visualizeForestVoxelGridEyeRadius * 10);
 
-    ui->forestVisualizationEyeXSlider_2->setRange(-vizEyeRange, vizEyeRange);
-    ui->forestVisualizationEyeXSlider_2->setValue(settings.visualizeForestVoxelGridEyeX * 10);
-    ui->forestVisualizationEyeYSlider_2->setRange(-vizEyeRange, vizEyeRange);
-    ui->forestVisualizationEyeYSlider_2->setValue(settings.visualizeForestVoxelGridEyeY * 10);
-    ui->forestVisualizationEyeZSlider_2->setRange(-vizEyeRange, vizEyeRange);
-    ui->forestVisualizationEyeZSlider_2->setValue(settings.visualizeForestVoxelGridEyeZ * 10);
-    ui->forestVisualizationEyeRSlider_2->setRange(0, 30);
-    ui->forestVisualizationEyeRSlider_2->setValue(settings.visualizeForestVoxelGridEyeRadius * 10);
+    ui->fireVisualizationEyeXSlider->setRange(-vizEyeRange, vizEyeRange);
+    ui->fireVisualizationEyeXSlider->setValue(settings.visualizeForestVoxelGridEyeX * 10);
+    ui->fireVisualizationEyeYSlider->setRange(-vizEyeRange + 50, vizEyeRange + 50);
+    ui->fireVisualizationEyeYSlider->setValue(settings.visualizeForestVoxelGridEyeY * 10);
+    ui->fireVisualizationEyeZSlider->setRange(-vizEyeRange, vizEyeRange);
+    ui->fireVisualizationEyeZSlider->setValue(settings.visualizeForestVoxelGridEyeZ * 10);
+    ui->fireVisualizationEyeRSlider->setRange(0, 30);
+    ui->fireVisualizationEyeRSlider->setValue(settings.visualizeForestVoxelGridEyeRadius * 10);
 
     ui->visualizationTemperatureRangeSlider->setRange(-10, 150);
     ui->visualizationTemperatureRangeSlider->setValues(settings.visualizeForestVoxelGridMinTemp * 10, settings.visualizeForestVoxelGridMaxTemp * 10);
-    ui->visualizationTemperatureRangeSlider_2->setRange(-10, 500);
-    ui->visualizationTemperatureRangeSlider_2->setValues(settings.visualizeForestVoxelGridMinTemp * 10, settings.visualizeForestVoxelGridMaxTemp * 10);
+    ui->fireVisualizationTemperatureRangeSlider->setRange(-10, 500);
+    ui->fireVisualizationTemperatureRangeSlider->setValues(settings.visualizeForestVoxelGridMinTemp * 10, settings.visualizeForestVoxelGridMaxTemp * 10);
 
 
     ui->FieldVisOptionsDropbox->setCurrentIndex(settings.vectorGridMode);
@@ -267,7 +267,7 @@ void MainWindow::on_forestVisualizationEyeXSlider_valueChanged(int value)
 void MainWindow::on_forestVisualizationEyeYSlider_valueChanged(int value)
 {
     ui->forestVisualizationEyeYValue->setText(QString::number(value / 10.0));
-    settings.visualizeForestVoxelGridEyeY = value / 10.0 + 5;
+    settings.visualizeForestVoxelGridEyeY = value / 10.0;
     signalSettingsChanged();
 }
 
@@ -298,44 +298,44 @@ void MainWindow::on_visualizationTemperatureRangeSlider_valuesChanged(int min, i
 }
 
 
-void MainWindow::on_forestVisualizationEyeXSlider_2_valueChanged(int value)
+void MainWindow::on_fireVisualizationEyeXSlider_valueChanged(int value)
 {
-    ui->forestVisualizationEyeXValue->setText(QString::number(value / 10.0));
+    ui->fireVisualizationEyeXValue->setText(QString::number(value / 10.0));
     settings.visualizeForestVoxelGridEyeX = value / 10.0;
     signalSettingsChanged();
 }
 
 
-void MainWindow::on_forestVisualizationEyeYSlider_2_valueChanged(int value)
+void MainWindow::on_fireVisualizationEyeYSlider_valueChanged(int value)
 {
-    ui->forestVisualizationEyeYValue->setText(QString::number(value / 10.0));
-    settings.visualizeForestVoxelGridEyeY = value / 10.0 + 5;
+    ui->fireVisualizationEyeYValue->setText(QString::number(value / 10.0));
+    settings.visualizeForestVoxelGridEyeY = value / 10.0;
     signalSettingsChanged();
 }
 
 
-void MainWindow::on_forestVisualizationEyeZSlider_2_valueChanged(int value)
+void MainWindow::on_fireVisualizationEyeZSlider_valueChanged(int value)
 {
-    ui->forestVisualizationEyeZValue->setText(QString::number(value / 10.0));
+    ui->fireVisualizationEyeZValue->setText(QString::number(value / 10.0));
     settings.visualizeForestVoxelGridEyeZ = value / 10.0;
     signalSettingsChanged();
 }
 
 
-void MainWindow::on_forestVisualizationEyeRSlider_2_valueChanged(int value)
+void MainWindow::on_fireVisualizationEyeRSlider_valueChanged(int value)
 {
-    ui->forestVisualizationEyeRValue->setText(QString::number(value / 10.0));
+    ui->fireVisualizationEyeRValue->setText(QString::number(value / 10.0));
     settings.visualizeForestVoxelGridEyeRadius = value / 10.0;
     signalSettingsChanged();
 }
 
 
-void MainWindow::on_visualizationTemperatureRangeSlider_2_valuesChanged(int min, int max)
+void MainWindow::on_fireVisualizationTemperatureRangeSlider_valuesChanged(int min, int max)
 {
     settings.visualizeForestVoxelGridMinTemp = min / 10.0;
     settings.visualizeForestVoxelGridMaxTemp = max / 10.0;
-    ui->forestVisualizationTemperatureMinValue->setText(QString::number(min / 10.0));
-    ui->forestVisualizationTemperatureMaxValue->setText(QString::number(max / 10.0));
+    ui->fireVisualizationTemperatureMinValue->setText(QString::number(min / 10.0));
+    ui->fireVisualizationTemperatureMaxValue->setText(QString::number(max / 10.0));
     signalSettingsChanged();
 }
 
@@ -508,4 +508,3 @@ void MainWindow::on_useMidpointForVoxelHeatTransfer_stateChanged(int state)
 {
     settings.useMidpointForVoxelHeatTransfer = state == Qt::CheckState::Checked;
 }
-
