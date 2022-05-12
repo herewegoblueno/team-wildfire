@@ -84,12 +84,6 @@ void Simulator::stepModuleHeatTransfer(Module *m, VoxelSet surroundingAir, int d
     surroundSize = std::max(surroundSize, 1.);
     surroundingAirTemp = surroundingAirTemp / surroundSize;
 
-    if(isnan(tempLaplace))
-    {
-        cout<< " temperature explodes by q_v" << flush;
-        exit(0);
-    }
-
     double tempLaplace = m->getTemperatureLaplaceFromPreviousFrame();
     double dTdt = adjacent_module_diffusion * tempLaplace
             + air_to_module_diffusion * (surroundingAirTemp - moduleTemp);
