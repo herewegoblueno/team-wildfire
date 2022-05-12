@@ -17,10 +17,6 @@
         <file>xmlScenes/twoRegions.xml</file>
         <file>xmlScenes/twoRegionsCloser.xml</file>
     </qresource>
-    <qresource prefix="/textures">
-        <file alias="fire.png">fire/fire_particle.jpg</file>
-        <file alias="fire2.png">fire/fire_particle2.png</file>
-    </qresource>
     <qresource prefix="/images">
         <file>images/killWithFire.png</file>
         <file>images/Two-Buttons.jpeg</file>

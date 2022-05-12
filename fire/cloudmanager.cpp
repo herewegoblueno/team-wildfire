@@ -1,7 +1,4 @@
 #include "support/shapes/OpenGLShape.h"
-#include "support/gl/textures/Texture2D.h"
-#include "support/gl/textures/TextureParametersBuilder.h"
-
 #include "support/gl/datatype/VAO.h"
 #include "support/gl/datatype/FBO.h"
 #include "support/gl/datatype/VBO.h"
@@ -40,11 +37,6 @@ CloudManager::CloudManager(VoxelGrid *grid) :
     attribs.push_back(VBOAttribMarker(ShaderAttrib::TEXCOORD0, 2, 3*sizeof(GLfloat), VBOAttribMarker::DATA_TYPE::FLOAT, false));
     CS123::GL::VBO vbo(particle_quad.data(), 20, attribs, VBO::GEOMETRY_LAYOUT::LAYOUT_TRIANGLE_STRIP);
     m_quad->m_VAO = std::make_unique<VAO>(vbo, 4);
-
-
-    QImage img(":/textures/fire2.png");
-    QImage gl_img = QGLWidget::convertToGLFormat(img);
-    m_texture = std::make_unique<Texture2D>(gl_img.bits(), gl_img.width(), gl_img.height());
 
     std::string vertexSource = ResourceLoader::loadResourceFileToString(":/shaders/cloud.vert");
     std::string fragmentSource = ResourceLoader::loadResourceFileToString(":/shaders/cloud.frag");
