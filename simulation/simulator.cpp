@@ -48,11 +48,12 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
 #ifdef CUDA_FLUID
     dvec3 g_w = grid->getGlobalFField();
     double g_w3[3] = {g_w.x, g_w.y, g_w.z};
-    processWindGPU(host2cuda.grid_temp, host2cuda.grid_q_v, host2cuda.grid_h, host2cuda.u_xyz, host2cuda.id_xyz,
-                   64, g_w3, gridResolution, grid->cellSideLengthForGradients(), deltaTime/1000.);
-    threads.clear();
-
+    processWindGPU(host2cuda.grid_temp, host2cuda.grid_q_v, host2cuda.grid_q_c, host2cuda.grid_q_r,
+                                   host2cuda.grid_h, host2cuda.grid_humidity,
+                                   host2cuda.u_xyz, host2cuda.id_xyz, 32, g_w3,
+                                   gridResolution, grid->cellSideLengthForGradients(), deltaTime/1000.);
 #endif
+    threads.clear();
     for (int x = 0; x < gridResolution; x += jumpPerThread)
         threads.emplace_back(&Simulator::stepCuda2hostThreadHandler, this, grid, forest, deltaTime, gridResolution, x, x + jumpPerThread);
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
@@ -76,7 +77,7 @@ void Simulator::stepThreadHandler(VoxelGrid *grid ,Forest * forest, int deltaTim
                 Voxel *v = grid->getVoxel(x, y, z);
                 ModuleSet nearbyModules = forest == nullptr ? ModuleSet() : forest->getModulesMappedToVoxel(v);
                 stepVoxelHeatTransfer(v, nearbyModules, deltaTime);
-                writeHost2cudaSpace(v, x*resolution*resolution+y*resolution+z);
+                writeHost2Cuda(v, x*resolution*resolution+y*resolution+z);
             }
         }
     }
@@ -91,10 +92,10 @@ void Simulator::stepCuda2hostThreadHandler(VoxelGrid *grid ,Forest * forest, int
             for (int z = 0; z < resolution; z++){
                 Voxel* vox = grid->getVoxel(x,y,z);
             #ifdef CUDA_FLUID
-                dvec3 u(host2cuda.u_xyz[index*3], host2cuda.u_xyz[index*3+1], host2cuda.u_xyz[index*3+2]);
-                vox->getCurrentState()->u = u;
-            #endif
+                writeCuda2Host(vox, index);
+            #else
                 stepVoxelWater(vox, deltaTime/1000.);
+            #endif
                 index++;
             }
         }
@@ -151,7 +152,7 @@ void Simulator::mallocHost2cuda(VoxelGrid *grid)
 #endif
 }
 
-void Simulator::writeHost2cudaSpace(Voxel* v, int index)
+void Simulator::writeHost2Cuda(Voxel* v, int index)
 {
 #ifdef CUDA_FLUID
     host2cuda.grid_temp[index] = v->getCurrentState()->temperature;
@@ -165,6 +166,19 @@ void Simulator::writeHost2cudaSpace(Voxel* v, int index)
     host2cuda.id_xyz[index*3+0] = v->XIndex;
     host2cuda.id_xyz[index*3+1] = v->YIndex;
     host2cuda.id_xyz[index*3+2] = v->ZIndex;
+#endif
+}
+
+void Simulator::writeCuda2Host(Voxel* v, int index)
+{
+#ifdef CUDA_FLUID
+    dvec3 u(host2cuda.u_xyz[index*3], host2cuda.u_xyz[index*3+1], host2cuda.u_xyz[index*3+2]);
+    v->getCurrentState()->u = u;
+    v->getCurrentState()->q_v = host2cuda.grid_q_v[index];
+    v->getCurrentState()->q_c = host2cuda.grid_q_c[index];
+    v->getCurrentState()->q_r = host2cuda.grid_q_r[index];
+    v->getCurrentState()->temperature = host2cuda.grid_temp[index];
+    v->getCurrentState()->humidity = host2cuda.grid_humidity[index];
 #endif
 }
 

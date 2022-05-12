@@ -38,6 +38,11 @@ private:
     std::vector<Particle> m_particles;
 
     glm::vec3 m_center;
+    const float mean = 0.0;
+    const float stddev = 0.2;
+    std::default_random_engine generator;
+    std::normal_distribution<float> dist;
+    std::vector<glm::vec2> m_offset;
 
 };
 

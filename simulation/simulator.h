@@ -48,7 +48,8 @@ private:
     void stepModuleHeatTransfer(Module *m, VoxelSet surroundingAir, int deltaTimeInMs);
     host2cuda_data host2cuda;
     void mallocHost2cuda(VoxelGrid *grid);
-    void writeHost2cudaSpace(Voxel* v, int index);
+    void writeHost2Cuda(Voxel* v, int index);
+    void writeCuda2Host(Voxel* v, int index);
     void freeHost2cuda();
 
 };

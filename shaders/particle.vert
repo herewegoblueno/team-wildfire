@@ -21,6 +21,6 @@ void main()
     vec3 pos        = invViewRot * position;
     vec4 position_cameraSpace = v * m * vec4(pos*scale, 1.0);
     TexCoords = texCoord;
-    Temperature = temp-10;
+    Temperature = temp;
     gl_Position = p * position_cameraSpace;
 }

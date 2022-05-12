@@ -52,7 +52,7 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
         v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt * deltaTimeInMs / 1000.0;
     }
 
-    if(v->getCurrentState()->temperature>100)
+    if(v->getCurrentState()->temperature>100 || v->getCurrentState()->temperature<-100)
     {
         std::cout << "error";
     }

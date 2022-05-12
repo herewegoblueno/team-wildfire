@@ -102,8 +102,8 @@ void CloudManager::draw()
                 {
                     for(int sub=0;sub<3;sub++)
                     {
-                        glm::vec3 offset(dist(generator), dist(generator), dist(generator));
-                        glm::vec3 rand_pos = glm::vec3(v->centerInWorldSpace)+offset/5.f;
+                        glm::vec3 offset(dist(generator)*3, dist(generator), dist(generator)*3);
+                        glm::vec3 rand_pos = glm::vec3(v->centerInWorldSpace)+offset/4.f;
                         glm::mat4 M_cloud = glm::translate(glm::mat4(), rand_pos);
                         m_shader->setUniform("m", M_cloud);
                         m_shader->setUniform("humi", v->getCurrentState()->humidity);

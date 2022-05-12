@@ -4,9 +4,10 @@
 #include "physics.h"
 
 #ifdef CUDA_FLUID
-extern "C" void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
-                    double* u_xyz, int* id_xyz, int jacobi_iter, double f[3],
-                    int resolution, double cell_size, float dt);
+extern "C" void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_q_c, double* grid_q_r,
+                               double* grid_h, double* grid_humidity,
+                               double* u_xyz, int* id_xyz, int jacobi_iter, double f[3],
+                               int resolution, double cell_size, float dt);
 #endif
 
 // water particle related equation
