@@ -208,7 +208,7 @@ double Module::sigmoidFunc(double x) {
 double Module::getMassChangeRateFromPreviousFrame(double windSpeed) {
     double reactionRate = getReactionRateFromPreviousFrame(windSpeed);
     double surfaceArea = getLastFrameState()->area;
-    return -reactionRate * reation_rate_multiplier * surfaceArea;
+    return -reactionRate * surfaceArea;
 }
 
 /** Sample a random point from the center of a branch */
