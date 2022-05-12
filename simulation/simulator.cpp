@@ -51,11 +51,11 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
     processWindGPU(host2cuda.grid_temp, host2cuda.grid_q_v, host2cuda.grid_h, host2cuda.u_xyz, host2cuda.id_xyz,
                    64, g_w3, gridResolution, grid->cellSideLengthForGradients(), deltaTime/1000.);
     threads.clear();
+
+#endif
     for (int x = 0; x < gridResolution; x += jumpPerThread)
         threads.emplace_back(&Simulator::stepCuda2hostThreadHandler, this, grid, forest, deltaTime, gridResolution, x, x + jumpPerThread);
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
-#endif
-
     if (forest != nullptr){ //Forest is optional
         //This should be the last step of the simulation
         //We want the actual step to be based on last frame's mapping, but we want the scene's rendering
@@ -90,8 +90,10 @@ void Simulator::stepCuda2hostThreadHandler(VoxelGrid *grid ,Forest * forest, int
         for (int y = 0; y < resolution; y++){
             for (int z = 0; z < resolution; z++){
                 Voxel* vox = grid->getVoxel(x,y,z);
+            #ifdef CUDA_FLUID
                 dvec3 u(host2cuda.u_xyz[index*3], host2cuda.u_xyz[index*3+1], host2cuda.u_xyz[index*3+2]);
                 vox->getCurrentState()->u = u;
+            #endif
                 stepVoxelWater(vox, deltaTime/1000.);
                 index++;
             }
