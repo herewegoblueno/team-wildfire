@@ -142,7 +142,10 @@ void Simulator::mallocHost2cuda(VoxelGrid *grid)
     int cell_num = gridResolution*gridResolution*gridResolution;
     host2cuda.grid_temp = (double *) malloc(cell_num*sizeof(double));
     host2cuda.grid_q_v = (double *) malloc(cell_num*sizeof(double));
+    host2cuda.grid_q_c = (double *) malloc(cell_num*sizeof(double));
+    host2cuda.grid_q_r = (double *) malloc(cell_num*sizeof(double));
     host2cuda.grid_h = (double *) malloc(cell_num*sizeof(double));
+    host2cuda.grid_humidity = (double *) malloc(cell_num*sizeof(double));
     host2cuda.u_xyz = (double *) malloc(cell_num*sizeof(double)*3);
     host2cuda.id_xyz = (int *) malloc(cell_num*sizeof(int)*3);
 #endif
@@ -153,6 +156,8 @@ void Simulator::writeHost2cudaSpace(Voxel* v, int index)
 #ifdef CUDA_FLUID
     host2cuda.grid_temp[index] = v->getCurrentState()->temperature;
     host2cuda.grid_q_v[index] = v->getLastFrameState()->q_v;
+    host2cuda.grid_q_c[index] = v->getLastFrameState()->q_c;
+    host2cuda.grid_q_r[index] = v->getLastFrameState()->q_r;
     host2cuda.grid_h[index] = v->centerInWorldSpace.y;
     host2cuda.u_xyz[index*3+0] = v->getLastFrameState()->u.x;
     host2cuda.u_xyz[index*3+1] = v->getLastFrameState()->u.y;
@@ -168,7 +173,10 @@ void Simulator::freeHost2cuda()
 #ifdef CUDA_FLUID
     free(host2cuda.grid_temp);
     free(host2cuda.grid_q_v);
+    free(host2cuda.grid_q_c);
+    free(host2cuda.grid_q_r);
     free(host2cuda.grid_h);
+    free(host2cuda.grid_humidity);
     free(host2cuda.u_xyz);
     free(host2cuda.id_xyz);
 #endif

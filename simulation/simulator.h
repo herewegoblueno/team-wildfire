@@ -13,7 +13,10 @@ struct host2cuda_data
 {
     double* grid_temp;
     double* grid_q_v;
+    double* grid_q_c;
+    double* grid_q_r;
     double* grid_h;
+    double* grid_humidity;
     double* u_xyz;
     int* id_xyz;
 };
