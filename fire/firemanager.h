@@ -18,7 +18,7 @@
 
 inline int densityFromSize(float size) {
 #ifdef CUDA_FLUID
-    return 400;
+    return 30;
 #endif
     return size*size*1000;
 }

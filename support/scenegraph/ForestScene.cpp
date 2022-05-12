@@ -130,7 +130,7 @@ void ForestScene::render(SupportCanvas3D *context) {
 
     updateFires();
     _fireManager->setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
-    _fireManager->setScale(0.03, 0.05);
+    _fireManager->setScale(0.06, 0.1);
     _fireManager->drawFires(_simulator->getTimeSinceLastFrame()/1000.0, true);
 
     _cloudManager->setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());

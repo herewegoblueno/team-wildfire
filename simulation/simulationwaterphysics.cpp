@@ -29,10 +29,10 @@ void Simulator::stepVoxelWater(Voxel* v, double deltaTimeInMs)
     if(v->YIndex==1 || v->YIndex==resolution-1) {
         grad_v.y = 0; grad_c.y = 0; grad_r.y = 0;
     }
-    if(v->YIndex==1) // random evaporation from land
-    {
-        grad_v.y = -(3*std::sin(v->XIndex*3) + 1*std::sin(v->ZIndex*5) + 0.5*std::sin(v->ZIndex*7)+4.5)/cell_size;
-    }
+    // if(v->YIndex==1) // random evaporation from land
+    // {
+    //     grad_v.y = -(3*std::sin(v->XIndex*3) + 1*std::sin(v->ZIndex*5) + 0.5*std::sin(v->ZIndex*7)+4.5)/cell_size;
+    // }
 
 
     q_v -= glm::dot(grad_v, u_center)*deltaTimeInMs*100;
@@ -53,7 +53,7 @@ void Simulator::stepVoxelWater(Voxel* v, double deltaTimeInMs)
     double abs_pres = absolute_pres(h);
     float q_vs = saturate(abs_pres, temperature);
     float E_r = q_r*evaporation_rate*std::min(std::max(q_vs - q_v, 0.), 10.);// evaporation of rain Fire Eq.22
-    float A_c = autoconverge_cloud*std::max(q_c - 0.001, 0.); // below Stormscape Eq.24
+    float A_c = autoconverge_cloud*std::max(q_c - 0.01, 0.); // below Stormscape Eq.24
     float K_c = raindrop_accelerate*q_c*q_r;  // below Stormscape Eq.24
     q_v = q_v + std::min(q_vs - q_v, q_c) + E_r;
     q_c = q_c - std::min(q_vs - q_v, q_c) - A_c - K_c;

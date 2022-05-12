@@ -43,7 +43,6 @@ void buoyancyKernel(double* grid_temp, double* grid_q_v, double* grid_h, double*
         if(height < 9) T_air = 293.15 - 0.65*height;
         double p_z_r = pow(1 - 0.65*height/293.15, 5.2561);
         double T_th = 287.3*pow(p_z_r, 1 - 1/y_th);
-//        double T_th = (grid_temp[idx]-2)*10 + 293.15;
         double buoyancy =  0.05*(28.96*T_th/(M_th*T_air)-1);
 
         if (buoyancy<0) buoyancy=0;
@@ -52,11 +51,6 @@ void buoyancyKernel(double* grid_temp, double* grid_q_v, double* grid_h, double*
         if(fabs(src_u[0]) < fabs(src_u[0])) src_u[0] += f[0]*0.1*dt;
         if(fabs(src_u[1]) < fabs(src_u[1])) src_u[1] += f[1]*0.1*dt;
         if(fabs(src_u[2]) < fabs(src_u[2])) src_u[2] += f[2]*0.1*dt;
-        if(idx==prob_x*resolution*resolution + prob_y*resolution + prob_z)
-        {
-             printf("=>B(%f, %f, %f)", src_u[0], src_u[1], src_u[2]);
-             printf("-[%f] ", buoyancy);
-        }
     }
 }
 
@@ -84,10 +78,6 @@ void advectKernel(double* su_xyz, int* id_xyz, double* tu_xyz,
         ua = getVel(x, y, z-1, su_xyz, resolution, 2);
         ub = getVel(x, y, z+1, su_xyz, resolution, 2);
         dst_u[2] = src_u[2] - 0.95*(ub*ub - ua*ua)/2/cell_size*dt;
-        if(x==prob_x && y==prob_y && z==prob_z)
-        {
-             printf("O(%f, %f, %f)=>A(%f, %f, %f)", src_u[0], src_u[1], src_u[2], dst_u[0], dst_u[1], dst_u[2]);
-        }
     }
 }
 
@@ -130,11 +120,6 @@ void viscosityKernel(double* su_xyz, int* id_xyz, double* tu_xyz, double viscosi
             laplace += getVel(x, y, z+1, su_xyz, resolution, 2);
             laplace += getVel(x, y, z-1, su_xyz, resolution, 2);
             dst_u[2] = src_u[2] + laplace*factor;
-
-            if(x==prob_x && y==prob_y && z==prob_z)
-            {
-                 printf("=>D(%f, %f, %f)", dst_u[0], dst_u[1], dst_u[2]);
-            }
         }
         else
         {
@@ -211,15 +196,10 @@ void vorticityKernel(double* su_xyz, int* id_xyz, double* tu_xyz, double* vortic
         if(len>0)
         {
             dvor_x /= len; dvor_y /= len; dvor_z /= len;
-//            printf("(%f,%f,%f)-[%f]",dvor_x,dvor_y,dvor_z,len);
 
             dst_u[0] = src_u[0] + (dvor_y*vor_z - dvor_z*vor_y)*cell_size*dt*0.001;
             dst_u[1] = src_u[1] + (dvor_z*vor_x - dvor_x*vor_z)*cell_size*dt*0.001;
             dst_u[2] = src_u[2] + (dvor_x*vor_y - dvor_y*vor_x)*cell_size*dt*0.001;
-            if(x==prob_x && y==prob_y && z==prob_z)
-            {
-                 printf("=>V(%f, %f, %f)\n", dst_u[0], dst_u[1], dst_u[2]);
-            }
         }
         else
         {
@@ -286,7 +266,6 @@ __global__ void jacobi(double* x_next, double* A, double* x_now, double* b, int*
         if(id_z < Res-1) sigma += x_now[idx + 1];
 
         x_next[idx] = (b[idx] + sigma) / A[idx];
-//        printf(" (%d: %d, %d, %d) ", idx, id_x, id_y, id_z);
     }
 }
 
@@ -323,17 +302,89 @@ void pressureKernel(double* su_xyz, int* id_xyz, double* tu_xyz, double* pressur
         if(y==resolution-1) dst_u[1] = 0;
         if(z==resolution-1) dst_u[2] = 0;
         if(y==0 && dst_u[1]<0) dst_u==0;
-        if(x==prob_x && y==prob_y && z==prob_z)
-        {
-             printf("=>P(%f, %f, %f)", dst_u[0], dst_u[1], dst_u[2]);
-        }
 
+    }
+}
+
+__device__
+float getGrad(int x, int y, int z, int dim, int resolution, double cell_size, double* vals)
+{
+    if(dim==0)
+        return (safe_get(x+1,y,z,vals,resolution) - safe_get(x-1,y,z,vals,resolution))/2/cell_size;
+    if(dim==1)
+        return (safe_get(x,y+1,z,vals,resolution) - safe_get(x,y-1,z,vals,resolution))/2/cell_size;
+    if(dim==2)
+        return (safe_get(x,y,z+1,vals,resolution) - safe_get(x,y,z-1,vals,resolution))/2/cell_size;
+}
+
+__global__
+void waterKernel(double* u_xyz, int* id_xyz,  double* d_h, double* d_temp, double* d_humi,
+                 double* d_q_v, double*d_q_c, double*d_q_r,
+                 double* d_q_v2, double*d_q_c2, double*d_q_r2,
+                       int resolution, double cell_size, double dt)
+{
+    int idx = blockIdx.x*blockDim.x + threadIdx.x;
+    if(idx < resolution*resolution*resolution && idx>-1)
+    {
+        int* this_xyz = id_xyz + idx*3;
+        int x=this_xyz[0], y=this_xyz[1], z=this_xyz[2];
+        d_q_v2[idx] = d_q_v[idx];
+        d_q_c2[idx] = d_q_c[idx];
+        d_q_r2[idx] = d_q_r[idx];
+
+        float uc_x = (getVel(x,y,z,u_xyz,resolution,0)+getVel(x-1,y,z,u_xyz,resolution,0))*0.5*100;
+        float uc_y = (getVel(x,y,z,u_xyz,resolution,1)+getVel(x,y-1,z,u_xyz,resolution,1))*0.5*100;
+        float uc_z = (getVel(x,y,z,u_xyz,resolution,2)+getVel(x,y,z-1,u_xyz,resolution,2))*0.5*100;
+
+        d_q_v2[idx] -= uc_x*getGrad(x,y,z,0,resolution,cell_size,d_q_v)*dt;
+        d_q_v2[idx] -= uc_y*getGrad(x,y,z,1,resolution,cell_size,d_q_v)*dt;
+        d_q_v2[idx] -= uc_z*getGrad(x,y,z,2,resolution,cell_size,d_q_v)*dt;
+
+        d_q_c2[idx] -= uc_x*getGrad(x,y,z,0,resolution,cell_size,d_q_c)*dt;
+        d_q_c2[idx] -= uc_y*getGrad(x,y,z,1,resolution,cell_size,d_q_c)*dt;
+        d_q_c2[idx] -= uc_z*getGrad(x,y,z,2,resolution,cell_size,d_q_c)*dt;
+
+        d_q_r2[idx] -= uc_x*getGrad(x,y,z,0,resolution,cell_size,d_q_r)*dt;
+        d_q_r2[idx] -= uc_y*getGrad(x,y,z,1,resolution,cell_size,d_q_r)*dt;
+        d_q_r2[idx] -= uc_z*getGrad(x,y,z,2,resolution,cell_size,d_q_r)*dt;
+
+        d_q_v2[idx] = max(0., min(d_q_v2[idx], 1.));
+        d_q_c2[idx] = max(0., min(d_q_c2[idx], 1.));
+        d_q_r2[idx] = max(0., min(d_q_r2[idx], 1.));
+
+        double X_v = d_q_v2[idx]/(1+d_q_v2[idx]);
+        double M_th = 18.02*X_v + 28.96*(1-X_v);
+        double Y_v = X_v*18.02/M_th;
+        double gamma_th = Y_v*1.33 + (1-Y_v)*1.4;
+        double c_th_p = gamma_th*8.3/(M_th*(gamma_th-1));
+
+        double ambient_temperature = 20 - 0.65*d_h[idx];
+        double temperature = 20 + 30*d_temp[idx];
+        double abs_pres = 100000*pow(1 - 0.65*d_h[idx]/293.75, 5.2561);
+        double q_vs = 380.16/abs_pres*exp(17.67*temperature/(temperature+243.5));
+        double E_r = d_q_r2[idx]*0.0001*min(max(q_vs - d_q_v2[idx], 0.), 10.);// evaporation of rain Fire Eq.22
+        double A_c = 0.01*max(d_q_c2[idx] - 0.01, 0.); // below Stormscape Eq.24
+        double K_c = 0.01*d_q_c2[idx]*d_q_r2[idx];  // below Stormscape Eq.24
+        double saturate_cmp = min(q_vs - d_q_v2[idx], d_q_c2[idx]);
+        d_q_v2[idx] = d_q_v2[idx] + saturate_cmp + E_r;
+        d_q_c2[idx] = d_q_c2[idx] - saturate_cmp - A_c - K_c;
+        d_q_r2[idx] = A_c + K_c - E_r;
+
+        double q_vs_amb = 380.16/abs_pres*exp(17.67*ambient_temperature/(temperature+243.5));
+        d_humi[idx] = min(d_q_v2[idx],0.093)/10/q_vs_amb;
+
+        if(saturate_cmp<0)
+        {
+            float evp_temp = 2.5/c_th_p/0.287*(-saturate_cmp)/(1-saturate_cmp);
+            d_temp[idx] += evp_temp;
+        }
     }
 }
 
 
 extern "C"
-void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
+void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_q_c, double* grid_q_r,
+                    double* grid_h, double* grid_humidity,
                     double* u_xyz, int* id_xyz, int jacobi_iter, double f[3],
                     int resolution, double cell_size, float dt)
 {
@@ -345,11 +396,15 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
 
     auto t1 = now();
     int cell_num = resolution*resolution*resolution;
-    double *d_temp, *d_q_v, *d_h, *d_u, *d_u2, *d_f;
+    double *d_temp, *d_q_v, *d_q_c, *d_q_r, *d_h, *d_humi, *d_u, *d_u2, *d_f;
+    double *d_q_v2, *d_q_c2, *d_q_r2;
     int *d_id;
     cudaMalloc(&d_temp, cell_num * sizeof(double)); // temperature
     cudaMalloc(&d_q_v,  cell_num * sizeof(double)); // q_v
+    cudaMalloc(&d_q_c,  cell_num * sizeof(double)); // q_c
+    cudaMalloc(&d_q_r,  cell_num * sizeof(double)); // q_r
     cudaMalloc(&d_h,    cell_num * sizeof(double)); // height
+    cudaMalloc(&d_humi,    cell_num * sizeof(double)); // humidity
     cudaMalloc(&d_u,    cell_num * sizeof(double) * 3); // vel 1
     cudaMalloc(&d_u2,   cell_num * sizeof(double) * 3); // vel 2(for switching values)
     cudaMalloc(&d_id,   cell_num * sizeof(int) * 3); // temperature
@@ -357,6 +412,8 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
 
     cudaMemcpy(d_temp,  grid_temp, cell_num * sizeof(double), cudaMemcpyHostToDevice);
     cudaMemcpy(d_q_v,   grid_q_v,  cell_num * sizeof(double), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_q_c,   grid_q_c,  cell_num * sizeof(double), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_q_r,   grid_q_r,  cell_num * sizeof(double), cudaMemcpyHostToDevice);
     cudaMemcpy(d_h,     grid_h,    cell_num * sizeof(double), cudaMemcpyHostToDevice);
     cudaMemcpy(d_u,     u_xyz,     cell_num * sizeof(double) * 3, cudaMemcpyHostToDevice);
     cudaMemcpy(d_u2,    u_xyz,     cell_num * sizeof(double) * 3, cudaMemcpyHostToDevice);
@@ -389,11 +446,6 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
     buoyancyKernel <<<numBlocks, blockSize>>> (d_temp, d_q_v, d_h, d_u2, d_f, resolution, dt);
     cudaDeviceSynchronize();
 
-    err = cudaGetLastError();
-    if( cudaSuccess != err) {
-        fprintf( stderr, "Cuda error in file '%s' in line %i : %s.\n",
-                 __FILE__, __LINE__, cudaGetErrorString( err) );
-    }
     // pressure projection
     auto t6 = now();
     double *d_diag, *d_rhs = d_u, *x_now_d, *x_next_d;
@@ -407,11 +459,6 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
     pre_JacobiKernel<<<numBlocks, blockSize>>>(d_u2, d_id, density_term, resolution, cell_size, d_diag, d_rhs);
     cudaDeviceSynchronize();
 
-    err = cudaGetLastError();
-    if( cudaSuccess != err) {
-        fprintf( stderr, "Cuda error in file '%s' in line %i : %s.\n",
-                 __FILE__, __LINE__, cudaGetErrorString( err) );
-    }
     for (int k=0; k<jacobi_iter; k++)
     {
         if (k%2)
@@ -428,31 +475,49 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
                                              resolution, cell_size, dt);
     cudaDeviceSynchronize();
     auto t7 = now();
-
-    cudaFree(d_diag);
-    cudaFree(x_now_d);
-    cudaFree(x_next_d);
-    cudaMemcpy(u_xyz, d_u, cell_num * sizeof(double) * 3, cudaMemcpyDeviceToHost);
-
-    cudaFree(d_temp);
-    cudaFree(d_q_v);
-    cudaFree(d_h);
-    cudaFree(d_u);
-    cudaFree(d_u2);
-    cudaFree(d_id);
-    cudaFree(d_f);
-
-//    cudaError err;
     err = cudaGetLastError();
     if( cudaSuccess != err) {
         fprintf( stderr, "Cuda error in file '%s' in line %i : %s.\n",
                  __FILE__, __LINE__, cudaGetErrorString( err) );
     }
+    cudaFree(d_diag);
+    cudaFree(x_now_d);
+    cudaFree(x_next_d);
 
+    cudaMalloc(&d_q_v2,  cell_num * sizeof(double)); // q_v
+    cudaMalloc(&d_q_c2,  cell_num * sizeof(double)); // q_c
+    cudaMalloc(&d_q_r2,  cell_num * sizeof(double)); // q_r
+
+    waterKernel<<<numBlocks, blockSize>>>(d_u, d_id, d_h, d_temp, d_humi,
+                                          d_q_v, d_q_c, d_q_r, d_q_v2, d_q_c2, d_q_r2,
+                                          resolution, cell_size, dt);
+    err = cudaGetLastError();
+    if( cudaSuccess != err) {
+        fprintf( stderr, "Cuda error in file '%s' in line %i : %s.\n",
+                 __FILE__, __LINE__, cudaGetErrorString( err) );
+    }
+    auto t8 = now();
+    cudaMemcpy(u_xyz, d_u, cell_num * sizeof(double) * 3, cudaMemcpyDeviceToHost);
+    cudaMemcpy(grid_q_v, d_q_v2, cell_num * sizeof(double), cudaMemcpyDeviceToHost);
+    cudaMemcpy(grid_q_c, d_q_c2, cell_num * sizeof(double), cudaMemcpyDeviceToHost);
+    cudaMemcpy(grid_q_r, d_q_r2, cell_num * sizeof(double), cudaMemcpyDeviceToHost);
+    cudaMemcpy(grid_humidity, d_humi, cell_num * sizeof(double), cudaMemcpyDeviceToHost);
+    cudaMemcpy(grid_temp, d_temp, cell_num * sizeof(double), cudaMemcpyDeviceToHost);
+    auto t9 = now();
+    cudaFree(d_temp);
+    cudaFree(d_q_v); cudaFree(d_q_c); cudaFree(d_q_r);
+    cudaFree(d_q_v2); cudaFree(d_q_c2); cudaFree(d_q_r2);
+    cudaFree(d_h);
+    cudaFree(d_humi);
+    cudaFree(d_u); cudaFree(d_u2);
+    cudaFree(d_id);
+    cudaFree(d_f);
 //    printf("[param]-[density:%f]-[viscosity:%f]-[cell:%f]-", air_density, viscosity, cell_size);
-//    std::cout << "[Wind Update Ellapse Summary]";
-//    std::cout << "-[Total- " << milliseconds(t7 - t1) << "]\n";
-//    std::cout << "[load- " << milliseconds(t2 - t1) << "]-";
+    std::cout << "[Wind-Water Update Ellapse Summary]\n";
+    std::cout << "[load- " << milliseconds(t2 - t1) << "]-";
+    std::cout << "[Wind- " << milliseconds(t7 - t2) << "]";
+    std::cout << "[Water- " << milliseconds(t8 - t7) << "]";
+    std::cout << "[back- " << milliseconds(t9 - t7) << "]";
 //    std::cout << "[advect- " << milliseconds(t3 - t2) << "]-";
 //    std::cout << "[diffuse- " << milliseconds(t4 - t3) << "]-";
 //    std::cout << "[vorticity- " << milliseconds(t5 - t4) << "]-";

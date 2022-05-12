@@ -82,7 +82,7 @@ void Fire::update_particles(float timeStep)
     for (unsigned int i = 0; i < m_density; ++i)
     {
         Particle &p = m_particles[i];
-        p.Life -= fire_frame_rate*0.02;
+        p.Life -= fire_frame_rate;
 
         if (p.Life > 0.0f)
         {
@@ -92,27 +92,27 @@ void Fire::update_particles(float timeStep)
             float ambient_T = vox->temperature;
             if(std::isnan(ambient_T)) ambient_T = p.Temp;
 
-            float b_factor = 0.025;
+            float b_factor = 0.05;
             glm::vec3 u = vec3(vox->u);
 
         #ifdef CUDA_FLUID
-            b_factor = 0.00;
+            b_factor = 0.05;
+            if(timeStep>0) p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
         #else
             if(timeStep>0) p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
         #endif
 
             float b = gravity_acceleration*thermal_expansion*b_factor*
                     (float)std::max(simTempToWorldTemp(p.Temp) - simTempToWorldTemp(ambient_T), 0.); // Buoyancy
-            u.y += b;
-            if(glm::length(u)>0.2) u = u/glm::length(u);
+            u.y += b + 0.1;
+            if(glm::length(u)>1) u = u/glm::length(u)*1.f;
             p.Position += u * timeStep;
-
-            if(p.Life < fire_frame_rate*1.5 || p.Temp < 10)
+            if(p.Life < fire_frame_rate*1.5 || p.Temp < 20)
             {
-                #ifndef CUDA_FLUID
+//                #ifndef CUDA_FLUID
                 m_smoke->RespawnParticle(i, p);
                 p.Life = 0;
-                #endif
+//                #endif
             }
         }
     }
@@ -130,7 +130,7 @@ void Fire::RespawnParticle(int index)
     particle.Position = m_center + offset;
     particle.Color = glm::vec4(rColor, rColor, rColor, 1.0f);
     particle.Life = m_life;
-    particle.Temp = 15;
+    particle.Temp = 25;
 
     particle.Velocity = m_size*m_vels[index];
 }
@@ -145,8 +145,7 @@ void Fire::drawSmoke(CS123::GL::CS123Shader* shader, OpenGLShape* shape) {
 }
 
 void Fire::drawParticles(CS123::GL::CS123Shader* shader, OpenGLShape* shape) {
-
-
+    glDepthMask(GL_FALSE);
     for (Particle particle : m_particles)
     {
         if (particle.Life > 0.0f)
@@ -158,6 +157,7 @@ void Fire::drawParticles(CS123::GL::CS123Shader* shader, OpenGLShape* shape) {
             shape->drawVAO();
         }
     }
+    glDepthMask(GL_TRUE);
 }
 
 

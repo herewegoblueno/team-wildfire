@@ -125,6 +125,8 @@ void FireManager::drawFires(float time, bool smoke)
 
     if (smoke)
     {
+
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         m_smokeshader->bind();
         m_smokeshader->setUniform("scale", scale_smoke);
         m_smokeshader->setUniform("p", p);

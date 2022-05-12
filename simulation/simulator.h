@@ -13,7 +13,10 @@ struct host2cuda_data
 {
     double* grid_temp;
     double* grid_q_v;
+    double* grid_q_c;
+    double* grid_q_r;
     double* grid_h;
+    double* grid_humidity;
     double* u_xyz;
     int* id_xyz;
 };
@@ -45,7 +48,8 @@ private:
     void stepModuleHeatTransfer(Module *m, VoxelSet surroundingAir, int deltaTimeInMs);
     host2cuda_data host2cuda;
     void mallocHost2cuda(VoxelGrid *grid);
-    void writeHost2cudaSpace(Voxel* v, int index);
+    void writeHost2Cuda(Voxel* v, int index);
+    void writeCuda2Host(Voxel* v, int index);
     void freeHost2cuda();
 
 };
