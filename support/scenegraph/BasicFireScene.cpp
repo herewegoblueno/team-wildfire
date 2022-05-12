@@ -19,17 +19,10 @@ using namespace CS123::GL;
 
 
 BasicFireScene::BasicFireScene():
-     voxelGrid(VoxelGridDim(vec3(0, 5, 0), 8), 48),
-     fireManager(&voxelGrid)
+     voxelGrid(VoxelGridDim(vec3(0, 5, 0), 13), 48),
+     fireManager(&voxelGrid),
+     cloudManager(&voxelGrid)
 {
-
-    Voxel* v = voxelGrid.getVoxel(8, 2, 16);
-    fireManager.addFire(nullptr, vec3(v->centerInWorldSpace), 15);
-
-    v = voxelGrid.getVoxel(24, 2, 16);
-    fireManager.addFire(nullptr, vec3(v->centerInWorldSpace), 15);
-
-
     voxelGrid.getVisualization()->toggle(false, true);
 
     simulator.init();
@@ -41,7 +34,11 @@ BasicFireScene::~BasicFireScene()
 }
 
 void BasicFireScene::constructShaders() {
-    shader_bank.clear();
+
+    cloudCube = std::make_unique<Cube>(1,1);
+    std::string vertexSource = ResourceLoader::loadResourceFileToString(":/shaders/cloud.vert");
+    std::string fragmentSource = ResourceLoader::loadResourceFileToString(":/shaders/cloud.frag");
+    _cloudShader = std::make_unique<CS123Shader>(vertexSource, fragmentSource);
 }
 
 std::vector<std::unique_ptr<CS123Shader>> *BasicFireScene::getShaderPrograms(){
@@ -49,18 +46,18 @@ std::vector<std::unique_ptr<CS123Shader>> *BasicFireScene::getShaderPrograms(){
 }
 
 void BasicFireScene::render(SupportCanvas3D *context) {
-    Voxel* v = voxelGrid.getVoxel(8, 6, 16);
+    Voxel* v = voxelGrid.getVoxel(8, 20, 16);
     v->getLastFrameState()->temperature = 20;
-    v->getLastFrameState()->q_v = 0.01;
-    v = voxelGrid.getVoxel(8, 6, 15);
+    v->getLastFrameState()->q_v = 0.2;
+    v = voxelGrid.getVoxel(8, 20, 15);
     v->getLastFrameState()->temperature = 20;
-    v->getLastFrameState()->q_v = 0.01;
-    v = voxelGrid.getVoxel(9, 6, 16);
+    v->getLastFrameState()->q_v = 0.2;
+    v = voxelGrid.getVoxel(9, 20, 16);
     v->getLastFrameState()->temperature = 20;
-    v->getLastFrameState()->q_v = 0.01;
-    v = voxelGrid.getVoxel(9, 6, 15);
+    v->getLastFrameState()->q_v = 0.2;
+    v = voxelGrid.getVoxel(9, 20, 15);
     v->getLastFrameState()->temperature = 20;
-    v->getLastFrameState()->q_v = 0.01;
+    v->getLastFrameState()->q_v = 0.2;
     simulator.step(&voxelGrid);
 
     glClearColor(0.2, 0.2, 0.2, 0.3);
@@ -74,6 +71,10 @@ void BasicFireScene::render(SupportCanvas3D *context) {
     fireManager.setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
     fireManager.setScale(0.03, 0.05);
     fireManager.drawFires(10, false);
+
+    cloudManager.setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
+    cloudManager.setScale(0.5);
+    cloudManager.draw();
 
     //Trigger another render
     simulator.cleanupForNextStep(&voxelGrid);

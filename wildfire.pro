@@ -21,6 +21,7 @@ win32 {
 }
 
 SOURCES += ui/mainwindow.cpp \
+    fire/cloudmanager.cpp \
     fire/firemanager.cpp \
     fire/smoke.cpp \
     main.cpp \
@@ -59,6 +60,7 @@ SOURCES += ui/mainwindow.cpp \
     support/scenegraph/SupportCanvas3D.cpp \
     support/shapes/CircleBase.cpp \
     support/shapes/Cone.cpp \
+    support/shapes/Cube.cpp \
     support/shapes/Cylinder.cpp \
     support/shapes/Ground.cpp \
     support/shapes/Leaf.cpp \
@@ -80,6 +82,7 @@ SOURCES += ui/mainwindow.cpp \
 
 
 HEADERS += ui/mainwindow.h \
+    fire/cloudmanager.h \
     fire/firemanager.h \
     fire/particle.h \
     fire/smoke.h \
@@ -120,6 +123,7 @@ HEADERS += ui/mainwindow.h \
     support/scenegraph/SupportCanvas3D.h \
     support/shapes/CircleBase.h \
     support/shapes/Cone.h \
+    support/shapes/Cube.h \
     support/shapes/Cylinder.h \
     support/shapes/Ground.h \
     support/shapes/Leaf.h \

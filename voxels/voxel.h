@@ -22,6 +22,7 @@ struct VoxelPhysicalData {
     float q_v = 0.0002; // water vapor
     float q_c = 0.0002; // condensed water
     float q_r = 0.0002; // rain (ignore for now)
+    float humidity = 0; // rain (ignore for now)
 
     VoxelPhysicalData operator+(const VoxelPhysicalData& rhs) const
     {
@@ -34,6 +35,7 @@ struct VoxelPhysicalData {
         newdata.q_v = this->q_v + rhs.q_v;
         newdata.q_c = this->q_c + rhs.q_c;
         newdata.q_r = this->q_r + rhs.q_r;
+        newdata.humidity = this->humidity + rhs.humidity;
         return newdata;
     }
 
@@ -48,6 +50,7 @@ struct VoxelPhysicalData {
         newdata.q_v = this->q_v*t;
         newdata.q_c = this->q_c*t;
         newdata.q_r = this->q_r*t;
+        newdata.humidity = this->humidity*t;
         return newdata;
     }
 };

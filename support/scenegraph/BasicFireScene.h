@@ -6,6 +6,8 @@
 #include "OpenGLScene.h"
 #include "voxels/voxelgrid.h"
 #include "fire/firemanager.h"
+#include "fire/cloudmanager.h"
+#include "support/shapes/Cube.h"
 #include "simulation/simulator.h"
 
 class BasicFireScene : public OpenGLScene {
@@ -26,6 +28,9 @@ private:
     CS123::GL::CS123Shader *current_shader;
     VoxelGrid voxelGrid;
     FireManager fireManager;
+    CloudManager cloudManager;
+    std::unique_ptr<Cube> cloudCube;
+    std::unique_ptr<CS123::GL::CS123Shader> _cloudShader;
 
     Simulator simulator;
 };

@@ -113,6 +113,47 @@ VoxelPhysicalData VoxelGrid::getStateInterpolatePoint(vec3 point){
     return out;
 }
 
+
+float VoxelGrid::getQcInterpolatePoint(vec3 point)
+{
+    vec3 distancesToPoint = point - minXYZ;
+    float voxelSize = cellSideLength();
+    int xIndex = static_cast<int>(clamp(floor(distancesToPoint.x / voxelSize), 0.f, float(resolution - 1)));
+    int yIndex = static_cast<int>(clamp(floor(distancesToPoint.y / voxelSize), 0.f, float(resolution - 1)));
+    int zIndex = static_cast<int>(clamp(floor(distancesToPoint.z / voxelSize), 0.f, float(resolution - 1)));
+
+    VoxelPhysicalData output;
+    Voxel* p000 = getVoxel(xIndex, yIndex, zIndex);
+    Voxel* p001 = getVoxel(xIndex, yIndex, zIndex+1);
+    Voxel* p010 = getVoxel(xIndex, yIndex+1, zIndex);
+    Voxel* p011 = getVoxel(xIndex, yIndex+1, zIndex+1);
+    Voxel* p100 = getVoxel(xIndex+1, yIndex, zIndex);
+    Voxel* p101 = getVoxel(xIndex+1, yIndex, zIndex+1);
+    Voxel* p110 = getVoxel(xIndex+1, yIndex+1, zIndex);
+    Voxel* p111 = getVoxel(xIndex+1, yIndex+1, zIndex+1);
+    if(p000==nullptr || p001==nullptr || p010==nullptr || p011==nullptr ||
+       p100==nullptr || p101==nullptr || p110==nullptr || p111==nullptr)
+    {
+        if(getVoxel(xIndex, yIndex, zIndex) != nullptr)
+            return getVoxel(xIndex, yIndex, zIndex)->getCurrentState()->q_c;
+        else
+            return 0;
+    }
+
+    double xd = (point.x - p000->centerInWorldSpace.x - voxelSize*0.5)/voxelSize;
+    double yd = (point.y - p000->centerInWorldSpace.y - voxelSize*0.5)/voxelSize;
+    double zd = (point.z - p000->centerInWorldSpace.z - voxelSize*0.5)/voxelSize;
+
+    float c00 = (p000->getCurrentState()->q_c)*(1.-xd) + (p100->getCurrentState()->q_c)*xd;
+    float c01 = (p001->getCurrentState()->q_c)*(1.-xd) + (p101->getCurrentState()->q_c)*xd;
+    float c10 = (p010->getCurrentState()->q_c)*(1.-xd) + (p110->getCurrentState()->q_c)*xd;
+    float c11 = (p011->getCurrentState()->q_c)*(1.-xd) + (p111->getCurrentState()->q_c)*xd;
+    float c0 = c00*(1.-yd) + c10*yd;
+    float c1 = c01*(1.-yd) + c11*yd;
+
+    return c0*(1-zd) + c1*zd;
+}
+
 //Not used at the moment, added in case it becomes useful
 dvec3 VoxelGrid::getVelInterpolatePoint(vec3 point)
 {

@@ -6,11 +6,10 @@
 #include <iostream>
 #include <chrono>
 #include <memory>
-//#include "info.cuh"
 
-#define prob_x 15
-#define prob_y 15
-#define prob_z 0
+#define prob_x 8
+#define prob_y 6
+#define prob_z 15
 
 std::chrono::time_point<std::chrono::high_resolution_clock> now() {
     return std::chrono::high_resolution_clock::now();
@@ -36,28 +35,27 @@ void buoyancyKernel(double* grid_temp, double* grid_q_v, double* grid_h, double*
     {
         double* src_u = su_xyz + idx*3;
         double height = grid_h[idx];
-        double X_v = grid_q_v[idx]/(1+grid_q_v[idx]);
+        double X_v = grid_q_v[idx]/(1+grid_q_v[idx])*10;
         double M_th = 18.02*X_v + 28.96*(1-X_v);
         double Y_v = X_v*18.02/M_th;
         double y_th = Y_v*1.33 + (1-Y_v)*1.4;
         double T_air = 301;
         if(height < 9) T_air = 293.15 - 0.65*height;
         double p_z_r = pow(1 - 0.65*height/293.15, 5.2561);
-//        double T_th = 293.15*pow(p_z_r, 1 - 1/y_th);
-        double T_th = (grid_temp[idx]-2)*40 + 293.15;
-
-//        double buoyancy =  0.098*(28.96*T_th/(M_th*T_air)-1);
-        double buoyancy =  0.01*(T_th*28.96/T_air/M_th-1);
+        double T_th = 287.3*pow(p_z_r, 1 - 1/y_th);
+//        double T_th = (grid_temp[idx]-2)*10 + 293.15;
+        double buoyancy =  0.05*(28.96*T_th/(M_th*T_air)-1);
 
         if (buoyancy<0) buoyancy=0;
-        if (buoyancy>0.1) buoyancy=0.1;
+        if (buoyancy>0.05) buoyancy=0.05;
         src_u[1] += buoyancy*dt;
-//        if(fabs(src_u[0]) < fabs(src_u[0])) src_u[0] += f[0]*0.1*dt;
-//        if(fabs(src_u[1]) < fabs(src_u[1])) src_u[1] += f[1]*0.1*dt;
-//        if(fabs(src_u[2]) < fabs(src_u[2])) src_u[2] += f[2]*0.1*dt;
+        if(fabs(src_u[0]) < fabs(src_u[0])) src_u[0] += f[0]*0.1*dt;
+        if(fabs(src_u[1]) < fabs(src_u[1])) src_u[1] += f[1]*0.1*dt;
+        if(fabs(src_u[2]) < fabs(src_u[2])) src_u[2] += f[2]*0.1*dt;
         if(idx==prob_x*resolution*resolution + prob_y*resolution + prob_z)
         {
              printf("=>B(%f, %f, %f)", src_u[0], src_u[1], src_u[2]);
+             printf("-[%f] ", buoyancy);
         }
     }
 }
@@ -108,18 +106,31 @@ void viscosityKernel(double* su_xyz, int* id_xyz, double* tu_xyz, double viscosi
         if(x<resolution-1 && y<resolution-1 && z<resolution-1)
         {
             double factor = viscosity*dt/cell_size/cell_size;
-            double u0, u1;
-            u1 = getVel(x+1, y, z, su_xyz, resolution, 0);
-            u0 = getVel(x-1, y, z, su_xyz, resolution, 0);
-            dst_u[0] = src_u[0] + ((u1 - src_u[0]) - (src_u[0] - u0))*factor;
+            double laplace = -src_u[0]*6;
+            laplace += getVel(x+1, y, z, su_xyz, resolution, 0);
+            laplace += getVel(x-1, y, z, su_xyz, resolution, 0);
+            laplace += getVel(x, y+1, z, su_xyz, resolution, 0);
+            laplace += getVel(x, y-1, z, su_xyz, resolution, 0);
+            laplace += getVel(x, y, z+1, su_xyz, resolution, 0);
+            laplace += getVel(x, y, z-1, su_xyz, resolution, 0);
+            dst_u[0] = src_u[0] + laplace*factor;
+            laplace = -src_u[1]*6;
+            laplace += getVel(x+1, y, z, su_xyz, resolution, 1);
+            laplace += getVel(x-1, y, z, su_xyz, resolution, 1);
+            laplace += getVel(x, y+1, z, su_xyz, resolution, 1);
+            laplace += getVel(x, y-1, z, su_xyz, resolution, 1);
+            laplace += getVel(x, y, z+1, su_xyz, resolution, 1);
+            laplace += getVel(x, y, z-1, su_xyz, resolution, 1);
+            dst_u[1] = src_u[1] + laplace*factor;
+            laplace = -src_u[2]*6;
+            laplace += getVel(x+1, y, z, su_xyz, resolution, 2);
+            laplace += getVel(x-1, y, z, su_xyz, resolution, 2);
+            laplace += getVel(x, y+1, z, su_xyz, resolution, 2);
+            laplace += getVel(x, y-1, z, su_xyz, resolution, 2);
+            laplace += getVel(x, y, z+1, su_xyz, resolution, 2);
+            laplace += getVel(x, y, z-1, su_xyz, resolution, 2);
+            dst_u[2] = src_u[2] + laplace*factor;
 
-            u1 = getVel(x, y+1, z, su_xyz, resolution, 1);
-            u0 = getVel(x, y-1, z, su_xyz, resolution, 1);
-            dst_u[1] = src_u[1] + ((u1 - src_u[1]) - (src_u[1] - u0))*factor;
-
-            u1 = getVel(x, y, z+1, su_xyz, resolution, 2);
-            u0 = getVel(x, y, z-1, su_xyz, resolution, 2);
-            dst_u[2] = src_u[2] + ((u1 - src_u[2]) - (src_u[2] - u0))*factor;
             if(x==prob_x && y==prob_y && z==prob_z)
             {
                  printf("=>D(%f, %f, %f)", dst_u[0], dst_u[1], dst_u[2]);
@@ -304,6 +315,10 @@ void pressureKernel(double* su_xyz, int* id_xyz, double* tu_xyz, double* pressur
         else dP = 0;
         dst_u[2] = src_u[2] - dP*dt/(cell_size*density);
 
+        if(fabs(dst_u[0])>0.1) dst_u[0] = dst_u[0]/fabs(dst_u[0])*0.1;
+        if(fabs(dst_u[1])>0.1) dst_u[1] = dst_u[1]/fabs(dst_u[1])*0.1;
+        if(fabs(dst_u[2])>0.1) dst_u[2] = dst_u[2]/fabs(dst_u[2])*0.1;
+
         if(x==resolution-1) dst_u[0] = 0;
         if(y==resolution-1) dst_u[1] = 0;
         if(z==resolution-1) dst_u[2] = 0;
@@ -323,8 +338,8 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
                     int resolution, double cell_size, float dt)
 {
     double air_density = 1.225;
-    double viscosity = 10;
-    dt = dt;
+    double viscosity = 0.1;
+    dt = dt/2;
     cudaError err;
 
 
@@ -446,8 +461,6 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_h,
     std::cout << "\n";
     std::cout << std::flush;
 }
-
-
 
 
 

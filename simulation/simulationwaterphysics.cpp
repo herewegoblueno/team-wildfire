@@ -37,9 +37,12 @@ void Simulator::stepVoxelWater(Voxel* v, double deltaTimeInMs)
     }
 
 
-    q_v -= glm::dot(grad_v, u_center)*deltaTimeInMs*500;
-    q_c -= glm::dot(grad_c, u_center)*deltaTimeInMs*500;
-    q_r -= glm::dot(grad_r, u_center)*deltaTimeInMs*500;
+    q_v -= glm::dot(grad_v, u_center)*deltaTimeInMs*100;
+    q_c -= glm::dot(grad_c, u_center)*deltaTimeInMs*100;
+    q_r -= glm::dot(grad_r, u_center)*deltaTimeInMs*100;
+    q_v = std::max(0., std::min(q_v, 1.));
+    q_c = std::max(0., std::min(q_c, 1.));
+    q_r = std::max(0., std::min(q_r, 1.));
 
     float X_v = mole_fraction(q_v);
     float M_th = avg_mole_mass(X_v);
@@ -47,30 +50,38 @@ void Simulator::stepVoxelWater(Voxel* v, double deltaTimeInMs)
     float gamma_th = isentropic_exponent(Y_v);
     float c_th_p = heat_capacity(gamma_th, M_th);
 
-//    double ambient_temperature = absolute_temp(v->centerInWorldSpace.y);
+    double ambient_temperature = absolute_temp(v->centerInWorldSpace.y);
     double temperature = simTempToWorldTemp(v->getCurrentState()->temperature);
     double abs_pres = absolute_pres(h);
-    double abs_temp = (temperature+273.15)*std::pow(abs_pres/100000, 1/0.287)-273.15;
-    float q_vs = saturate(absolute_pres(h), abs_temp);
+    float q_vs = saturate(abs_pres, temperature);
     float E_r = q_r*evaporation_rate*std::min(std::max(q_vs - q_v, 0.), 10.);// evaporation of rain Fire Eq.22
-    float A_c = autoconverge_cloud*(q_c - 0.001); // below Stormscape Eq.24
+    float A_c = autoconverge_cloud*std::max(q_c - 0.001, 0.); // below Stormscape Eq.24
     float K_c = raindrop_accelerate*q_c*q_r;  // below Stormscape Eq.24
     q_v = q_v + std::min(q_vs - q_v, q_c) + E_r;
     q_c = q_c - std::min(q_vs - q_v, q_c) - A_c - K_c;
     q_r = A_c + K_c - E_r;
 
+
     float evp_temp = 2.5/c_th_p/0.287*mole_fraction(-std::min(q_vs-q_v, q_c));
 
-//    if(v->XIndex==8 && v->YIndex==2 && v->ZIndex==15)
-//    {
-//        cout << "q_v change:" << glm::dot(grad_v, u_center)*deltaTimeInMs*100 << " u_y:" << u_center.y ;
-//        cout << " evp temp:" << evp_temp << endl << flush;
-//    }
+    if(v->XIndex==8 && v->YIndex==2 && v->ZIndex==15)
+    {
+        cout << "q_v change:" << glm::dot(grad_v, u_center)*deltaTimeInMs*100 << " u_y:" << u_center.y ;
+        cout << " evp temp:" << evp_temp << endl << flush;
+    }
 
     v->getCurrentState()->q_v = q_v;
     v->getCurrentState()->q_c = q_c;
     v->getCurrentState()->q_r = q_r;
+    v->getCurrentState()->humidity = std::min(q_v,0.093)/10/saturate(abs_pres, ambient_temperature);
     v->getCurrentState()->temperature += evp_temp;
+    if(v->YIndex==resolution-5)
+    {
+        if(v->getCurrentState()->humidity>0.2)
+        {
+            cout<<"";
+        }
+    }
 }
 
 
@@ -95,8 +106,7 @@ double saturate(double pressure, double temperature)
 double absolute_temp(double height)
 {
 //    height = height_scale*height;
-    height = (height + 20)*100;
-    return sealevel_temperature - 0.0065*height;
+    return sealevel_temperature - 0.65*height;
 }
 
 // absolute pressure calculation based on Eq.28 Stormscape

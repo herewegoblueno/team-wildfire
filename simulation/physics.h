@@ -56,7 +56,7 @@ const double minReasonableCelcuis = 20;
 const double celciusdiff = maxReasonableCelcuis - minReasonableCelcuis;
 
 const double maxSimulationTemp = 20;
-const double minSimulationTemp = 2;
+const double minSimulationTemp = 0;
 const double simDiff = maxSimulationTemp - minSimulationTemp;
 
 double worldTempToSimulationTemp(double worldTemp);

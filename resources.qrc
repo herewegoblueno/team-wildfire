@@ -9,6 +9,8 @@
         <file alias="fire.frag">shaders/fire.frag</file>
         <file alias="particle.vert">shaders/particle.vert</file>
         <file alias="module.frag">shaders/module.frag</file>
+        <file alias="cloud.vert">shaders/cloud.vert</file>
+        <file alias="cloud.frag">shaders/cloud.frag</file>
     </qresource>
     <qresource prefix="/xmlScenes">
         <file>xmlScenes/basicScene.xml</file>
