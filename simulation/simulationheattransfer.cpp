@@ -74,6 +74,9 @@ void Simulator::stepModuleHeatTransfer(Module *m, VoxelSet surroundingAir, int d
         }
         surroundingAirTemp = surroundingAirTemp / static_cast<double>(surroundingAir.size());
     } else {
+        // If we don't have any surrounding voxels, it's because the burning module is
+        // very thin and about to get deleted. Using the ambient temp here will speed up
+        // the burning, but it's ok since the module will likely be gone in a few frames.
         surroundingAirTemp = ambientTemperatureFunc(m->getCenterOfMass());
     }
 
