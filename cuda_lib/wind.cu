@@ -46,11 +46,15 @@ void buoyancyKernel(double* grid_temp, double* grid_q_v, double* grid_h, double*
         double buoyancy =  0.05*(28.96*T_th/(M_th*T_air)-1);
 
         if (buoyancy<0) buoyancy=0;
-        if (buoyancy>0.05) buoyancy=0.05;
-        src_u[1] += buoyancy*dt;
-        if(fabs(src_u[0]) < fabs(src_u[0])) src_u[0] += f[0]*0.1*dt;
-        if(fabs(src_u[1]) < fabs(src_u[1])) src_u[1] += f[1]*0.1*dt;
-        if(fabs(src_u[2]) < fabs(src_u[2])) src_u[2] += f[2]*0.1*dt;
+        if (buoyancy>0.1) buoyancy=0.1;
+        if(src_u[1]<0.2) src_u[1] += buoyancy*dt;
+
+        if(height<6)
+        {
+            if(fabs(src_u[0]) < fabs(f[0])) src_u[0] += f[0]*0.02*dt;
+            if(fabs(src_u[1]) < fabs(f[1])) src_u[1] += f[1]*0.02*dt;
+            if(fabs(src_u[2]) < fabs(f[2])) src_u[2] += f[2]*0.02*dt;
+        }
     }
 }
 
@@ -294,14 +298,19 @@ void pressureKernel(double* su_xyz, int* id_xyz, double* tu_xyz, double* pressur
         else dP = 0;
         dst_u[2] = src_u[2] - dP*dt/(cell_size*density);
 
-        if(fabs(dst_u[0])>0.1) dst_u[0] = dst_u[0]/fabs(dst_u[0])*0.1;
-        if(fabs(dst_u[1])>0.1) dst_u[1] = dst_u[1]/fabs(dst_u[1])*0.1;
-        if(fabs(dst_u[2])>0.1) dst_u[2] = dst_u[2]/fabs(dst_u[2])*0.1;
+//        if(fabs(dst_u[0])>0.3) dst_u[0] = dst_u[0]/fabs(dst_u[0])*0.3;
+//        if(fabs(dst_u[1])>0.3) dst_u[1] = dst_u[1]/fabs(dst_u[1])*0.3;
+//        if(fabs(dst_u[2])>0.3) dst_u[2] = dst_u[2]/fabs(dst_u[2])*0.3;
 
-        if(x==resolution-1) dst_u[0] = 0;
+        if(x==resolution-1 || x==0) dst_u[0] = 0;
         if(y==resolution-1) dst_u[1] = 0;
-        if(z==resolution-1) dst_u[2] = 0;
-        if(y==0 && dst_u[1]<0) dst_u==0;
+        if(z==resolution-1 || z==0) dst_u[2] = 0;
+        if(y==0)
+        {
+            dst_u[1]=0;
+            dst_u[0]=0;
+            dst_u[2]=0;
+        }
 
     }
 }
@@ -332,9 +341,9 @@ void waterKernel(double* u_xyz, int* id_xyz,  double* d_h, double* d_temp, doubl
         d_q_c2[idx] = d_q_c[idx];
         d_q_r2[idx] = d_q_r[idx];
 
-        float uc_x = (getVel(x,y,z,u_xyz,resolution,0)+getVel(x-1,y,z,u_xyz,resolution,0))*0.5*100;
-        float uc_y = (getVel(x,y,z,u_xyz,resolution,1)+getVel(x,y-1,z,u_xyz,resolution,1))*0.5*100;
-        float uc_z = (getVel(x,y,z,u_xyz,resolution,2)+getVel(x,y,z-1,u_xyz,resolution,2))*0.5*100;
+        float uc_x = (getVel(x,y,z,u_xyz,resolution,0)+getVel(x-1,y,z,u_xyz,resolution,0))*0.5*1000;
+        float uc_y = (getVel(x,y,z,u_xyz,resolution,1)+getVel(x,y-1,z,u_xyz,resolution,1))*0.5*1000;
+        float uc_z = (getVel(x,y,z,u_xyz,resolution,2)+getVel(x,y,z-1,u_xyz,resolution,2))*0.5*1000;
 
         d_q_v2[idx] -= uc_x*getGrad(x,y,z,0,resolution,cell_size,d_q_v)*dt;
         d_q_v2[idx] -= uc_y*getGrad(x,y,z,1,resolution,cell_size,d_q_v)*dt;
@@ -370,7 +379,7 @@ void waterKernel(double* u_xyz, int* id_xyz,  double* d_h, double* d_temp, doubl
         d_q_c2[idx] = d_q_c2[idx] - saturate_cmp - A_c - K_c;
         d_q_r2[idx] = A_c + K_c - E_r;
 
-        double q_vs_amb = 380.16/abs_pres*exp(17.67*ambient_temperature/(temperature+243.5));
+        double q_vs_amb = 380.16/abs_pres*exp(17.67*ambient_temperature/(ambient_temperature+243.5));
         d_humi[idx] = min(d_q_v2[idx],0.093)/10/q_vs_amb;
 
         if(saturate_cmp<0)
@@ -424,23 +433,23 @@ void processWindGPU(double* grid_temp, double* grid_q_v, double* grid_q_c, doubl
     int numBlocks = (cell_num - 1) / blockSize + 1;
     // advection
     auto t2 = now();
-    advectKernel <<<numBlocks, blockSize>>> (d_u, d_id, d_u2, resolution, cell_size, dt);
-    cudaDeviceSynchronize();
+//    advectKernel <<<numBlocks, blockSize>>> (d_u, d_id, d_u2, resolution, cell_size, dt);
+//    cudaDeviceSynchronize();
 //     diffusion
     auto t3 = now();
-    viscosityKernel <<<numBlocks, blockSize>>> (d_u2, d_id, d_u, viscosity, resolution, cell_size, dt);
-    cudaDeviceSynchronize();
+//    viscosityKernel <<<numBlocks, blockSize>>> (d_u2, d_id, d_u, viscosity, resolution, cell_size, dt);
+//    cudaDeviceSynchronize();
     // vorticity confinement
     auto t4 = now();
-//    cudaMemcpy(d_u,    d_u2,     cell_num * sizeof(double) * 3, cudaMemcpyDeviceToDevice);
-    double *vorticity, *vorticity_len;
-    cudaMalloc(&vorticity,      cell_num * sizeof(double) * 3);
-    cudaMalloc(&vorticity_len,  cell_num * sizeof(double));
-    pre_vorticityKernel <<<numBlocks, blockSize>>> (d_u, d_id, vorticity, vorticity_len, resolution, cell_size, dt);
-    cudaDeviceSynchronize();
-    vorticityKernel <<<numBlocks, blockSize>>> (d_u, d_id, d_u2, vorticity, vorticity_len, resolution, cell_size, dt);
-    cudaDeviceSynchronize();
-    cudaFree(vorticity);  cudaFree(vorticity_len);
+    cudaMemcpy(d_u,    d_u2,     cell_num * sizeof(double) * 3, cudaMemcpyDeviceToDevice);
+//    double *vorticity, *vorticity_len;
+//    cudaMalloc(&vorticity,      cell_num * sizeof(double) * 3);
+//    cudaMalloc(&vorticity_len,  cell_num * sizeof(double));
+//    pre_vorticityKernel <<<numBlocks, blockSize>>> (d_u, d_id, vorticity, vorticity_len, resolution, cell_size, dt);
+//    cudaDeviceSynchronize();
+//    vorticityKernel <<<numBlocks, blockSize>>> (d_u, d_id, d_u2, vorticity, vorticity_len, resolution, cell_size, dt);
+//    cudaDeviceSynchronize();
+//    cudaFree(vorticity);  cudaFree(vorticity_len);
     // buoyancy
     auto t5 = now();
     buoyancyKernel <<<numBlocks, blockSize>>> (d_temp, d_q_v, d_h, d_u2, d_f, resolution, dt);

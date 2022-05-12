@@ -25,6 +25,9 @@ BasicFireScene::BasicFireScene():
 {
     voxelGrid.getVisualization()->toggle(false, true);
 
+    Voxel* v = voxelGrid.getVoxel(24, 22, 24);
+    fireManager.addFire(nullptr, vec3(v->centerInWorldSpace), 0.5);
+
     simulator.init();
     constructShaders();
 }
@@ -42,16 +45,7 @@ std::vector<std::unique_ptr<CS123Shader>> *BasicFireScene::getShaderPrograms(){
 }
 
 void BasicFireScene::render(SupportCanvas3D *context) {
-    Voxel* v = voxelGrid.getVoxel(8, 20, 16);
-    v->getLastFrameState()->temperature = 20;
-    v->getLastFrameState()->q_v = 0.2;
-    v = voxelGrid.getVoxel(8, 20, 15);
-    v->getLastFrameState()->temperature = 20;
-    v->getLastFrameState()->q_v = 0.2;
-    v = voxelGrid.getVoxel(9, 20, 16);
-    v->getLastFrameState()->temperature = 20;
-    v->getLastFrameState()->q_v = 0.2;
-    v = voxelGrid.getVoxel(9, 20, 15);
+    Voxel*  v = voxelGrid.getVoxel(24, 21, 24);
     v->getLastFrameState()->temperature = 20;
     v->getLastFrameState()->q_v = 0.2;
     simulator.step(&voxelGrid);
@@ -65,8 +59,8 @@ void BasicFireScene::render(SupportCanvas3D *context) {
     voxelGrid.getVisualization()->draw(context);
 
     fireManager.setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
-    fireManager.setScale(0.03, 0.05);
-    fireManager.drawFires(10, false);
+    fireManager.setScale(0.1, 0.2);
+    fireManager.drawFires(20.f/1000, true);
 
     cloudManager.setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
     cloudManager.setScale(0.5);

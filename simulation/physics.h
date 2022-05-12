@@ -23,7 +23,7 @@ const double air_density = 1.225;
 
 // heat transfer
 const double heat_diffusion_intensity = 0.3; //alpha
-const double radiative_cooling = 0.0002; //gamma
+const double radiative_cooling = 0.0004; //gamma
 const double adjacent_module_diffusion = 0.16; // alpha_M
 const double air_to_module_diffusion = 0.75; // b
 const double module_to_air_diffusion = 200; // tau
@@ -33,7 +33,7 @@ const double min_combust_temp_cel = 150.0; // T_0
 const double max_combust_temp_cel = 450.0; // T_1
 const double max_wind_combustion_boost = 1.5; // n_max
 const double speed_for_max_wind_boost = 1.0; // u_ref
-const double vapor_release_ratio = 0.1;
+const double vapor_release_ratio = 100;
 const double reation_rate_multiplier = 1.0; //Not in paper, added by us
 
 //Voxels
@@ -46,8 +46,8 @@ const double voxelSizeMultiplierForGradients = 10.0;
 const double woodDensity = 40;
 
 // fire particle
-const double alpha_temp = 0.9;
-const double beta_temp = 0.1;
+const double alpha_temp = 0.96;
+const double beta_temp = 0.04;
 const double burn_coef = 0.1;
 const double thermal_expansion = 0.05;
 
@@ -57,7 +57,7 @@ const double minReasonableCelcuis = 20;
 const double celciusdiff = maxReasonableCelcuis - minReasonableCelcuis;
 
 const double maxSimulationTemp = 20;
-const double minSimulationTemp = 0;
+const double minSimulationTemp = 2;
 const double simDiff = maxSimulationTemp - minSimulationTemp;
 
 double worldTempToSimulationTemp(double worldTemp);

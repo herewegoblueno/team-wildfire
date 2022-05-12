@@ -27,7 +27,8 @@ void main()
     TexCoords = texCoord;
     condensation = q_c>0.1 ? q_c : 0.1;
     humidity = (humi-0.5)*2;
-    x_off = x_offset;
-    y_off = x_offset;
+    vec4 world_pos = p * position_cameraSpace;
+    x_off = world_pos.y*world_pos.y+world_pos.x;
+    y_off = world_pos.y*world_pos.y+world_pos.z;
     gl_Position = p * position_cameraSpace;
 }

@@ -1,11 +1,14 @@
 #version 330 core
 in vec2 TexCoords;
-in float Temperature;
+in float Life;
+in float pattern;
+in float stamp;
+
 out vec4 color;
 
 uniform sampler2D sprite;
 
-float rand(vec2 co){return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);}
+float rand (vec2 co){return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);}
 float rand (vec2 co, float l) {return rand(vec2(rand(co), l));}
 float rand (vec2 co, float l, float t) {return rand(vec2(rand(co, l), t));}
 
@@ -34,18 +37,18 @@ void main()
 {
     vec2 temp = TexCoords - vec2(0.5);
     float f = dot(temp, temp);
-    if(f>0.25) discard;
+//    if(f>0.25) discard;
 
-    float rel_temperature = Temperature - 20;
-    if(rel_temperature>4.5) color = vec4(0.7, 0.45-f, 0.3, 1);
-    else if(rel_temperature>4.0) color = vec4(0.8, 0.36-f, 0.2, 1);
-    else if(rel_temperature>3.6) color = vec4(0.8, 0.25-f, 0.1, 1);
-    else if(rel_temperature>3.0) color = vec4(0.9, 0.05, 0.0, 1);
+    if(Life>4.5) color = vec4(0.7, 0.35-f, 0.1, 1);
+    else if(Life>4.0) color = vec4(0.8, 0.28-f, 0.07, 1);
+    else if(Life>3.6) color = vec4(0.8, 0.25-f, 0.02, 1);
+    else if(Life>3.0) color = vec4(0.8, 0.00, 0.0, 1);
     else color = vec4(0.8, 0, 0, 1);
 
     //For some reason this isn't working on Mac....
-    float guage = (0.1 + 0.5*rel_temperature/5)*(0.1 + 0.5*rel_temperature/5);
-    float w = perlin(TexCoords, 2.5, 0.0);
-    color.a = (w*0.5 + 0.5)*(0.25-f);
-
+    float guage = (0.5*Life/5)*(0.5*Life/5);
+    float w = perlin(TexCoords, 2.5, 5-Life);
+    color.a = (w*0.8 + 0.2)*(1-f/(guage+0.04));
+    if(f>guage+0.04) discard;
+//    color = vec4(1,1,1,1);
 }

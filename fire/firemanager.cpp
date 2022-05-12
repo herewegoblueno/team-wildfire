@@ -50,7 +50,6 @@ FireManager::FireManager(VoxelGrid *grid) :
     std::string fragmentSource = ResourceLoader::loadResourceFileToString(":/shaders/fire.frag");
     m_fireshader = std::make_unique<CS123Shader>(vertexSource, fragmentSource);
 
-    vertexSource = ResourceLoader::loadResourceFileToString(":/shaders/particle.vert");
     fragmentSource = ResourceLoader::loadResourceFileToString(":/shaders/smoke.frag");
     m_smokeshader = std::make_unique<CS123Shader>(vertexSource, fragmentSource);
 }
@@ -134,7 +133,7 @@ void FireManager::drawFires(float time, bool smoke)
         m_quad->bindVAO();
         for(auto &fire:m_fires){
             fire.second->updateSmoke(time);
-            fire.second->drawSmoke(m_fireshader.get(), m_quad.get());
+            fire.second->drawSmoke(m_smokeshader.get(), m_quad.get());
         }
         m_quad->unbindVAO();
         m_smokeshader->unbind();

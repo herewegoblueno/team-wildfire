@@ -47,9 +47,9 @@ Fire::Fire(int density, glm::vec3 center, float size, VoxelGrid* grid):
         m_vels.push_back(glm::vec3(vec_x, vec_y, vec_z));
     }
     //set respawn rate based on given density
-    assert(m_density>2);
+//    assert(m_density>2);
     m_respawn_num = fire_frame_rate * m_density / m_life;
-    m_respawn_num = std::max(m_respawn_num, 2);
+    m_respawn_num = std::max(m_respawn_num, 1);
 
     // init renderer
     generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
@@ -91,21 +91,24 @@ void Fire::update_particles(float timeStep)
             VoxelPhysicalData* vox = &voxel;
             float ambient_T = vox->temperature;
             if(std::isnan(ambient_T)) ambient_T = p.Temp;
+//            ambient_T = std::min(ambient_T, 30.f);
+            p.Life -= fire_frame_rate*(p.Temp-20)/60;
 
             float b_factor = 0.05;
-            glm::vec3 u = vec3(vox->u);
+            glm::vec3 u = vec3(vox->u)*1000.f;
+            u.y = std::max(u.y, 0.f);
 
         #ifdef CUDA_FLUID
-            b_factor = 0.05;
+            b_factor = 0.03;
             if(timeStep>0) p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
         #else
             if(timeStep>0) p.Temp = alpha_temp*p.Temp + beta_temp*ambient_T;
         #endif
 
             float b = gravity_acceleration*thermal_expansion*b_factor*
-                    (float)std::max(simTempToWorldTemp(p.Temp) - simTempToWorldTemp(ambient_T), 0.); // Buoyancy
-            u.y += b + 0.1;
-            if(glm::length(u)>1) u = u/glm::length(u)*1.f;
+                    (float)std::max(simTempToWorldTemp(p.Temp+10) - simTempToWorldTemp(ambient_T), 0.); // Buoyancy
+            u.y += b;
+            if(glm::length(u)>0.8) u = u/glm::length(u)*0.8f;
             p.Position += u * timeStep;
             if(p.Life < fire_frame_rate*1.5 || p.Temp < 20)
             {
@@ -130,7 +133,7 @@ void Fire::RespawnParticle(int index)
     particle.Position = m_center + offset;
     particle.Color = glm::vec4(rColor, rColor, rColor, 1.0f);
     particle.Life = m_life;
-    particle.Temp = 25;
+    particle.Temp = 35;
 
     particle.Velocity = m_size*m_vels[index];
 }
@@ -152,7 +155,7 @@ void Fire::drawParticles(CS123::GL::CS123Shader* shader, OpenGLShape* shape) {
         {
             glm::mat4 M_fire = glm::translate(glm::mat4(), particle.Position);
             shader->setUniform("m", M_fire);
-            shader->setUniform("temp", particle.Temp);
+            shader->setUniform("life", particle.Life);
 
             shape->drawVAO();
         }

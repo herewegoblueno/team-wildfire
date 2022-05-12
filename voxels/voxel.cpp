@@ -3,6 +3,7 @@
 #include "simulation/physics.h"
 #include "simulation/fluid.h"
 #include "voxelgrid.h"
+#include <iostream>
 
 
 #define GLM_ENABLE_EXPERIMENTAL

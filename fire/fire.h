@@ -28,8 +28,8 @@ private:
     // particle cluster property
     int m_density;
     float m_size;
-    float fire_frame_rate = 0.03;
-    float m_life = 3.0f;
+    float fire_frame_rate = 0.1;
+    float m_life = 5.0f;
     int m_respawn_num = 2;
     glm::vec3 m_center;
     std::vector<glm::vec3> m_vels;

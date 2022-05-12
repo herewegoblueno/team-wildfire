@@ -95,17 +95,11 @@ void CloudManager::draw()
                 Voxel* v = m_grid->getVoxel(x,y,z);
                 if(v->getCurrentState()->humidity>0.8)
                 {
-                    for(int sub=0;sub<3;sub++)
-                    {
-                        glm::vec3 offset(dist(generator)*3, dist(generator), dist(generator)*3);
-                        glm::vec3 rand_pos = glm::vec3(v->centerInWorldSpace)+offset/4.f;
-                        glm::mat4 M_cloud = glm::translate(glm::mat4(), rand_pos);
-                        m_shader->setUniform("m", M_cloud);
-                        m_shader->setUniform("humi", v->getCurrentState()->humidity);
-                        float q_c = m_grid->getQcInterpolatePoint(rand_pos);
-                        m_shader->setUniform("q_c", q_c);
-                        m_quad->drawVAO();
-                    }
+                    glm::mat4 M_cloud = glm::translate(glm::mat4(), glm::vec3(v->centerInWorldSpace));
+                    m_shader->setUniform("m", M_cloud);
+                    m_shader->setUniform("humi", v->getCurrentState()->humidity);
+                    m_shader->setUniform("q_c", v->getCurrentState()->q_c);
+                    m_quad->drawVAO();
                 }
 
             }

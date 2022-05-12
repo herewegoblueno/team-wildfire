@@ -22,8 +22,8 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
     for (Module *m : nearbyModules) dMdt += m->getCurrentState()->massChangeRateFromLastFrame;
 
     // Vapor release (the rest of the workon q_v will be done in the dedicated water physics part of the simulation)
-    v->getLastFrameState()->q_v += dMdt*vapor_release_ratio*deltaTimeInMs/1000.0;
-
+    v->getLastFrameState()->q_v -= dMdt*vapor_release_ratio*deltaTimeInMs/1000.0;
+    v->getLastFrameState()->q_v = clamp(v->getLastFrameState()->q_v, 0.f, 1.f);
 
     // Midpoint Integration
     // first pass
@@ -54,7 +54,7 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
         v->getCurrentState()->temperature = v->getLastFrameState()->temperature + dTdt * deltaTimeInMs / 1000.0;
     }
 
-    if(v->getCurrentState()->temperature > 100) {
+    if(std::abs(v->getCurrentState()->temperature) > 100) {
         cout << "Looks like a voxel's temperature is exploding! " << v->getCurrentState()->temperature << endl;
     }
 
@@ -71,7 +71,15 @@ void Simulator::stepModuleHeatTransfer(Module *m, VoxelSet surroundingAir, int d
     for (Voxel *v : surroundingAir) {
         surroundingAirTemp += v->getLastFrameState()->temperature;
     }
-    surroundingAirTemp = surroundingAirTemp / static_cast<double>(surroundingAir.size());
+    double surroundSize = static_cast<double>(surroundingAir.size());
+    surroundSize = std::max(surroundSize, 1.);
+    surroundingAirTemp = surroundingAirTemp / surroundSize;
+
+    if(isnan(tempLaplace))
+    {
+        cout<< " temperature explodes by q_v" << flush;
+        exit(0);
+    }
     double dTdt = adjacent_module_diffusion * tempLaplace
             + air_to_module_diffusion * (surroundingAirTemp - moduleTemp);
     m->getCurrentState()->temperature = moduleTemp + dTdt * deltaTimeInMs / 1000.0;

@@ -32,8 +32,8 @@ public:
 private:
     int m_density;
     float m_size;
-    float m_frame_rate;
-    float m_life_max = 5.0f;
+    float m_frame_rate = 0.005;
+    float m_life_max = 1.0f;
     VoxelGrid* m_grid;
     std::vector<Particle> m_particles;
 

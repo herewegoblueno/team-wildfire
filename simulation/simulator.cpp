@@ -44,6 +44,7 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
 
     std::vector<std::thread> threads;
     for (int x = 0; x < gridResolution; x += jumpPerThread)
+//        stepThreadHeatHandler(grid, forest, deltaTime, gridResolution, x, x + jumpPerThread);
         threads.emplace_back(&Simulator::stepThreadHeatHandler, this, grid, forest, deltaTime, gridResolution, x, x + jumpPerThread);
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
 
@@ -96,9 +97,22 @@ void Simulator::stepThreadWaterHandler(VoxelGrid *grid, int deltaTime, int resol
                 Voxel* vox = grid->getVoxel(x,y,z);
             #ifdef CUDA_FLUID
                 writeCuda2Host(vox, index);
+
             #else
                 stepVoxelWater(vox, deltaTime/1000.);
             #endif
+
+                if(index==32040)
+                {
+                    cout << vox->getCurrentState()->q_c<<",";
+                    cout << vox->getCurrentState()->q_v<<",";
+                    cout << vox->getCurrentState()->q_r<<",";
+                    cout << vox->getCurrentState()->temperature<<",(";
+                    cout << vox->getCurrentState()->u.x<<",";
+                    cout << vox->getCurrentState()->u.y<<",";
+                    cout << vox->getCurrentState()->u.z<<")\n" << flush;
+
+                }
                 index++;
             }
         }

@@ -1,6 +1,6 @@
 #version 330 core
 in vec2 TexCoords;
-in float Temperature;
+in float Life;
 out vec4 color;
 
 uniform float base_x;
@@ -36,19 +36,16 @@ void main()
 {
     vec2 temp = TexCoords - vec2(0.5);
     float f = dot(temp, temp);
+
+    color = vec4(0.7,0.7,0.7,1);
+    float w = perlin(TexCoords+vec2(base_x, base_y)*5, 3, 0.);
+
+    float guage = (1-Life)*(1-Life);
+    guage = max(guage, 0.04);
+    color.a = w*(1.0-f/guage)*0.05;
+
+//    color = vec4(1,1,1,0.3);
     if(f>0.25) discard;
-
-    float ref_temp = 20. - Temperature;
-    if(ref_temp>4) color = vec4(0.7, 0.7, 0.7, 1);
-    else if(ref_temp>3) color = vec4(0.6, 0.6, 0.6, 1);
-    else if(ref_temp>2) color = vec4(0.5, 0.5, 0.5, 1);
-    else if(ref_temp>1) color = vec4(0.4, 0.4, 0.4, 1);
-
-    float w = perlin(TexCoords+vec2(base_x, base_y)*5, 2.5, 0.);
-    color.a = w*(0.25-f);
-
-//    if(f>0.1) discard;
-    if(f>0.03*ref_temp) discard;
-//    if(f>0.25) discard;
+    if(f>guage) discard;
 
 }
