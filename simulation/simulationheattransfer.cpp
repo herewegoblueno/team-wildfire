@@ -66,11 +66,20 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
 /** Equation 25 of Fire in Paradise paper */
 void Simulator::stepModuleHeatTransfer(Module *m, VoxelSet surroundingAir, int deltaTimeInMs) {
     double moduleTemp = m->getLastFrameState()->temperature;
-    double tempLaplace = m->getTemperatureLaplaceFromPreviousFrame();
-    double surroundingAirTemp = 0.0;
-    for (Voxel *v : surroundingAir) {
-        surroundingAirTemp += v->getLastFrameState()->temperature;
+    double surroundingAirTemp;
+    if (surroundingAir.size() > 0) {
+        surroundingAirTemp = 0.0;
+        for (Voxel *v : surroundingAir) {
+            surroundingAirTemp += v->getLastFrameState()->temperature;
+        }
+        surroundingAirTemp = surroundingAirTemp / static_cast<double>(surroundingAir.size());
+    } else {
+        // If we don't have any surrounding voxels, it's because the burning module is
+        // very thin and about to get deleted. Using the ambient temp here will speed up
+        // the burning, but it's ok since the module will likely be gone in a few frames.
+        surroundingAirTemp = ambientTemperatureFunc(m->getCenterOfMass());
     }
+
     double surroundSize = static_cast<double>(surroundingAir.size());
     surroundSize = std::max(surroundSize, 1.);
     surroundingAirTemp = surroundingAirTemp / surroundSize;
@@ -80,6 +89,8 @@ void Simulator::stepModuleHeatTransfer(Module *m, VoxelSet surroundingAir, int d
         cout<< " temperature explodes by q_v" << flush;
         exit(0);
     }
+
+    double tempLaplace = m->getTemperatureLaplaceFromPreviousFrame();
     double dTdt = adjacent_module_diffusion * tempLaplace
             + air_to_module_diffusion * (surroundingAirTemp - moduleTemp);
     m->getCurrentState()->temperature = moduleTemp + dTdt * deltaTimeInMs / 1000.0;

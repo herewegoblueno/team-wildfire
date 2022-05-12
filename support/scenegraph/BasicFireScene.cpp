@@ -59,8 +59,10 @@ void BasicFireScene::render(SupportCanvas3D *context) {
     voxelGrid.getVisualization()->draw(context);
 
     fireManager.setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
+
     fireManager.setScale(0.1, 0.2);
     fireManager.drawFires(20.f/1000, true);
+
 
     cloudManager.setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
     cloudManager.setScale(0.5);

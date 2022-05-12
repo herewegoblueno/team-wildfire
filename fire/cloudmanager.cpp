@@ -1,7 +1,4 @@
 #include "support/shapes/OpenGLShape.h"
-#include "support/gl/textures/Texture2D.h"
-#include "support/gl/textures/TextureParametersBuilder.h"
-
 #include "support/gl/datatype/VAO.h"
 #include "support/gl/datatype/FBO.h"
 #include "support/gl/datatype/VBO.h"
@@ -41,11 +38,6 @@ CloudManager::CloudManager(VoxelGrid *grid) :
     CS123::GL::VBO vbo(particle_quad.data(), 20, attribs, VBO::GEOMETRY_LAYOUT::LAYOUT_TRIANGLE_STRIP);
     m_quad->m_VAO = std::make_unique<VAO>(vbo, 4);
 
-
-    QImage img(":/textures/fire2.png");
-    QImage gl_img = QGLWidget::convertToGLFormat(img);
-    m_texture = std::make_unique<Texture2D>(gl_img.bits(), gl_img.width(), gl_img.height());
-
     std::string vertexSource = ResourceLoader::loadResourceFileToString(":/shaders/cloud.vert");
     std::string fragmentSource = ResourceLoader::loadResourceFileToString(":/shaders/cloud.frag");
     m_shader = std::make_unique<CS123Shader>(vertexSource, fragmentSource);
@@ -73,15 +65,7 @@ void CloudManager::draw()
 
 
     m_shader->bind();
-    // bind texture (though currently it's not even used in the shader since it doesn't work on Mac)
-    TextureParametersBuilder builder;
-    builder.setFilter(TextureParameters::FILTER_METHOD::LINEAR);
-    builder.setWrap(TextureParameters::WRAP_METHOD::REPEAT);
 
-    TextureParameters parameters = builder.build();
-    parameters.applyTo(*m_texture);
-    std::string filename = "sprite";
-    m_shader->setTexture(filename, *m_texture);
     m_shader->setUniform("scale", scale);
     m_shader->setUniform("p", p);
     m_shader->setUniform("v", v);

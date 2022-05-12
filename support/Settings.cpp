@@ -61,6 +61,8 @@ void Settings::loadSettingsOrDefaults() {
 
     useMidpointForVoxelHeatTransfer = s.value("useMidpointForVoxelHeatTransfer", true).toBool();
 
+    boolRenderSmoke = s.value("boolRenderSmoke", true).toBool();
+
     // Shape Tesselation Settings
     shapeParameter1 = s.value("shapeParameter1", 15).toInt();
     shapeParameter2 = s.value("shapeParameter2", 15).toInt();
@@ -107,6 +109,7 @@ void Settings::saveSettings() {
     s.setValue("visualizeForestVoxelGridMinTemp", visualizeForestVoxelGridMinTemp);
     s.setValue("visualizeForestVoxelGridMaxTemp", visualizeForestVoxelGridMaxTemp);
 
+    s.setValue("boolRenderSmoke", boolRenderSmoke);
 
     // Shapes
     s.setValue("shapeParameter1", shapeParameter1);

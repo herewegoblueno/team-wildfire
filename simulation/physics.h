@@ -2,7 +2,7 @@
 #define PHYSICS_H
 #include "glm/ext.hpp"
 
-//These are all the relevant tunable physics variables for the simulation
+// These are all the relevant tunable physics variables for the simulation
 
 // general
 const double sealevel_temperature = 20;
@@ -23,7 +23,12 @@ const double air_density = 1.225;
 
 // heat transfer
 const double heat_diffusion_intensity = 0.3; //alpha
-const double radiative_cooling = 0.0004; //gamma
+
+#ifdef CUDA_FLUID
+    const double radiative_cooling = 0.0002; //gamma
+#else
+    const double radiative_cooling = 0.0004; //gamma
+#endif
 const double adjacent_module_diffusion = 0.16; // alpha_M
 const double air_to_module_diffusion = 0.75; // b
 const double module_to_air_diffusion = 200; // tau
@@ -33,17 +38,19 @@ const double min_combust_temp_cel = 150.0; // T_0
 const double max_combust_temp_cel = 450.0; // T_1
 const double max_wind_combustion_boost = 1.5; // n_max
 const double speed_for_max_wind_boost = 1.0; // u_ref
+
 const double vapor_release_ratio = 100;
 const double reation_rate_multiplier = 1.0; //Not in paper, added by us
 
-//Voxels
-double ambientTemperatureFunc(glm::dvec3 point);
-//When calculating gradients, we act as if the cells are larger than they actually are for better
-//simulation stability
-const double voxelSizeMultiplierForGradients = 10.0;
 
 // trees
-const double woodDensity = 40;
+const double woodDensity = 100; // rho
+
+// voxels
+double ambientTemperatureFunc(glm::dvec3 point);
+// when calculating gradients, we act as if the cells are larger than they actually are
+// for better simulation stability
+const double voxelSizeMultiplierForGradients = 10.0;
 
 // fire particle
 const double alpha_temp = 0.96;

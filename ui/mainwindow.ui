@@ -187,7 +187,7 @@
           <locale language="English" country="UnitedStates"/>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="forestTab">
           <attribute name="title">
@@ -1060,6 +1060,13 @@
                 </rect>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_6">
+                <item>
+                 <widget class="QCheckBox" name="RenderSmokeForest">
+                  <property name="text">
+                   <string>Render Smoke</string>
+                  </property>
+                 </widget>
+                </item>
                 <item>
                  <widget class="QCheckBox" name="useLightingForShaders">
                   <property name="text">

@@ -9,7 +9,6 @@
 #include "GL/glew.h"
 #include <glm.hpp>
 
-#include "support/gl/textures/Texture2D.h"
 #include "voxels/voxelgrid.h"
 #include "particle.h"
 #include "fire.h"
@@ -42,7 +41,6 @@ private:
 
     // render components
     std::unique_ptr<OpenGLShape> m_quad;
-    std::unique_ptr<CS123::GL::Texture2D> m_texture;
 
     glm::mat4 p;
     glm::mat4 v;

@@ -69,6 +69,8 @@ struct Settings
     float simulatorTimescale;
     bool useMidpointForVoxelHeatTransfer;
 
+    bool boolRenderSmoke;
+
     // Shapes
     int shapeParameter1;
     int shapeParameter2;

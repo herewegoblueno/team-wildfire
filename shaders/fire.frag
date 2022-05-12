@@ -6,9 +6,8 @@ in float stamp;
 
 out vec4 color;
 
-uniform sampler2D sprite;
 
-float rand (vec2 co){return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);}
+float rand(vec2 co){return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);}
 float rand (vec2 co, float l) {return rand(vec2(rand(co), l));}
 float rand (vec2 co, float l, float t) {return rand(vec2(rand(co, l), t));}
 
@@ -51,4 +50,5 @@ void main()
     color.a = (w*0.8 + 0.2)*(1-f/(guage+0.04));
     if(f>guage+0.04) discard;
 //    color = vec4(1,1,1,1);
+
 }

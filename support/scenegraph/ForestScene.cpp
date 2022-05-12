@@ -53,6 +53,10 @@ void ForestScene::init() {
     fireCursor = QCursor(cursor_pixmap, 0, 0);
     cursor_pixmap = QPixmap(":/images/images/snowflakecursor.png");
     snowCursor = QCursor(cursor_pixmap, 0, 0);
+
+#ifndef CUDA_FLUID
+    mainWindow->createWindForNonCuda(0.2, 0.05);
+#endif
 }
 
 /**
@@ -130,8 +134,9 @@ void ForestScene::render(SupportCanvas3D *context) {
 
     updateFires();
     _fireManager->setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
+
     _fireManager->setScale(0.1, 0.2);
-    _fireManager->drawFires(_simulator->getTimeSinceLastFrame()/1000.0, true);
+    _fireManager->drawFires(_simulator->getTimeSinceLastFrame()/1000.0, settings.boolRenderSmoke);
 
     _cloudManager->setCamera(camera->getProjectionMatrix(), camera->getViewMatrix());
     _cloudManager->setScale(0.5);
