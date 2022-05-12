@@ -66,12 +66,18 @@ void Simulator::stepVoxelHeatTransfer(Voxel* v, ModuleSet nearbyModules, int del
 /** Equation 25 of Fire in Paradise paper */
 void Simulator::stepModuleHeatTransfer(Module *m, VoxelSet surroundingAir, int deltaTimeInMs) {
     double moduleTemp = m->getLastFrameState()->temperature;
-    double tempLaplace = m->getTemperatureLaplaceFromPreviousFrame();
-    double surroundingAirTemp = 0.0;
-    for (Voxel *v : surroundingAir) {
-        surroundingAirTemp += v->getLastFrameState()->temperature;
+    double surroundingAirTemp;
+    if (surroundingAir.size() > 0) {
+        surroundingAirTemp = 0.0;
+        for (Voxel *v : surroundingAir) {
+            surroundingAirTemp += v->getLastFrameState()->temperature;
+        }
+        surroundingAirTemp = surroundingAirTemp / static_cast<double>(surroundingAir.size());
+    } else {
+        surroundingAirTemp = ambientTemperatureFunc(m->getCenterOfMass());
     }
-    surroundingAirTemp = surroundingAirTemp / static_cast<double>(surroundingAir.size());
+
+    double tempLaplace = m->getTemperatureLaplaceFromPreviousFrame();
     double dTdt = adjacent_module_diffusion * tempLaplace
             + air_to_module_diffusion * (surroundingAirTemp - moduleTemp);
     m->getCurrentState()->temperature = moduleTemp + dTdt * deltaTimeInMs / 1000.0;
