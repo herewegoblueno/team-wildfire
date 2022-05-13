@@ -34,7 +34,7 @@
         <center x="0" y="0" z="0"/>
         <width v="10"/>
         <height v="10"/>
-        <numtrees v="80"/>
+        <numtrees v="20"/>
     </treeregion>
 
     <object type="tree" name="root">

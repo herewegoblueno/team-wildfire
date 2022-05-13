@@ -72,12 +72,16 @@ void CloudManager::draw()
 
     int resolution = m_grid->getResolution();
     m_quad->bindVAO();
+    int half_res = resolution/2;
     for(int x=0;x<resolution;x++)
-        for(int y=resolution*0.7;y<resolution*0.9;y++)
+        for(int y=resolution*0.7;y<resolution*0.95;y++)
             for(int z=0;z<resolution;z++)
             {
+                if((x-half_res)*(x-half_res)+(z-half_res)*(z-half_res)+3*(y-half_res)*(y-half_res)>half_res*half_res)
+                    continue;
+
                 Voxel* v = m_grid->getVoxel(x,y,z);
-                if(v->getCurrentState()->humidity>0.8)
+                if(v->getCurrentState()->humidity>0.9)
                 {
                     glm::mat4 M_cloud = glm::translate(glm::mat4(), glm::vec3(v->centerInWorldSpace));
                     m_shader->setUniform("m", M_cloud);
@@ -85,28 +89,20 @@ void CloudManager::draw()
                     m_shader->setUniform("q_c", v->getCurrentState()->q_c);
                     m_quad->drawVAO();
                 }
-
             }
 
 //// testing
-//    for(int x=18;x<23;x++)
-//        for(int y=40;y<43;y++)
-//            for(int z=18;z<21;z++)
+//    for(int x=18;x<23;x+=2)
+//        for(int y=40;y<43;y+=2)
+//            for(int z=18;z<21;z+=2)
 //    {
 //        Voxel* v = m_grid->getVoxel(x,y,z);
-//        for(int sub=0;sub<3;sub++)
-//        {
-//            glm::vec3 offset(dist(generator), dist(generator), dist(generator));
-//            glm::vec3 rand_pos = glm::vec3(v->centerInWorldSpace)+offset/2.f;
-//            glm::vec3 world_pos = glm::vec3(v->centerInWorldSpace);
-//            glm::mat4 M_cloud = glm::translate(glm::mat4(), rand_pos);
-//            m_shader->setUniform("m", M_cloud);
-//            m_shader->setUniform("humi", v->getCurrentState()->humidity);
-//            m_shader->setUniform("q_c", v->getCurrentState()->q_c);
-//            m_shader->setUniform("x_offset", offset.x+offset.y);
-//            m_shader->setUniform("y_offset", offset.z+offset.y);
-//            m_quad->drawVAO();
-//        }
+//        glm::mat4 M_cloud = glm::translate(glm::mat4(), glm::vec3(v->centerInWorldSpace));
+//        m_shader->setUniform("m", M_cloud);
+//        m_shader->setUniform("humi", v->getCurrentState()->humidity);
+//        m_shader->setUniform("q_c", 0.8f);
+//        m_quad->drawVAO();
+
 //    }
 
     m_quad->unbindVAO();
