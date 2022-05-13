@@ -213,6 +213,7 @@ void MainWindow::changeCameraSettings(bool useOrbiting){
 
 //Called by Forest scene if it doesn't have CUDA running to make make wind that at least
 //simulates some form of bouyance
+//Unfortunately this won't be enough for clouds, though, since they require non-uniform u-fields
 void MainWindow::createWindForNonCuda(float y, float x){
     ui->WindFieldXSlider->setValue(x * dividerForWindSliders);
     ui->WindFieldYSlider->setValue(y * dividerForWindSliders);

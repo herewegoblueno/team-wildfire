@@ -193,17 +193,4 @@ DISTFILES += \
     xmlScenes/twoRegions.xml \
     xmlScenes/twoRegionsCloser.xml
 
-# For Eigen, see readme for more details
-macx {
-    HOME_DIR = $$(HOME)
-}
-
-win32 {
-    HOME_DIR = $$(HOMEPATH)
-}
-
-#QMAKE_CXXFLAGS = -I "$${HOME_DIR}/eigen-git-mirror"
-#INCLUDEPATH += "$${HOME_DIR}/eigen-git-mirror"
-#DEPENDPATH += "$${HOME_DIR}/eigen-git-mirror"
-
 include(cuda_lib/cuda_lib.pri)
