@@ -80,10 +80,6 @@ void Simulator::stepModuleHeatTransfer(Module *m, VoxelSet surroundingAir, int d
         surroundingAirTemp = ambientTemperatureFunc(m->getCenterOfMass());
     }
 
-    double surroundSize = static_cast<double>(surroundingAir.size());
-    surroundSize = std::max(surroundSize, 1.);
-    surroundingAirTemp = surroundingAirTemp / surroundSize;
-
     double tempLaplace = m->getTemperatureLaplaceFromPreviousFrame();
     double dTdt = adjacent_module_diffusion * tempLaplace
             + air_to_module_diffusion * (surroundingAirTemp - moduleTemp);

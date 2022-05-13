@@ -44,7 +44,7 @@ const double reation_rate_multiplier = 1.0; //Not in paper, added by us
 
 
 // trees
-const double woodDensity = 100; // rho
+const double woodDensity = 60; // rho
 
 // voxels
 double ambientTemperatureFunc(glm::dvec3 point);

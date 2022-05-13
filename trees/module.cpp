@@ -190,7 +190,6 @@ double Module::getReactionRateFromPreviousFrame(double windSpeed) {
     windSpeed = std::min(windSpeed, speed_for_max_wind_boost);
     double windBoost = (max_wind_combustion_boost - 1.0)
             * sigmoidFunc(windSpeed / speed_for_max_wind_boost) + 1.0;
-
     return windBoost * rate;
 }
 
@@ -208,7 +207,6 @@ double Module::sigmoidFunc(double x) {
  */
 double Module::getMassChangeRateFromPreviousFrame(double windSpeed) {
     double reactionRate = getReactionRateFromPreviousFrame(windSpeed);
-
     double surfaceArea = getLastFrameState()->area;
     return -reactionRate * surfaceArea;
 }
