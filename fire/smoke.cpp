@@ -62,15 +62,15 @@ void Smoke::update_particles(float timeStep)
             glm::vec3 u = vec3(vox->u)*1000.f;
             u.y = std::max(u.y, 0.f);
 
-            float b_factor = 0.08;
+            float b_factor = 0.3;
             #ifdef CUDA_FLUID
-                b_factor = 0.05;
+                b_factor = 0.2;
             #endif
 
             float b = gravity_acceleration*thermal_expansion*b_factor*
                     (float)std::max(simTempToWorldTemp(p.Temp+5) - simTempToWorldTemp(ambient_T), 0.); // Buoyancy
             u.y += b;
-            if(glm::length(u)>3) u = u/glm::length(u)*3.f;
+            if(glm::length(u)>2) u = u/glm::length(u)*2.f;
             p.Position += u * timeStep;
 
             if(p.Life>0.5) p.Life -= m_frame_rate;
