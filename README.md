@@ -24,7 +24,7 @@ In case those links are dead you can see those papers in the README_papers folde
 
 Here's a shot of what it can do:
 
-<img src="README_and_docs_images/wildfire%20preview.png" alt="Preview" height=300/>
+<img src="README_and_docs_images/wildfire%20preview.png" alt="Preview" height=500/>
 
 This simulation handles heat spread through the air and through individual trees, convection,
 water evaporation and condensation and clouds, wind, combustion, and trees can eventually burn to 
