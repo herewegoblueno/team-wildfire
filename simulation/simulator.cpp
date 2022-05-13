@@ -6,7 +6,7 @@
 #include "support/Settings.h"
 
 
-const int Simulator::NUMBER_OF_SIMULATION_THREADS = 8;
+const int Simulator::NUMBER_OF_SIMULATION_THREADS = 16;
 const int Simulator::MAX_TIMESTEP_MS_ALLOWED = 50;
 
 Simulator::Simulator() {}
@@ -51,10 +51,13 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
 #ifdef CUDA_FLUID
     dvec3 g_w = grid->getGlobalFField();
     double g_w3[3] = {g_w.x, g_w.y, g_w.z};
-    processWindGPU(host2cuda.grid_temp, host2cuda.grid_q_v, host2cuda.grid_q_c, host2cuda.grid_q_r,
-                                   host2cuda.grid_h, host2cuda.grid_humidity,
-                                   host2cuda.u_xyz, host2cuda.id_xyz, 32, g_w3,
-                                   gridResolution, grid->cellSideLengthForGradients(), deltaTime/1000.);
+    if(deltaTime>0){
+        processWindGPU(host2cuda.grid_temp, host2cuda.grid_q_v, host2cuda.grid_q_c, host2cuda.grid_q_r,
+                                       host2cuda.grid_h, host2cuda.grid_humidity,
+                                       host2cuda.u_xyz, host2cuda.id_xyz, 32, g_w3,
+                                       gridResolution, grid->cellSideLengthForGradients(), deltaTime/1000.);
+    }
+
 #endif
     threads.clear();
     for (int x = 0; x < gridResolution; x += jumpPerThread)
@@ -163,6 +166,7 @@ void Simulator::writeHost2Cuda(Voxel* v, int index)
     host2cuda.grid_q_c[index] = v->getLastFrameState()->q_c;
     host2cuda.grid_q_r[index] = v->getLastFrameState()->q_r;
     host2cuda.grid_h[index] = v->centerInWorldSpace.y;
+    host2cuda.grid_humidity[index] = v->getLastFrameState()->humidity;
     host2cuda.u_xyz[index*3+0] = v->getLastFrameState()->u.x;
     host2cuda.u_xyz[index*3+1] = v->getLastFrameState()->u.y;
     host2cuda.u_xyz[index*3+2] = v->getLastFrameState()->u.z;

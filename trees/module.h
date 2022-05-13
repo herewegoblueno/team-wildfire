@@ -7,7 +7,7 @@
 #include "voxels/voxelgrid.h"
 #include "utils/Random.h"
 
-const int numFireSpawnPointsPerBranch = 2;
+const int numFireSpawnPointsPerBranch = 1;
 const float branchWidthDecay = 0.7; // Amount to scale x, z size of each successive iteration
 
 // Object space values based off of Trunk.cpp

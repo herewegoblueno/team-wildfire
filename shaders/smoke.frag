@@ -42,7 +42,7 @@ void main()
 
     float guage = (1-Life)*(1-Life);
     guage = max(guage, 0.04);
-    color.a = w*(1.0-f/guage)*0.05;
+    color.a = w*(1.0-f/guage)*0.25;
 
 //    color = vec4(1,1,1,0.3);
     if(f>0.25) discard;

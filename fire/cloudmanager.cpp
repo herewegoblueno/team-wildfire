@@ -73,7 +73,7 @@ void CloudManager::draw()
     int resolution = m_grid->getResolution();
     m_quad->bindVAO();
     for(int x=0;x<resolution;x++)
-        for(int y=resolution*0.7;y<resolution;y++)
+        for(int y=resolution*0.7;y<resolution*0.9;y++)
             for(int z=0;z<resolution;z++)
             {
                 Voxel* v = m_grid->getVoxel(x,y,z);
