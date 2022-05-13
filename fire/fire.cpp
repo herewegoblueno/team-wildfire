@@ -44,8 +44,8 @@ Fire::Fire(int density, glm::vec3 center, float size, VoxelGrid* grid):
         m_poss.push_back(glm::vec3(random_x, random_y, random_z));
         m_vels.push_back(glm::vec3(vec_x, vec_y, vec_z));
     }
+
     //set respawn rate based on given density
-//    assert(m_density>2);
     m_respawn_num = fire_frame_rate * m_density / m_life;
     m_respawn_num = std::max(m_respawn_num, 1);
 
@@ -110,10 +110,8 @@ void Fire::update_particles(float timeStep)
             p.Position += u * timeStep;
             if(p.Life < fire_frame_rate*1.5 || p.Temp < 20)
             {
-//                #ifndef CUDA_FLUID
                 m_smoke->RespawnParticle(i, p);
                 p.Life = 0;
-//                #endif
             }
         }
     }

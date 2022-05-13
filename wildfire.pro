@@ -189,6 +189,7 @@ RESOURCES += \
 
 DISTFILES += \
     xmlScenes/basicScene.xml \
+    xmlScenes/lessForestCover.xml \
     xmlScenes/twoRegions.xml \
     xmlScenes/twoRegionsCloser.xml
 
