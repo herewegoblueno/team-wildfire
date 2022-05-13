@@ -129,6 +129,15 @@ void ForestScene::render(SupportCanvas3D *context) {
     glBindTexture(GL_TEXTURE_2D, 0);
     selectedShader->unbind();
 
+
+    _phongShader.get()->bind();
+    setGlobalData(_phongShader.get());
+    setSceneUniforms(context, _phongShader.get());
+    setLights(_phongShader.get());
+    renderGround();
+    glBindTexture(GL_TEXTURE_2D, 0);
+    _phongShader.get()->unbind();
+
     _voxelGrid->getVisualization()->setPV(camera->getProjectionMatrix() * camera->getViewMatrix());
     _voxelGrid->getVisualization()->draw(context);
 
@@ -168,7 +177,6 @@ void ForestScene::tessellateShapes() {
 /** Render each primitive's shape */
 void ForestScene::renderGeometry() {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    renderGround();
     if (settings.seeBranchModules) {
         renderTrunksVisualizedModules();
     } else {
@@ -223,6 +231,7 @@ void ForestScene::renderTrunksVisualizedModules() {
 void ForestScene::renderTrunks() {
     _trunk->bindVAO();
     for (PrimitiveBundle &bundle : _trunkBundles) {
+        _phongShader->bind();
         _phongShader->setUniform("m",  bundle.model);
         _phongShader->applyMaterial(bundle.primitive.material);
         _trunk->drawVAO();

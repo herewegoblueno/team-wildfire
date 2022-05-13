@@ -61,6 +61,11 @@
              <height>15</height>
             </size>
            </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
            <property name="styleSheet">
             <string notr="true">QLabel{
     background-color: rgb(10, 140, 10);
@@ -69,7 +74,7 @@
 </string>
            </property>
            <property name="text">
-            <string>No CUDA (CPU water physics, less wind physics)</string>
+            <string>No CUDA (CPU water physics, less wind physics, no clouds)</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -664,8 +669,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>330</width>
-                <height>351</height>
+                <width>98</width>
+                <height>28</height>
                </rect>
               </property>
               <attribute name="label">
@@ -852,8 +857,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>330</width>
-                <height>351</height>
+                <width>98</width>
+                <height>28</height>
                </rect>
               </property>
               <attribute name="label">
@@ -1043,8 +1048,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>330</width>
-                <height>351</height>
+                <width>98</width>
+                <height>28</height>
                </rect>
               </property>
               <attribute name="label">
