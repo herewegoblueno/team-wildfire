@@ -39,3 +39,5 @@ assumes that Windows and Linux will run the code with CUDA, edit it if that's no
 
 Without CUDA, the simulation will still look cool, but there will be no complicated wind physics and
 convection, and there will also be no clouds. 
+
+<img src="README_and_docs_images/KILLITWITHFIRE.gif" alt="Preview" height=50/>
