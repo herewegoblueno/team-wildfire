@@ -40,4 +40,11 @@ assumes that Windows and Linux will run the code with CUDA, edit it if that's no
 Without CUDA, the simulation will still look cool, but there will be no complicated wind physics and
 convection, and there will also be no clouds. 
 
+By the way, on the Forest scene, you can hold Ctrl (or Command) or Shift and click to 
+raycast to the floor and change the temperatures of the trees around where that 
+ray hits the ground. Thanks to [this](http://www.rw-designer.com/cursor-set/charmander-1)
+ guy and [that](http://www.rw-designer.com/cursor-detail/22266) guy for the nice mouse cursors we used
+in this feature.
+
 <img src="README_and_docs_images/KILLITWITHFIRE.gif" alt="Preview" height=50/>
+
