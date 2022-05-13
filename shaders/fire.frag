@@ -36,7 +36,6 @@ void main()
 {
     vec2 temp = TexCoords - vec2(0.5);
     float f = dot(temp, temp);
-//    if(f>0.25) discard;
 
     if(Life>4.5) color = vec4(0.7, 0.35-f, 0.1, 1);
     else if(Life>4.0) color = vec4(0.8, 0.28-f, 0.07, 1);
@@ -44,11 +43,9 @@ void main()
     else if(Life>3.0) color = vec4(0.8, 0.00, 0.0, 1);
     else color = vec4(0.8, 0, 0, 1);
 
-    //For some reason this isn't working on Mac....
     float guage = (0.5*Life/5)*(0.5*Life/5);
     float w = perlin(TexCoords, 2.5, 5-Life);
     color.a = (w*0.8 + 0.2)*(1-f/(guage+0.04));
     if(f>guage+0.04) discard;
-//    color = vec4(1,1,1,1);
 
 }
