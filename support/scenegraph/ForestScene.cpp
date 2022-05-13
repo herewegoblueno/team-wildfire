@@ -231,7 +231,6 @@ void ForestScene::renderTrunksVisualizedModules() {
 void ForestScene::renderTrunks() {
     _trunk->bindVAO();
     for (PrimitiveBundle &bundle : _trunkBundles) {
-        _phongShader->bind();
         _phongShader->setUniform("m",  bundle.model);
         _phongShader->applyMaterial(bundle.primitive.material);
         _trunk->drawVAO();
