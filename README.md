@@ -26,6 +26,8 @@ Here's a shot of what it can do:
 
 <img src="README_and_docs_images/wildfire%20preview.png" alt="Preview" height=500/>
 
+[Here's a video!](https://www.youtube.com/watch?v=h3taBIWDA3U)
+
 This simulation handles heat spread through the air and through individual trees, convection,
 water evaporation and condensation and clouds, wind, combustion, and trees can eventually burn to 
 nothingness. The UI also has some useful visualization tools to view temperature fields, vector fields,
