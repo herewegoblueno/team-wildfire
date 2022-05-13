@@ -22,6 +22,7 @@ double milliseconds(T t) {
 
 __device__ double getVel(int x, int y, int z, double* u, int resolution, int dim);
 __device__ double safe_get(int x, int y, int z, double* u, int resolution);
+__device__ double safe_get_zero(int x, int y, int z, double* u, int resolution);
 __global__ void jacobi(double* x_next, double* A, double* x_now, double* b, int* xyz, int Ni, int Res, int segment);
 
 
@@ -319,11 +320,11 @@ __device__
 float getGrad(int x, int y, int z, int dim, int resolution, double cell_size, double* vals)
 {
     if(dim==0)
-        return (safe_get(x+1,y,z,vals,resolution) - safe_get(x-1,y,z,vals,resolution))/2/cell_size;
+        return (safe_get_zero(x+1,y,z,vals,resolution) - safe_get_zero(x-1,y,z,vals,resolution))/2/cell_size;
     if(dim==1)
-        return (safe_get(x,y+1,z,vals,resolution) - safe_get(x,y-1,z,vals,resolution))/2/cell_size;
+        return (safe_get_zero(x,y+1,z,vals,resolution) - safe_get_zero(x,y-1,z,vals,resolution))/2/cell_size;
     if(dim==2)
-        return (safe_get(x,y,z+1,vals,resolution) - safe_get(x,y,z-1,vals,resolution))/2/cell_size;
+        return (safe_get_zero(x,y,z+1,vals,resolution) - safe_get_zero(x,y,z-1,vals,resolution))/2/cell_size;
 }
 
 __global__
@@ -341,9 +342,9 @@ void waterKernel(double* u_xyz, int* id_xyz,  double* d_h, double* d_temp, doubl
         d_q_c2[idx] = d_q_c[idx];
         d_q_r2[idx] = d_q_r[idx];
 
-        float uc_x = (getVel(x,y,z,u_xyz,resolution,0)+getVel(x-1,y,z,u_xyz,resolution,0))*0.5*1000;
-        float uc_y = (getVel(x,y,z,u_xyz,resolution,1)+getVel(x,y-1,z,u_xyz,resolution,1))*0.5*1000;
-        float uc_z = (getVel(x,y,z,u_xyz,resolution,2)+getVel(x,y,z-1,u_xyz,resolution,2))*0.5*1000;
+        float uc_x = (getVel(x,y,z,u_xyz,resolution,0)+getVel(x-1,y,z,u_xyz,resolution,0))*0.5*700;
+        float uc_y = (getVel(x,y,z,u_xyz,resolution,1)+getVel(x,y-1,z,u_xyz,resolution,1))*0.5*700;
+        float uc_z = (getVel(x,y,z,u_xyz,resolution,2)+getVel(x,y,z-1,u_xyz,resolution,2))*0.5*700;
 
         d_q_v2[idx] -= uc_x*getGrad(x,y,z,0,resolution,cell_size,d_q_v)*dt;
         d_q_v2[idx] -= uc_y*getGrad(x,y,z,1,resolution,cell_size,d_q_v)*dt;
@@ -379,8 +380,9 @@ void waterKernel(double* u_xyz, int* id_xyz,  double* d_h, double* d_temp, doubl
         d_q_c2[idx] = d_q_c2[idx] - saturate_cmp - A_c - K_c;
         d_q_r2[idx] = A_c + K_c - E_r;
 
-        double q_vs_amb = 380.16/abs_pres*exp(17.67*ambient_temperature/(ambient_temperature+243.5));
-        d_humi[idx] = min(d_q_v2[idx],0.093)/10/q_vs_amb;
+//        double q_vs_amb = 380.16/abs_pres*exp(17.67*ambient_temperature/(ambient_temperature+243.5));
+//        d_humi[idx] = min(d_q_v2[idx],0.093)/10/q_vs_amb;
+        d_humi[idx] = d_q_v2[idx]/q_vs;
 
         if(saturate_cmp<0)
         {
@@ -557,6 +559,14 @@ __device__ double safe_get(int x, int y, int z, double* u, int resolution)
     if(x>resolution-1) x=resolution-1;
     if(y>resolution-1) y=resolution-1;
     if(z>resolution-1) z=resolution-1;
+    int index = x*resolution*resolution + y*resolution + z;
+    return u[index];
+}
+
+__device__ double safe_get_zero(int x, int y, int z, double* u, int resolution)
+{
+    if(x<0 || y<0 || z<0 || x>resolution-1 || y>resolution-1 || z>resolution-1)
+        return 0;
     int index = x*resolution*resolution + y*resolution + z;
     return u[index];
 }

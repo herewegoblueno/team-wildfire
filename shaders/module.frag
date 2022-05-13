@@ -26,6 +26,6 @@ void main(){
     }else if (propType == 1){
         //Temperature visualization, yellow to red
         float lerp = min((prop - propMin) / (propMax - propMin), 1);
-        fragColor = vec4(1, 1 - lerp, 0, 1);
+        fragColor = vec4(1, 1 - lerp, 0.0, 1);
     }
 }
