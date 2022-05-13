@@ -16,6 +16,7 @@
         <file>xmlScenes/basicScene.xml</file>
         <file>xmlScenes/twoRegions.xml</file>
         <file>xmlScenes/twoRegionsCloser.xml</file>
+        <file>xmlScenes/lessForestCover.xml</file>
     </qresource>
     <qresource prefix="/images">
         <file>images/killWithFire.png</file>

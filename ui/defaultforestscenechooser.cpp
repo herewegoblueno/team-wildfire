@@ -24,6 +24,8 @@ void DefaultForestSceneChooser::on_comboBox_currentIndexChanged(int index)
             mainWindow->currentForestXMLScene = ":/xmlScenes/xmlScenes/twoRegions.xml";
         case 2:
             mainWindow->currentForestXMLScene = ":/xmlScenes/xmlScenes/twoRegionsCloser.xml";
+        case 3:
+            mainWindow->currentForestXMLScene = ":/xmlScenes/xmlScenes/lessForestCover.xml";
     }
 
     this->hide();
