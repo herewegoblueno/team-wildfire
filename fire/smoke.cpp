@@ -1,6 +1,4 @@
 #include "support/shapes/OpenGLShape.h"
-#include "support/gl/textures/Texture2D.h"
-#include "support/gl/textures/TextureParametersBuilder.h"
 
 #include "support/gl/datatype/VAO.h"
 #include "support/gl/datatype/FBO.h"

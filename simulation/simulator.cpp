@@ -43,11 +43,12 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
     }
 
     std::vector<std::thread> threads;
-    for (int x = 0; x < gridResolution; x += jumpPerThread)
+    for (int x = 0; x < gridResolution; x += jumpPerThread){
         threads.emplace_back(&Simulator::stepThreadHeatHandler, this, grid, forest, deltaTime, gridResolution, x, x + jumpPerThread);
+    }
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
 
-
+//processWindGPU actaully handles both with and water physics
 #ifdef CUDA_FLUID
     dvec3 g_w = grid->getGlobalFField();
     double g_w3[3] = {g_w.x, g_w.y, g_w.z};
@@ -57,8 +58,9 @@ void Simulator::step(VoxelGrid *grid, Forest *forest){
                                    gridResolution, grid->cellSideLengthForGradients(), deltaTime/1000.);
 #endif
     threads.clear();
-    for (int x = 0; x < gridResolution; x += jumpPerThread)
+    for (int x = 0; x < gridResolution; x += jumpPerThread){
         threads.emplace_back(&Simulator::stepThreadWaterHandler, this, grid, deltaTime, gridResolution, x, x + jumpPerThread);
+    }
     for (auto& th : threads) th.join();  //Wait for all the threads to terminate
 
     if (forest != nullptr){ //Forest is optional
@@ -94,6 +96,9 @@ void Simulator::stepThreadWaterHandler(VoxelGrid *grid, int deltaTime, int resol
         for (int y = 0; y < resolution; y++){
             for (int z = 0; z < resolution; z++){
                 Voxel* vox = grid->getVoxel(x,y,z);
+
+                //If we've already run processWindGPU, then we can just copy in the results from that
+                //(which is both wind and water physics)
             #ifdef CUDA_FLUID
                 writeCuda2Host(vox, index);
             #else
